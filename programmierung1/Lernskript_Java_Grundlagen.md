@@ -1,14 +1,15 @@
 # Lernskript Programmierung 1 – Java-Grundlagen
 
-**Stoff:** Foliensätze 00 bis 04 (Kursmodalitäten, Einführung, Datentypen/Operatoren/Verzweigungen, Schleifen, Methoden)
-**Ziel:** Du verstehst die Konzepte **und** kannst sie selbst in Java programmieren.
+**Stoff:** Foliensätze 00 bis 04 (Kursmodalitäten, Einführung, Datentypen/Operatoren/Verzweigungen, Schleifen, Methoden)  
+**Ziel:** Du verstehst die Konzepte **und** kannst sie selbst in Java programmieren.  
 **Java-Version im Kurs:** Java 21 · **Editor:** Visual Studio Code
 
 > **So arbeitest du mit diesem Skript**
+>
 > 1. Kapitel lesen und jedes Codebeispiel **selbst abtippen** (nicht kopieren!). Programmieren lernt man mit den Fingern.
 > 2. Jedes Kapitel endet mit einem ✅ **Selbsttest**. Beantworte ihn erst ohne Hilfe, dann klapp die Lösung auf.
 > 3. Die 🛠 **Übungen** zuerst allein lösen. Getestete Musterlösungen liegen im Ordner [`beispiele/`](beispiele/).
-> 4. Wenn etwas nicht kompiliert, lies die Fehlermeldung. Kapitel 9 erklärt die häufigsten.
+> 4. Wenn etwas nicht kompiliert, lies die Fehlermeldung. Kapitel 10 erklärt die häufigsten.
 
 ---
 
@@ -57,7 +58,7 @@
 
 💡 **Warum das wichtig ist:** Alles ab Block 5 baut direkt auf den Blöcken 1 bis 4 auf, also auf diesem Skript. Wer Variablen, `if`, Schleifen und Methoden sicher beherrscht, hat den Rest viel leichter.
 
-> „Learning to make things requires to make things.“ – Thomas Dullien
+> „Learning to make things requires to make things.“ – Thomas Dullien  
 > Übersetzt: **Üben, üben, üben.** Lesen allein reicht beim Programmieren nicht.
 
 ---
@@ -351,8 +352,8 @@ Datentyp
 | **`boolean`** | – | `true`, `false` | `true` | Bedingungen, Ja/Nein |
 | **`char`** | 16 Bit | ein Unicode-Zeichen | `'f'`, `'?'` | einzelnes Zeichen |
 
-⚠️ **Suffixe beachten:** `long big = 3456789L;` und `float f = 32.5f;`. Ohne `f` ist `32.5` ein `double` und passt nicht in `float`.
-⚠️ **Anführungszeichen:** `char` verwendet einfache `'a'`, `String` doppelte `"abc"`.
+⚠️ **Suffixe beachten:** `long big = 3456789L;` und `float f = 32.5f;`. Ohne `f` ist `32.5` ein `double` und passt nicht in `float`.  
+⚠️ **Anführungszeichen:** `char` verwendet einfache `'a'`, `String` doppelte `"abc"`.  
 ℹ️ Ein `char` belegt in Java 16 Bit (UTF-16-Codeeinheit). Die Folie spricht von „UTF-8“; gemeint ist, dass Java Unicode verwendet.
 
 **Wichtige Nicht-Primitive:**
@@ -434,7 +435,7 @@ byte b = x;         // ❌ Fehler: "incompatible types: possible lossy conversio
 byte b = (byte) x;  // ✅ "Ich weiß, was ich tue"
 ```
 
-**Frage von der Folie:** *24 passt doch in ein byte, warum geht `byte b = x;` nicht?*
+**Frage von der Folie:** *24 passt doch in ein byte, warum geht `byte b = x;` nicht?*  
 ➡️ Der Compiler prüft den **Typ**, nicht den aktuellen Wert. `x` ist ein `int` und *könnte* zur Laufzeit auch 1 000 000 enthalten. Deshalb verlangt Java die explizite Bestätigung `(byte)`.
 
 ```java
@@ -634,7 +635,7 @@ double avg = (3 + 4) / 2;       // 3.0 (!) Erst wird int/int = 3 berechnet, DANN
 double avg2 = (3 + 4) / 2.0;    // 3.5 ✅
 ```
 
-**Aufgabe von der Folie:** `int z = 4 + 2 / 3 - 1;` Welchen Wert hat z?
+**Aufgabe von der Folie:** `int z = 4 + 2 / 3 - 1;` Welchen Wert hat z?  
 ➡️ `2 / 3` = `0` (Punkt vor Strich, Ganzzahldivision), dann `4 + 0 - 1` = **3**
 
 **Achtung, auch das Folienbeispiel hat diesen Bug:**
@@ -1573,6 +1574,7 @@ App.java:7: error: cannot find symbol
 Alle Lösungen sind **getestet** (Java 21) und liegen als eigene Dateien in [`beispiele/`](beispiele/). Ausführen: in den Ordner wechseln, dann `javac Datei.java` und `java Datei`.
 
 > **Vorgehen bei jeder Aufgabe (Programmier-Rezept):**
+>
 > 1. Aufgabe verstehen: Was ist **Eingabe**, was ist **Ausgabe**? Ein Beispiel von Hand durchrechnen.
 > 2. Schritte als **Pseudocode/Kommentare** notieren.
 > 3. Nötige **Variablen und Typen** festlegen.
@@ -1657,7 +1659,7 @@ for (int i = 2; i <= n; i++) {
 }
 System.out.println(n + "! = " + result);
 ```
-💡 `long`, weil schon 13! nicht mehr in einen `int` passt. `0!` ist 1 und funktioniert automatisch, weil die Schleife dann gar nicht läuft.
+💡 `long`, weil schon 13! nicht mehr in einen `int` passt. `0!` ist 1 und funktioniert automatisch, weil die Schleife dann gar nicht läuft.  
 Datei: [`beispiele/Factorial.java`](beispiele/Factorial.java)
 </details>
 
@@ -1690,7 +1692,7 @@ if (granted) {
     System.out.println("Access denied");
 }
 ```
-💡 Das **Flag-Muster**: Eine `boolean`-Variable (`granted`) merkt sich, ob etwas passiert ist, und steuert die Schleife mit.
+💡 Das **Flag-Muster**: Eine `boolean`-Variable (`granted`) merkt sich, ob etwas passiert ist, und steuert die Schleife mit.  
 Datei: [`beispiele/PasswordRetry.java`](beispiele/PasswordRetry.java)
 </details>
 
@@ -1732,7 +1734,7 @@ do {
 
 System.out.println(digits + " digits");
 ```
-💡 `do-while` statt `while`, damit auch die Eingabe `0` korrekt **1** Stelle ergibt.
+💡 `do-while` statt `while`, damit auch die Eingabe `0` korrekt **1** Stelle ergibt.  
 Datei: [`beispiele/CountDigits.java`](beispiele/CountDigits.java)
 </details>
 
