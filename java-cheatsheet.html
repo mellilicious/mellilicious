@@ -1,0 +1,1063 @@
+<title>Java CheatSheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky Themen-Navigation links, Snippet-Karten in mehrspaltigem Fluss rechts */
+:root{
+  --bg:#f3f6f7; --surface:#ffffff; --fg:#13222b; --muted:#566a75; --line:#d5dee3;
+  --accent:#c2410c; --accent-soft:#fde9dc; --code-bg:#12232d; --code-fg:#dbe7ec;
+  --k:#ff9e64; --s:#9ece6a; --c:#6f8794; --a:#7dcfff; --n:#e0af68; --tbl:#eaf0f3;
+  --f-display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --f-body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1a21; --surface:#14252e; --fg:#e4edf1; --muted:#93a7b2; --line:#26404c;
+    --accent:#ff8a4c; --accent-soft:#3a2418; --code-bg:#0a141a; --code-fg:#d3e1e8;
+    --tbl:#1a2f3a; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1a21; --surface:#14252e; --fg:#e4edf1; --muted:#93a7b2; --line:#26404c;
+  --accent:#ff8a4c; --accent-soft:#3a2418; --code-bg:#0a141a; --code-fg:#d3e1e8;
+  --tbl:#1a2f3a; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1320px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+@media(min-width:960px){.wrap{grid-template-columns:200px minmax(0,1fr);gap:32px}}
+header.top{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px}
+h1{font-family:var(--f-display);font-size:clamp(2rem,5vw,3rem);line-height:1.05;margin:0;letter-spacing:-.02em;text-wrap:balance}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);margin:6px 0 0;max-width:60ch}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+input[type=search]{font:inherit;padding:9px 12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:6px;width:min(100%,260px)}
+button{font:inherit;cursor:pointer}
+.btn{padding:9px 12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:6px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+nav{min-width:0}
+nav ul{list-style:none;margin:0;padding:0;display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
+nav a{display:block;white-space:nowrap;padding:5px 10px;border:1px solid var(--line);border-radius:999px;color:var(--fg);text-decoration:none;font-size:13px;background:var(--surface)}
+nav a:hover{border-color:var(--accent);color:var(--accent)}
+@media(min-width:960px){
+  nav{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);overflow-y:auto}
+  nav ul{flex-direction:column;gap:0;overflow:visible}
+  nav a{border:0;border-radius:4px;border-left:2px solid var(--line);border-top-left-radius:0;border-bottom-left-radius:0;background:transparent;padding:5px 10px}
+  nav a:hover{border-left-color:var(--accent);background:var(--accent-soft)}
+  nav .grp{margin:14px 0 4px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+}
+nav .grp{display:none}
+@media(min-width:960px){nav .grp{display:block}}
+main{min-width:0}
+section{margin-bottom:40px;scroll-margin-top:16px}
+h2{font-family:var(--f-display);font-size:1.6rem;margin:0 0 14px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h2 small{font-family:var(--f-body);font-size:12px;font-weight:500;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:4px;letter-spacing:.04em;text-transform:uppercase}
+.grid{columns:2 380px;column-gap:16px}
+.blk{break-inside:avoid;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px;margin:0 0 16px;min-width:0}
+.blk h3{margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.blk p{margin:0 0 8px}
+.blk p:last-child{margin-bottom:0}
+.code{position:relative;margin:0 0 8px}
+.code:last-child{margin-bottom:0}
+pre{margin:0;background:var(--code-bg);color:var(--code-fg);border-radius:6px;padding:12px 14px;overflow-x:auto;font-family:var(--f-mono);font-size:12.5px;line-height:1.6;tab-size:4}
+pre code{font:inherit}
+.cp{position:absolute;top:6px;right:6px;font-size:11px;padding:2px 8px;border-radius:4px;border:1px solid #3a5564;background:#1b3340;color:#cfe0e8;opacity:0}
+.code:hover .cp,.cp:focus-visible{opacity:1}
+@media(hover:none){.cp{opacity:.85}}
+.k{color:var(--k)}.s{color:var(--s)}.c{color:var(--c);font-style:italic}.a{color:var(--a)}.n{color:var(--n)}
+code.i{font-family:var(--f-mono);font-size:.88em;background:var(--tbl);padding:1px 5px;border-radius:4px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--tbl);font-weight:600;white-space:nowrap}
+td code{font-family:var(--f-mono);font-size:12px}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:8px 12px;border-radius:0 6px 6px 0;font-size:13.5px;margin:0 0 8px}
+.empty{color:var(--muted);padding:24px 0}
+.hide{display:none!important}
+footer{grid-column:1/-1;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+</style>
+<div class="wrap">
+<header class="top">
+  <div>
+    <h1>Java <span>CheatSheet</span></h1>
+    <p class="sub">Kompakte Referenz zum Coden: Sprache, Collections, Streams, I/O, JDBC und Spring Boot. Code-Blöcke lassen sich per Klick kopieren.</p>
+  </div>
+  <div class="tools">
+    <input type="search" id="q" placeholder="Suchen, z. B. stream, Map, @Autowired" aria-label="Cheatsheet durchsuchen">
+    <button class="btn" id="theme" type="button" aria-label="Farbschema wechseln">Hell / Dunkel</button>
+  </div>
+</header>
+<nav aria-label="Themen"><ul id="nav"></ul></nav>
+<main id="main">
+
+<section id="grundgeruest" data-grp="Sprache"><h2>Grundgerüst</h2><div class="grid">
+<div class="blk"><h3>Hello World</h3>
+<pre><code>public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hallo Welt");
+    }
+}</code></pre></div>
+<div class="blk"><h3>Kompilieren &amp; starten</h3>
+<pre data-lang="sh"><code>javac Main.java      # kompilieren
+java Main            # ausführen
+java Main.java       # Single-File direkt starten (ab Java 11)
+jshell               # interaktive Konsole</code></pre></div>
+</div></section>
+
+<section id="datentypen" data-grp="Sprache"><h2>Datentypen</h2><div class="grid">
+<div class="blk"><h3>Primitive Typen</h3><div class="tw"><table>
+<tr><th>Typ</th><th>Größe</th><th>Beispiel</th></tr>
+<tr><td><code>byte</code></td><td>8 Bit</td><td><code>byte b = 10;</code></td></tr>
+<tr><td><code>short</code></td><td>16 Bit</td><td><code>short s = 1000;</code></td></tr>
+<tr><td><code>int</code></td><td>32 Bit</td><td><code>int i = 42;</code></td></tr>
+<tr><td><code>long</code></td><td>64 Bit</td><td><code>long l = 10_000L;</code></td></tr>
+<tr><td><code>float</code></td><td>32 Bit</td><td><code>float f = 1.5f;</code></td></tr>
+<tr><td><code>double</code></td><td>64 Bit</td><td><code>double d = 3.14;</code></td></tr>
+<tr><td><code>char</code></td><td>16 Bit</td><td><code>char c = 'A';</code></td></tr>
+<tr><td><code>boolean</code></td><td>1 Bit</td><td><code>true / false</code></td></tr>
+</table></div></div>
+<div class="blk"><h3>Umwandlung &amp; var</h3>
+<p>Wrapper-Klassen: <code class="i">Integer</code>, <code class="i">Long</code>, <code class="i">Double</code>, <code class="i">Boolean</code>, <code class="i">Character</code> (Autoboxing).</p>
+<pre><code>var x = 10;                        // Typinferenz (ab Java 10)
+int n = (int) 3.9;                 // Cast -> 3
+int p = Integer.parseInt("42");
+double d = Double.parseDouble("1.5");
+String s = String.valueOf(42);
+long big = Long.MAX_VALUE;</code></pre></div>
+</div></section>
+
+<section id="operatoren" data-grp="Sprache"><h2>Operatoren</h2><div class="grid">
+<div class="blk"><h3>Übersicht</h3>
+<pre><code>+ - * / %           // Arithmetik (7 / 2 == 3 bei int)
+++ --  += -= *= /=
+== != &lt; &gt; &lt;= &gt;=
+&amp;&amp; || !             // logisch (Short-Circuit)
+&amp; | ^ ~ &lt;&lt; &gt;&gt; &gt;&gt;&gt;   // bitweise
+cond ? a : b         // ternär
+obj instanceof Foo f // Pattern Matching</code></pre></div>
+</div></section>
+
+<section id="kontrollfluss" data-grp="Sprache"><h2>Kontrollfluss</h2><div class="grid">
+<div class="blk"><h3>if / Schleifen</h3>
+<pre><code>if (x &gt; 0) { } else if (x == 0) { } else { }
+
+for (int i = 0; i &lt; 10; i++) { }
+for (String s : list) { }      // for-each
+while (cond) { }
+do { } while (cond);
+break; continue;
+outer: for (...) { break outer; }</code></pre></div>
+<div class="blk"><h3>switch-Expression (ab Java 14)</h3>
+<pre><code>String name = switch (day) {
+    case 1, 7 -&gt; "Wochenende";
+    case 2, 3, 4, 5, 6 -&gt; "Werktag";
+    default -&gt; "?";
+};</code></pre></div>
+</div></section>
+
+<section id="strings" data-grp="Sprache"><h2>Strings</h2><div class="grid">
+<div class="blk"><h3>Wichtige Methoden</h3>
+<pre><code>String s = "Hallo";
+s.length();  s.charAt(0);  s.substring(1, 3);
+s.indexOf("l");  s.contains("al");  s.replace("a", "e");
+s.toUpperCase();  s.toLowerCase();  s.trim();  s.strip();
+s.split(",");  s.isEmpty();  s.isBlank();
+s.equals("x");  s.equalsIgnoreCase("X");  s.compareTo("x");
+String.join(", ", list);
+"a".repeat(3);
+String.format("%s ist %d Jahre, %.2f m", name, age, h);</code></pre>
+<p class="note">Strings immer mit <code class="i">equals()</code> vergleichen, nie mit <code class="i">==</code>.</p></div>
+<div class="blk"><h3>Textblock &amp; StringBuilder</h3>
+<pre><code>String json = """
+    { "a": 1 }
+    """;                              // ab Java 15
+
+StringBuilder sb = new StringBuilder();
+sb.append("a").append(1).reverse().toString();</code></pre></div>
+</div></section>
+
+<section id="arrays" data-grp="Sprache"><h2>Arrays</h2><div class="grid">
+<div class="blk"><h3>Anlegen &amp; Arrays-Helfer</h3>
+<pre><code>int[] a = new int[5];
+int[] b = {1, 2, 3};
+int[][] m = new int[3][3];
+a.length;
+
+Arrays.sort(b);
+Arrays.toString(b);
+Arrays.fill(a, 0);
+Arrays.copyOf(b, 10);
+Arrays.asList(1, 2, 3);
+Arrays.stream(b).sum();</code></pre></div>
+</div></section>
+
+<section id="oop" data-grp="Sprache"><h2>Klassen &amp; OOP</h2><div class="grid">
+<div class="blk"><h3>Klasse mit equals / hashCode</h3>
+<pre><code>public class Person {
+    private String name;
+    private int age;
+    private static int count = 0;
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+        count++;
+    }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    @Override
+    public String toString() { return name + " (" + age + ")"; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Person p)) return false;
+        return age == p.age &amp;&amp; Objects.equals(name, p.name);
+    }
+
+    @Override
+    public int hashCode() { return Objects.hash(name, age); }
+}</code></pre></div>
+<div class="blk"><h3>Vererbung, Interface, abstract</h3>
+<pre><code>public class Student extends Person implements Lernbar {
+    public Student(String n, int a) { super(n, a); }
+    @Override public void lernen() { }
+}
+
+interface Lernbar {
+    void lernen();
+    default void pause() { }     // default-Methode
+    static void hilfe() { }
+}
+
+abstract class Tier {
+    abstract void laut();
+}</code></pre></div>
+<div class="blk"><h3>Zugriffsmodifizierer</h3><div class="tw"><table>
+<tr><th>Modifier</th><th>Klasse</th><th>Package</th><th>Subklasse</th><th>Überall</th></tr>
+<tr><td><code>private</code></td><td>✔</td><td></td><td></td><td></td></tr>
+<tr><td><i>default</i></td><td>✔</td><td>✔</td><td></td><td></td></tr>
+<tr><td><code>protected</code></td><td>✔</td><td>✔</td><td>✔</td><td></td></tr>
+<tr><td><code>public</code></td><td>✔</td><td>✔</td><td>✔</td><td>✔</td></tr>
+</table></div>
+<p><code class="i">final</code>: nicht änderbar, nicht vererbbar, nicht überschreibbar. <code class="i">static</code>: gehört zur Klasse.</p></div>
+<div class="blk"><h3>Enum, Record, sealed</h3>
+<pre><code>enum Farbe { ROT, GRUEN, BLAU }
+Farbe.valueOf("ROT");  Farbe.values();
+
+record Punkt(int x, int y) { }   // ab Java 16, immutable
+Punkt p = new Punkt(1, 2);  p.x();
+
+sealed interface Form permits Kreis, Rechteck { }</code></pre></div>
+</div></section>
+
+<section id="collections" data-grp="Standardbibliothek"><h2>Collections</h2><div class="grid">
+<div class="blk"><h3>List &amp; Set</h3>
+<pre><code>List&lt;String&gt; list = new ArrayList&lt;&gt;();
+list.add("a"); list.get(0); list.set(0, "b");
+list.remove(0); list.size(); list.contains("a");
+List&lt;Integer&gt; imm = List.of(1, 2, 3);   // unveränderlich
+
+Set&lt;String&gt; set = new HashSet&lt;&gt;();
+// LinkedHashSet: Reihenfolge, TreeSet: sortiert</code></pre></div>
+<div class="blk"><h3>Map</h3>
+<pre><code>Map&lt;String, Integer&gt; map = new HashMap&lt;&gt;();
+map.put("a", 1);
+map.get("a");
+map.getOrDefault("x", 0);
+map.putIfAbsent("b", 2);
+map.merge("a", 1, Integer::sum);
+map.computeIfAbsent("k", k -&gt; new ArrayList&lt;&gt;());
+map.containsKey("a");
+for (var e : map.entrySet()) {
+    e.getKey(); e.getValue();
+}</code></pre></div>
+<div class="blk"><h3>Queue, Deque, Sortieren</h3>
+<pre><code>Queue&lt;Integer&gt; q = new LinkedList&lt;&gt;();
+q.offer(1); q.poll(); q.peek();
+Deque&lt;Integer&gt; st = new ArrayDeque&lt;&gt;();
+st.push(1); st.pop(); st.peek();
+PriorityQueue&lt;Integer&gt; pq = new PriorityQueue&lt;&gt;();
+
+Collections.sort(list);
+Collections.reverse(list);
+Collections.max(list);
+list.sort(Comparator.comparing(Person::getName)
+                    .thenComparing(Person::getAge));</code></pre></div>
+<div class="blk"><h3>Welche Struktur wann?</h3><div class="tw"><table>
+<tr><th>Struktur</th><th>Zugriff</th><th>Einfügen</th><th>Hinweis</th></tr>
+<tr><td><code>ArrayList</code></td><td>O(1)</td><td>O(n)</td><td>Standard-Liste</td></tr>
+<tr><td><code>LinkedList</code></td><td>O(n)</td><td>O(1)</td><td>Queue/Deque</td></tr>
+<tr><td><code>HashMap/HashSet</code></td><td>O(1)</td><td>O(1)</td><td>unsortiert</td></tr>
+<tr><td><code>TreeMap/TreeSet</code></td><td>O(log n)</td><td>O(log n)</td><td>sortiert</td></tr>
+</table></div></div>
+</div></section>
+
+<section id="generics" data-grp="Standardbibliothek"><h2>Generics</h2><div class="grid">
+<div class="blk"><h3>Klassen, Methoden, Wildcards</h3>
+<pre><code>class Box&lt;T&gt; {
+    private T inhalt;
+    public T get() { return inhalt; }
+}
+
+static &lt;T extends Comparable&lt;T&gt;&gt; T max(T a, T b) {
+    return a.compareTo(b) &gt; 0 ? a : b;
+}
+
+List&lt;? extends Number&gt; l1;   // lesen
+List&lt;? super Integer&gt; l2;    // schreiben</code></pre></div>
+</div></section>
+
+<section id="streams" data-grp="Standardbibliothek"><h2>Lambdas &amp; Streams</h2><div class="grid">
+<div class="blk"><h3>Funktionale Interfaces</h3>
+<pre><code>Runnable r = () -&gt; System.out.println("hi");
+Function&lt;Integer, Integer&gt; sq = x -&gt; x * x;
+BiFunction&lt;Integer, Integer, Integer&gt; add = (a, b) -&gt; a + b;
+Predicate&lt;String&gt; leer = String::isEmpty;
+Consumer&lt;String&gt; out = System.out::println;
+Supplier&lt;Double&gt; rnd = Math::random;</code></pre></div>
+<div class="blk"><h3>Stream-Pipeline</h3>
+<pre><code>List&lt;String&gt; result = list.stream()
+    .filter(s -&gt; s.length() &gt; 2)
+    .map(String::toUpperCase)
+    .sorted()
+    .distinct()
+    .limit(10)
+    .toList();                  // ab Java 16
+
+int sum = nums.stream().mapToInt(Integer::intValue).sum();
+Optional&lt;Integer&gt; max = nums.stream().max(Integer::compare);
+boolean any = list.stream().anyMatch(s -&gt; s.startsWith("a"));
+IntStream.range(0, 5).forEach(System.out::println);</code></pre></div>
+<div class="blk"><h3>Collectors</h3>
+<pre><code>Map&lt;Integer, List&lt;String&gt;&gt; gr = list.stream()
+    .collect(Collectors.groupingBy(String::length));
+String joined = list.stream()
+    .collect(Collectors.joining(", "));
+Map&lt;String, Long&gt; cnt = list.stream()
+    .collect(Collectors.groupingBy(s -&gt; s, Collectors.counting()));
+Map&lt;Boolean, List&lt;Integer&gt;&gt; parts = nums.stream()
+    .collect(Collectors.partitioningBy(n -&gt; n % 2 == 0));</code></pre></div>
+</div></section>
+
+<section id="optional" data-grp="Standardbibliothek"><h2>Optional</h2><div class="grid">
+<div class="blk"><h3>Verwenden statt null</h3>
+<pre><code>Optional&lt;String&gt; o = Optional.of("x");   // ofNullable(...) / empty()
+o.isPresent();  o.isEmpty();
+o.orElse("default");
+o.orElseGet(() -&gt; "x");
+o.orElseThrow();
+o.map(String::length);
+o.ifPresent(System.out::println);</code></pre></div>
+</div></section>
+
+<section id="exceptions" data-grp="Standardbibliothek"><h2>Exceptions</h2><div class="grid">
+<div class="blk"><h3>try / catch / finally</h3>
+<pre><code>try {
+    int x = Integer.parseInt("abc");
+} catch (NumberFormatException | NullPointerException e) {
+    e.printStackTrace();
+} finally {
+    // läuft immer
+}
+
+// try-with-resources schließt automatisch
+try (var br = new BufferedReader(new FileReader("f.txt"))) {
+    br.readLine();
+} catch (IOException e) { }</code></pre></div>
+<div class="blk"><h3>Eigene Exception</h3>
+<pre><code>throw new IllegalArgumentException("Ungültig");
+
+class MeineException extends Exception {
+    MeineException(String msg) { super(msg); }
+}
+void foo() throws MeineException { }</code></pre>
+<p><b>Checked:</b> <code class="i">IOException</code>, <code class="i">SQLException</code> (müssen behandelt werden). <b>Unchecked:</b> <code class="i">RuntimeException</code>, <code class="i">NullPointerException</code>, <code class="i">IllegalArgumentException</code>.</p></div>
+</div></section>
+
+<section id="io" data-grp="Standardbibliothek"><h2>Dateien &amp; I/O</h2><div class="grid">
+<div class="blk"><h3>NIO Files</h3>
+<pre><code>Path p = Path.of("datei.txt");
+String text = Files.readString(p);
+List&lt;String&gt; lines = Files.readAllLines(p);
+Files.writeString(p, "Inhalt");
+Files.write(p, lines, StandardOpenOption.APPEND);
+Files.exists(p);  Files.delete(p);
+try (Stream&lt;String&gt; s = Files.lines(p)) { }</code></pre></div>
+<div class="blk"><h3>Konsole lesen</h3>
+<pre><code>Scanner sc = new Scanner(System.in);
+String line = sc.nextLine();
+int n = sc.nextInt();</code></pre></div>
+</div></section>
+
+<section id="threads" data-grp="Standardbibliothek"><h2>Nebenläufigkeit</h2><div class="grid">
+<div class="blk"><h3>Threads &amp; Executor</h3>
+<pre><code>Thread t = new Thread(() -&gt; System.out.println("Thread"));
+t.start();  t.join();
+
+ExecutorService ex = Executors.newFixedThreadPool(4);
+Future&lt;Integer&gt; f = ex.submit(() -&gt; 42);
+f.get();
+ex.shutdown();
+
+Thread.startVirtualThread(() -&gt; { });   // ab Java 21</code></pre></div>
+<div class="blk"><h3>CompletableFuture &amp; Sync</h3>
+<pre><code>CompletableFuture.supplyAsync(() -&gt; "a")
+    .thenApply(String::toUpperCase)
+    .thenAccept(System.out::println);
+
+synchronized (lock) { }
+AtomicInteger ai = new AtomicInteger();
+ai.incrementAndGet();
+var chm = new ConcurrentHashMap&lt;String, Integer&gt;();</code></pre></div>
+</div></section>
+
+<section id="zeit" data-grp="Standardbibliothek"><h2>Datum &amp; Zeit</h2><div class="grid">
+<div class="blk"><h3>java.time</h3>
+<pre><code>LocalDate d = LocalDate.now();
+LocalDateTime dt = LocalDateTime.of(2025, 1, 31, 12, 0);
+d.plusDays(5);  d.getDayOfWeek();
+ChronoUnit.DAYS.between(d1, d2);
+Duration.ofMinutes(90);
+d.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+LocalDate.parse("2025-01-31");</code></pre></div>
+<div class="blk"><h3>Math &amp; Utilities</h3>
+<pre><code>Math.max(a, b); Math.min(a, b); Math.abs(x);
+Math.pow(2, 3); Math.sqrt(9); Math.round(2.5);
+Math.floor(2.7); Math.ceil(2.1);
+new Random().nextInt(100);
+ThreadLocalRandom.current().nextInt(1, 7);
+Objects.equals(a, b); Objects.requireNonNull(x);
+System.currentTimeMillis(); System.nanoTime();</code></pre></div>
+</div></section>
+
+<section id="patterns" data-grp="Standardbibliothek"><h2>Annotationen &amp; Patterns</h2><div class="grid">
+<div class="blk"><h3>Eingebaute Annotationen</h3>
+<p><code class="i">@Override</code> <code class="i">@Deprecated</code> <code class="i">@FunctionalInterface</code> <code class="i">@SuppressWarnings("unchecked")</code> <code class="i">@SafeVarargs</code></p></div>
+<div class="blk"><h3>Singleton, Builder, Varargs</h3>
+<pre><code>public enum Singleton { INSTANCE; }
+
+Person p = new Person.Builder().name("A").age(3).build();
+
+static int sum(int... n) { return Arrays.stream(n).sum(); }</code></pre></div>
+<div class="blk"><h3>Pattern Matching für switch (ab Java 21)</h3>
+<pre><code>String s = switch (obj) {
+    case Integer i when i &gt; 10 -&gt; "große Zahl";
+    case Integer i -&gt; "Zahl";
+    case String str -&gt; "Text " + str;
+    case null -&gt; "null";
+    default -&gt; "anderes";
+};</code></pre></div>
+</div></section>
+<section id="jdbc" data-grp="Datenbank &amp; Spring"><h2>JDBC <small>Datenbank</small></h2><div class="grid">
+<div class="blk"><h3>Verbindung &amp; Abfrage</h3>
+<pre><code>String url = "jdbc:postgresql://localhost:5432/shop";
+
+try (Connection con = DriverManager.getConnection(url, "user", "pw");
+     PreparedStatement ps = con.prepareStatement(
+         "SELECT id, name, preis FROM produkt WHERE preis &gt; ?")) {
+
+    ps.setBigDecimal(1, new BigDecimal("9.99"));
+
+    try (ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+            long id = rs.getLong("id");
+            String name = rs.getString("name");
+            BigDecimal preis = rs.getBigDecimal("preis");
+        }
+    }
+} catch (SQLException e) {
+    throw new RuntimeException(e);
+}</code></pre>
+<p class="note">Immer <code class="i">PreparedStatement</code> mit <code class="i">?</code>-Platzhaltern nutzen, nie Werte per String-Konkatenation in SQL einbauen (SQL-Injection).</p></div>
+
+<div class="blk"><h3>INSERT, UPDATE, DELETE</h3>
+<pre><code>String sql = "INSERT INTO produkt (name, preis) VALUES (?, ?)";
+try (PreparedStatement ps = con.prepareStatement(
+        sql, Statement.RETURN_GENERATED_KEYS)) {
+    ps.setString(1, "Tasse");
+    ps.setBigDecimal(2, new BigDecimal("7.50"));
+    int rows = ps.executeUpdate();          // Anzahl betroffener Zeilen
+
+    try (ResultSet keys = ps.getGeneratedKeys()) {
+        if (keys.next()) { long id = keys.getLong(1); }
+    }
+}</code></pre></div>
+
+<div class="blk"><h3>Transaktionen</h3>
+<pre><code>con.setAutoCommit(false);
+try {
+    // mehrere Statements ausführen
+    con.commit();
+} catch (SQLException e) {
+    con.rollback();
+    throw e;
+} finally {
+    con.setAutoCommit(true);
+}</code></pre></div>
+
+<div class="blk"><h3>Batch</h3>
+<pre><code>try (PreparedStatement ps = con.prepareStatement(
+        "INSERT INTO log (msg) VALUES (?)")) {
+    for (String m : messages) {
+        ps.setString(1, m);
+        ps.addBatch();
+    }
+    int[] counts = ps.executeBatch();
+}</code></pre></div>
+
+<div class="blk"><h3>Typ-Mapping</h3><div class="tw"><table>
+<tr><th>SQL</th><th>Java</th><th>Lesen</th></tr>
+<tr><td><code>VARCHAR / TEXT</code></td><td><code>String</code></td><td><code>getString</code></td></tr>
+<tr><td><code>INTEGER</code></td><td><code>int</code></td><td><code>getInt</code></td></tr>
+<tr><td><code>BIGINT</code></td><td><code>long</code></td><td><code>getLong</code></td></tr>
+<tr><td><code>DECIMAL / NUMERIC</code></td><td><code>BigDecimal</code></td><td><code>getBigDecimal</code></td></tr>
+<tr><td><code>BOOLEAN</code></td><td><code>boolean</code></td><td><code>getBoolean</code></td></tr>
+<tr><td><code>DATE</code></td><td><code>LocalDate</code></td><td><code>getObject(c, LocalDate.class)</code></td></tr>
+<tr><td><code>TIMESTAMP</code></td><td><code>LocalDateTime</code></td><td><code>getObject(c, LocalDateTime.class)</code></td></tr>
+</table></div>
+<p>NULL prüfen: <code class="i">rs.wasNull()</code> nach <code class="i">getInt</code>, oder <code class="i">getObject(c, Integer.class)</code>.</p></div>
+
+<div class="blk"><h3>Gängige JDBC-URLs</h3>
+<pre data-lang="sh"><code>jdbc:postgresql://host:5432/db
+jdbc:mysql://host:3306/db
+jdbc:mariadb://host:3306/db
+jdbc:sqlite:datei.db
+jdbc:h2:mem:testdb          # In-Memory
+jdbc:sqlserver://host:1433;databaseName=db</code></pre></div>
+
+<div class="blk"><h3>Connection-Pool (HikariCP)</h3>
+<pre><code>HikariConfig cfg = new HikariConfig();
+cfg.setJdbcUrl("jdbc:postgresql://localhost/shop");
+cfg.setUsername("user");
+cfg.setPassword("pw");
+cfg.setMaximumPoolSize(10);
+
+try (HikariDataSource ds = new HikariDataSource(cfg);
+     Connection con = ds.getConnection()) {
+    // Verbindung kommt aus dem Pool, close() gibt sie zurück
+}</code></pre></div>
+
+<div class="blk"><h3>Einfaches DAO</h3>
+<pre><code>public class ProduktDao {
+    private final DataSource ds;
+    public ProduktDao(DataSource ds) { this.ds = ds; }
+
+    public Optional&lt;Produkt&gt; findById(long id) throws SQLException {
+        String sql = "SELECT id, name, preis FROM produkt WHERE id = ?";
+        try (Connection con = ds.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next()
+                    ? Optional.of(new Produkt(rs.getLong("id"),
+                                              rs.getString("name"),
+                                              rs.getBigDecimal("preis")))
+                    : Optional.empty();
+            }
+        }
+    }
+}</code></pre></div>
+</div></section>
+
+<section id="spring-basics" data-grp="Datenbank &amp; Spring"><h2>Spring Boot <small>Grundlagen</small></h2><div class="grid">
+<div class="blk"><h3>Projektstart</h3>
+<pre><code>@SpringBootApplication
+public class App {
+    public static void main(String[] args) {
+        SpringApplication.run(App.class, args);
+    }
+}</code></pre>
+<pre data-lang="sh"><code>mvn spring-boot:run
+./gradlew bootRun
+java -jar target/app.jar --server.port=9090</code></pre>
+<p>Projekte erzeugen: <code class="i">start.spring.io</code></p></div>
+
+<div class="blk"><h3>Wichtige Annotationen</h3><div class="tw"><table>
+<tr><th>Annotation</th><th>Bedeutung</th></tr>
+<tr><td><code>@SpringBootApplication</code></td><td>Konfiguration + Auto-Config + Component-Scan</td></tr>
+<tr><td><code>@Component</code></td><td>Allgemeine Bean</td></tr>
+<tr><td><code>@Service</code></td><td>Geschäftslogik</td></tr>
+<tr><td><code>@Repository</code></td><td>Datenzugriff (übersetzt DB-Exceptions)</td></tr>
+<tr><td><code>@RestController</code></td><td>REST-Controller, Rückgabe als JSON</td></tr>
+<tr><td><code>@Controller</code></td><td>MVC-Controller (Views)</td></tr>
+<tr><td><code>@Configuration</code></td><td>Klasse mit <code>@Bean</code>-Methoden</td></tr>
+<tr><td><code>@Bean</code></td><td>Methode liefert eine Bean</td></tr>
+<tr><td><code>@Autowired</code></td><td>Injektion (besser: Konstruktor)</td></tr>
+<tr><td><code>@Value("${key}")</code></td><td>Wert aus Konfiguration</td></tr>
+<tr><td><code>@Profile("dev")</code></td><td>Bean nur in diesem Profil</td></tr>
+<tr><td><code>@Transactional</code></td><td>Methode läuft in Transaktion</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Dependency Injection</h3>
+<pre><code>@Service
+public class BestellService {
+    private final ProduktRepository repo;
+
+    // Konstruktor-Injektion, @Autowired ist bei einem Konstruktor optional
+    public BestellService(ProduktRepository repo) {
+        this.repo = repo;
+    }
+}
+
+@Configuration
+public class AppConfig {
+    @Bean
+    public Clock clock() { return Clock.systemUTC(); }
+}</code></pre></div>
+
+<div class="blk"><h3>Konfiguration (application.yml)</h3>
+<pre data-lang="sh"><code>server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/shop
+    username: user
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate       # none | validate | update | create
+    show-sql: false
+  profiles:
+    active: dev
+
+app:
+  mail-from: shop@example.com</code></pre>
+<pre><code>@Value("${app.mail-from}") private String from;
+
+@ConfigurationProperties(prefix = "app")
+public record AppProps(String mailFrom) { }</code></pre></div>
+</div></section>
+
+<section id="spring-rest" data-grp="Datenbank &amp; Spring"><h2>Spring Web <small>REST</small></h2><div class="grid">
+<div class="blk"><h3>REST-Controller</h3>
+<pre><code>@RestController
+@RequestMapping("/api/produkte")
+public class ProduktController {
+    private final ProduktService service;
+    public ProduktController(ProduktService service) { this.service = service; }
+
+    @GetMapping
+    public List&lt;Produkt&gt; alle() { return service.alle(); }
+
+    @GetMapping("/{id}")
+    public Produkt eins(@PathVariable Long id) { return service.finde(id); }
+
+    @GetMapping("/suche")
+    public List&lt;Produkt&gt; suche(@RequestParam String q,
+                                @RequestParam(defaultValue = "0") int seite) { ... }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Produkt neu(@Valid @RequestBody ProduktDto dto) { return service.anlegen(dto); }
+
+    @PutMapping("/{id}")
+    public Produkt aendern(@PathVariable Long id, @Valid @RequestBody ProduktDto dto) { ... }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void loeschen(@PathVariable Long id) { service.loesche(id); }
+}</code></pre></div>
+
+<div class="blk"><h3>ResponseEntity</h3>
+<pre><code>@GetMapping("/{id}")
+public ResponseEntity&lt;Produkt&gt; eins(@PathVariable Long id) {
+    return service.finde(id)
+        .map(ResponseEntity::ok)
+        .orElse(ResponseEntity.notFound().build());
+}
+
+@PostMapping
+public ResponseEntity&lt;Produkt&gt; neu(@RequestBody Produkt p) {
+    Produkt saved = service.speichern(p);
+    URI uri = URI.create("/api/produkte/" + saved.getId());
+    return ResponseEntity.created(uri).body(saved);
+}</code></pre></div>
+
+<div class="blk"><h3>Validierung</h3>
+<pre><code>public record ProduktDto(
+    @NotBlank String name,
+    @NotNull @Positive BigDecimal preis,
+    @Size(max = 200) String beschreibung,
+    @Email String kontakt
+) { }</code></pre>
+<p>Weitere: <code class="i">@Min</code> <code class="i">@Max</code> <code class="i">@Pattern</code> <code class="i">@NotEmpty</code> <code class="i">@Past</code> <code class="i">@Future</code></p></div>
+
+<div class="blk"><h3>Globale Fehlerbehandlung</h3>
+<pre><code>@RestControllerAdvice
+public class FehlerHandler {
+
+    @ExceptionHandler(NichtGefundenException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map&lt;String, String&gt; nichtGefunden(NichtGefundenException e) {
+        return Map.of("fehler", e.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map&lt;String, String&gt; ungueltig(MethodArgumentNotValidException e) {
+        return e.getBindingResult().getFieldErrors().stream()
+            .collect(Collectors.toMap(FieldError::getField,
+                                      FieldError::getDefaultMessage));
+    }
+}</code></pre></div>
+
+<div class="blk"><h3>HTTP-Status</h3><div class="tw"><table>
+<tr><th>Code</th><th>Bedeutung</th><th>Typisch für</th></tr>
+<tr><td><code>200</code></td><td>OK</td><td>GET, PUT</td></tr>
+<tr><td><code>201</code></td><td>Created</td><td>POST</td></tr>
+<tr><td><code>204</code></td><td>No Content</td><td>DELETE</td></tr>
+<tr><td><code>400</code></td><td>Bad Request</td><td>Validierung</td></tr>
+<tr><td><code>401 / 403</code></td><td>Nicht angemeldet / verboten</td><td>Security</td></tr>
+<tr><td><code>404</code></td><td>Not Found</td><td>ID unbekannt</td></tr>
+<tr><td><code>409</code></td><td>Conflict</td><td>Duplikat</td></tr>
+<tr><td><code>500</code></td><td>Server Error</td><td>Unerwarteter Fehler</td></tr>
+</table></div></div>
+</div></section>
+
+<section id="spring-data" data-grp="Datenbank &amp; Spring"><h2>Spring Data JPA <small>Persistenz</small></h2><div class="grid">
+<div class="blk"><h3>Entity</h3>
+<pre><code>@Entity
+@Table(name = "produkt")
+public class Produkt {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 100)
+    private String name;
+
+    private BigDecimal preis;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "kategorie_id")
+    private Kategorie kategorie;
+
+    @OneToMany(mappedBy = "produkt", cascade = CascadeType.ALL)
+    private List&lt;Bewertung&gt; bewertungen = new ArrayList&lt;&gt;();
+
+    protected Produkt() { }          // JPA braucht einen Default-Konstruktor
+}</code></pre></div>
+
+<div class="blk"><h3>Repository</h3>
+<pre><code>public interface ProduktRepository extends JpaRepository&lt;Produkt, Long&gt; {
+
+    List&lt;Produkt&gt; findByName(String name);
+    List&lt;Produkt&gt; findByPreisLessThanOrderByPreisAsc(BigDecimal max);
+    Optional&lt;Produkt&gt; findFirstByNameContainingIgnoreCase(String teil);
+    boolean existsByName(String name);
+    long countByKategorie(Kategorie k);
+
+    @Query("SELECT p FROM Produkt p WHERE p.preis BETWEEN :von AND :bis")
+    List&lt;Produkt&gt; imPreisbereich(@Param("von") BigDecimal von,
+                                  @Param("bis") BigDecimal bis);
+
+    @Query(value = "SELECT * FROM produkt WHERE name ILIKE ?1",
+           nativeQuery = true)
+    List&lt;Produkt&gt; sucheNativ(String muster);
+
+    Page&lt;Produkt&gt; findAll(Pageable pageable);
+}</code></pre></div>
+
+<div class="blk"><h3>Standardmethoden</h3>
+<pre><code>repo.save(p);                 // INSERT oder UPDATE
+repo.findById(1L);            // Optional
+repo.findAll();
+repo.existsById(1L);
+repo.deleteById(1L);
+repo.count();
+
+Pageable pg = PageRequest.of(0, 20, Sort.by("name").ascending());
+Page&lt;Produkt&gt; seite = repo.findAll(pg);
+seite.getContent();  seite.getTotalElements();</code></pre></div>
+
+<div class="blk"><h3>Transaktionen im Service</h3>
+<pre><code>@Service
+public class BestellService {
+
+    @Transactional
+    public void bestellen(Long produktId, int menge) {
+        // alles oder nichts; RuntimeException löst Rollback aus
+    }
+
+    @Transactional(readOnly = true)
+    public List&lt;Produkt&gt; alle() { return repo.findAll(); }
+}</code></pre></div>
+
+<div class="blk"><h3>JdbcTemplate (ohne JPA)</h3>
+<pre><code>@Repository
+public class ProduktJdbcRepo {
+    private final JdbcTemplate jdbc;
+    public ProduktJdbcRepo(JdbcTemplate jdbc) { this.jdbc = jdbc; }
+
+    public List&lt;Produkt&gt; alle() {
+        return jdbc.query("SELECT id, name, preis FROM produkt",
+            (rs, i) -&gt; new Produkt(rs.getLong("id"),
+                                   rs.getString("name"),
+                                   rs.getBigDecimal("preis")));
+    }
+
+    public int neu(String name, BigDecimal preis) {
+        return jdbc.update(
+            "INSERT INTO produkt (name, preis) VALUES (?, ?)", name, preis);
+    }
+}</code></pre></div>
+</div></section>
+
+<section id="spring-test" data-grp="Datenbank &amp; Spring"><h2>Spring Testen <small>JUnit 5</small></h2><div class="grid">
+<div class="blk"><h3>Unit-Test mit Mockito</h3>
+<pre><code>@ExtendWith(MockitoExtension.class)
+class BestellServiceTest {
+    @Mock ProduktRepository repo;
+    @InjectMocks BestellService service;
+
+    @Test
+    void findetProdukt() {
+        when(repo.findById(1L)).thenReturn(Optional.of(new Produkt()));
+
+        assertTrue(service.finde(1L).isPresent());
+        verify(repo).findById(1L);
+    }
+}</code></pre></div>
+
+<div class="blk"><h3>Controller-Test (MockMvc)</h3>
+<pre><code>@WebMvcTest(ProduktController.class)
+class ProduktControllerTest {
+    @Autowired MockMvc mvc;
+    @MockBean ProduktService service;
+
+    @Test
+    void liefertListe() throws Exception {
+        when(service.alle()).thenReturn(List.of());
+
+        mvc.perform(get("/api/produkte"))
+           .andExpect(status().isOk())
+           .andExpect(jsonPath("$").isArray());
+    }
+}</code></pre></div>
+
+<div class="blk"><h3>Integrationstest &amp; Assertions</h3>
+<pre><code>@SpringBootTest
+@AutoConfigureMockMvc
+class AppIT { }
+
+@DataJpaTest                 // nur JPA-Schicht, In-Memory-DB
+
+assertEquals(expected, actual);
+assertTrue(cond);  assertNotNull(x);
+assertThrows(IllegalArgumentException.class, () -&gt; foo());
+@ParameterizedTest @ValueSource(ints = {1, 2, 3})</code></pre></div>
+</div></section>
+
+<section id="spring-more" data-grp="Datenbank &amp; Spring"><h2>Spring Weiteres <small>Praxis</small></h2><div class="grid">
+<div class="blk"><h3>Geplante Tasks &amp; Async</h3>
+<pre><code>@EnableScheduling   // auf einer @Configuration-Klasse
+@Component
+public class Job {
+    @Scheduled(cron = "0 0 3 * * *")        // täglich 03:00
+    public void nachts() { }
+
+    @Scheduled(fixedRate = 60_000)
+    public void jedeMinute() { }
+}
+
+@EnableAsync
+@Async public CompletableFuture&lt;String&gt; langsam() { ... }</code></pre></div>
+
+<div class="blk"><h3>Security (Kurzform)</h3>
+<pre><code>@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    @Bean
+    SecurityFilterChain chain(HttpSecurity http) throws Exception {
+        return http
+            .csrf(csrf -&gt; csrf.disable())     // nur bei reinen APIs mit Token
+            .authorizeHttpRequests(a -&gt; a
+                .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated())
+            .httpBasic(Customizer.withDefaults())
+            .build();
+    }
+
+    @Bean PasswordEncoder encoder() { return new BCryptPasswordEncoder(); }
+}</code></pre></div>
+
+<div class="blk"><h3>HTTP-Client (RestClient)</h3>
+<pre><code>RestClient client = RestClient.create("https://api.example.com");
+
+Produkt p = client.get()
+    .uri("/produkte/{id}", 1)
+    .retrieve()
+    .body(Produkt.class);
+
+client.post().uri("/produkte")
+    .contentType(MediaType.APPLICATION_JSON)
+    .body(neu)
+    .retrieve()
+    .toBodilessEntity();</code></pre></div>
+
+<div class="blk"><h3>Actuator &amp; Logging</h3>
+<pre data-lang="sh"><code>management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    root: INFO
+    com.example: DEBUG</code></pre>
+<pre><code>private static final Logger log = LoggerFactory.getLogger(Foo.class);
+log.info("Bestellung {} angelegt", id);
+log.error("Fehler beim Speichern", ex);</code></pre></div>
+</div></section>
+
+<section id="build" data-grp="Werkzeuge"><h2>Maven &amp; Gradle</h2><div class="grid">
+<div class="blk"><h3>Kommandos</h3>
+<pre data-lang="sh"><code>mvn clean install     mvn test      mvn package
+mvn dependency:tree
+mvn spring-boot:run
+
+gradle build          gradle test   gradle run
+./gradlew bootRun</code></pre></div>
+<div class="blk"><h3>Dependency hinzufügen</h3>
+<pre data-lang="sh"><code>&lt;!-- Maven pom.xml --&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+// Gradle build.gradle
+implementation 'org.springframework.boot:spring-boot-starter-web'</code></pre>
+<p>Häufige Starter: <code class="i">web</code> <code class="i">data-jpa</code> <code class="i">jdbc</code> <code class="i">validation</code> <code class="i">security</code> <code class="i">actuator</code> <code class="i">test</code></p></div>
+</div></section>
+
+<section id="best" data-grp="Werkzeuge"><h2>Best Practices</h2><div class="grid">
+<div class="blk"><h3>Java</h3>
+<p>• Felder <code class="i">private</code>, Zugriff über Getter oder <code class="i">record</code><br>
+• Immutability bevorzugen (<code class="i">final</code>, <code class="i">List.of</code>, <code class="i">record</code>)<br>
+• <code class="i">equals()</code> und <code class="i">hashCode()</code> immer zusammen überschreiben<br>
+• Gegen Interfaces programmieren: <code class="i">List&lt;String&gt; l = new ArrayList&lt;&gt;()</code><br>
+• try-with-resources für alles <code class="i">AutoCloseable</code><br>
+• Keine leeren <code class="i">catch</code>-Blöcke<br>
+• <code class="i">Optional</code> als Rückgabetyp statt <code class="i">null</code><br>
+• Namen: Klassen <code class="i">PascalCase</code>, Methoden <code class="i">camelCase</code>, Konstanten <code class="i">UPPER_SNAKE_CASE</code></p></div>
+<div class="blk"><h3>JDBC &amp; Spring</h3>
+<p>• SQL nur mit <code class="i">PreparedStatement</code>, nie mit String-Konkatenation<br>
+• Verbindungen über einen Pool, immer schließen<br>
+• Konstruktor-Injektion statt Feld-<code class="i">@Autowired</code><br>
+• Entities nicht direkt als API-Antwort, lieber DTOs oder Records<br>
+• Transaktionen im Service, nicht im Controller<br>
+• Passwörter und Schlüssel über Umgebungsvariablen, nicht in Git<br>
+• <code class="i">ddl-auto: validate</code> plus Flyway/Liquibase für Schema-Änderungen<br>
+• LAZY-Beziehungen beachten (N+1-Problem, <code class="i">JOIN FETCH</code>)</p></div>
+</div></section>
+
+<div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
+</main>
+<footer>Java 21 / Spring Boot 3. Beispiele sind verkürzt, Imports sind weggelassen.</footer>
+</div>
+<script>
+(function(){
+  var KW = /\b(?:abstract|assert|boolean|break|byte|case|catch|char|class|continue|default|do|double|else|enum|extends|final|finally|float|for|if|implements|import|instanceof|int|interface|long|new|null|package|private|protected|public|record|return|sealed|permits|short|static|super|switch|this|throw|throws|try|var|void|while|true|false|yield|when)\b/;
+  var TOK = new RegExp([
+    '(\\/\\/[^\\n]*|\\/\\*[\\s\\S]*?\\*\\/)',                 // 1 comment
+    '("""[\\s\\S]*?"""|"(?:\\\\.|[^"\\\\\\n])*"|\'(?:\\\\.|[^\'\\\\\\n])\')', // 2 string
+    '(@[A-Za-z_][\\w.]*)',                                   // 3 annotation
+    '(' + KW.source + ')',                                    // 4 keyword
+    '(\\b\\d[\\d_]*(?:\\.\\d+)?[LlFfDd]?\\b)'                // 5 number
+  ].join('|'), 'g');
+  var TOK_SH = /(#[^\n]*|\/\/[^\n]*)|("(?:\\.|[^"\\\n])*")/g;
+  function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function hl(code, lang){
+    var src = code.textContent, out = '', last = 0, m;
+    if (lang === 'sh') {
+      TOK_SH.lastIndex = 0;
+      while ((m = TOK_SH.exec(src))) {
+        out += esc(src.slice(last, m.index));
+        out += '<span class="' + (m[1] ? 'c' : 's') + '">' + esc(m[0]) + '</span>';
+        last = m.index + m[0].length;
+      }
+    } else {
+      TOK.lastIndex = 0;
+      while ((m = TOK.exec(src))) {
+        out += esc(src.slice(last, m.index));
+        var cls = m[1] ? 'c' : m[2] ? 's' : m[3] ? 'a' : m[4] ? 'k' : 'n';
+        out += '<span class="' + cls + '">' + esc(m[0]) + '</span>';
+        last = m.index + m[0].length;
+      }
+    }
+    code.innerHTML = out + esc(src.slice(last));
+  }
+
+  document.querySelectorAll('pre').forEach(function(pre){
+    var code = pre.querySelector('code');
+    var raw = code.textContent;
+    hl(code, pre.getAttribute('data-lang') || 'java');
+    var wrap = document.createElement('div'); wrap.className = 'code';
+    pre.parentNode.insertBefore(wrap, pre); wrap.appendChild(pre);
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'cp'; b.textContent = 'Kopieren';
+    b.addEventListener('click', function(){
+      function done(){ b.textContent = 'Kopiert'; setTimeout(function(){ b.textContent = 'Kopieren'; }, 1200); }
+      function fallback(){
+        var r = document.createRange(); r.selectNodeContents(code);
+        var s = getSelection(); s.removeAllRanges(); s.addRange(r);
+        b.textContent = 'Markiert';
+        setTimeout(function(){ b.textContent = 'Kopieren'; }, 1200);
+      }
+      try { navigator.clipboard.writeText(raw).then(done, fallback); } catch (e) { fallback(); }
+    });
+    wrap.appendChild(b);
+  });
+
+  // Navigation
+  var nav = document.getElementById('nav'), lastGrp = '';
+  document.querySelectorAll('main > section').forEach(function(sec){
+    var g = sec.getAttribute('data-grp');
+    if (g !== lastGrp) {
+      lastGrp = g;
+      var gi = document.createElement('li'); gi.className = 'grp'; gi.textContent = g; nav.appendChild(gi);
+    }
+    var li = document.createElement('li'), a = document.createElement('a');
+    a.href = '#' + sec.id;
+    a.textContent = sec.querySelector('h2').childNodes[0].textContent.trim();
+    li.appendChild(a); nav.appendChild(li);
+  });
+
+  // Suche
+  var q = document.getElementById('q'), empty = document.getElementById('empty');
+  var blocks = Array.prototype.slice.call(document.querySelectorAll('.blk'));
+  var texts = blocks.map(function(b){ return b.textContent.toLowerCase(); });
+  function filter(){
+    var term = q.value.trim().toLowerCase(), any = false;
+    document.querySelectorAll('main > section').forEach(function(sec){
+      var shown = 0;
+      sec.querySelectorAll('.blk').forEach(function(b){
+        var hit = !term || texts[blocks.indexOf(b)].indexOf(term) !== -1;
+        b.classList.toggle('hide', !hit);
+        if (hit) shown++;
+      });
+      sec.classList.toggle('hide', shown === 0);
+      if (shown) any = true;
+    });
+    empty.classList.toggle('hide', any);
+  }
+  q.addEventListener('input', filter);
+
+  // Theme
+  var root = document.documentElement;
+  document.getElementById('theme').addEventListener('click', function(){
+    var dark = root.getAttribute('data-theme') === 'dark' ||
+      (!root.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+    root.setAttribute('data-theme', dark ? 'light' : 'dark');
+  });
+})();
+</script>
