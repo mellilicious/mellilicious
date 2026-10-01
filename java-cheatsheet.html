@@ -57,6 +57,7 @@ h2{font-family:var(--f-display);font-size:1.6rem;margin:0 0 14px;letter-spacing:
 h2 small{font-family:var(--f-body);font-size:12px;font-weight:500;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:4px;letter-spacing:.04em;text-transform:uppercase}
 .grid{columns:2 380px;column-gap:16px}
 .blk{break-inside:avoid;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px;margin:0 0 16px;min-width:0}
+.blk.wide{column-span:all}
 .blk h3{margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
 .blk p{margin:0 0 8px}
 .blk p:last-child{margin-bottom:0}
@@ -74,6 +75,8 @@ code.i{font-family:var(--f-mono);font-size:.88em;background:var(--tbl);padding:1
 table{border-collapse:collapse;width:100%;font-size:13px}
 th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:top}
 th{background:var(--tbl);font-weight:600;white-space:nowrap}
+.wide td:nth-child(4){min-width:240px}
+.wide td:nth-child(5){white-space:nowrap}
 td code{font-family:var(--f-mono);font-size:12px}
 .note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:8px 12px;border-radius:0 6px 6px 0;font-size:13.5px;margin:0 0 8px}
 .empty{color:var(--muted);padding:24px 0}
@@ -110,16 +113,9 @@ jshell               # interaktive Konsole</code></pre></div>
 </div></section>
 
 <section id="datentypen" data-grp="Sprache"><h2>Datentypen</h2><div class="grid">
-<div class="blk"><h3>Primitive Typen</h3><p class="ex">Primitive Typen speichern den Wert direkt und sind nie <code class="i">null</code>. Ganzzahlen: <code class="i">byte</code> bis <code class="i">long</code>, Kommazahlen: <code class="i">float</code>/<code class="i">double</code>. Für Geldbeträge <code class="i">BigDecimal</code> statt <code class="i">double</code> nehmen.</p><div class="tw"><table>
-<tr><th>Typ</th><th>Größe</th><th>Beispiel</th></tr>
-<tr><td><code>byte</code></td><td>8 Bit</td><td><code>byte b = 10;</code></td></tr>
-<tr><td><code>short</code></td><td>16 Bit</td><td><code>short s = 1000;</code></td></tr>
-<tr><td><code>int</code></td><td>32 Bit</td><td><code>int i = 42;</code></td></tr>
-<tr><td><code>long</code></td><td>64 Bit</td><td><code>long l = 10_000L;</code></td></tr>
-<tr><td><code>float</code></td><td>32 Bit</td><td><code>float f = 1.5f;</code></td></tr>
-<tr><td><code>double</code></td><td>64 Bit</td><td><code>double d = 3.14;</code></td></tr>
-<tr><td><code>char</code></td><td>16 Bit</td><td><code>char c = 'A';</code></td></tr>
-<tr><td><code>boolean</code></td><td>1 Bit</td><td><code>true / false</code></td></tr>
+<div class="blk wide"><h3>Primitive Typen</h3><p class="ex">Primitive Typen speichern den Wert direkt und sind nie <code class="i">null</code>. Ganzzahlen: <code class="i">byte</code> bis <code class="i">long</code>, Kommazahlen: <code class="i">float</code>/<code class="i">double</code>. Für Geldbeträge <code class="i">BigDecimal</code> statt <code class="i">double</code> nehmen.</p><div class="tw"><table>
+<tr><th>Typ</th><th>Größe</th><th>Wertebereich</th><th>Beschreibung</th><th>Beispiel</th></tr>
+<tr><td><code>byte</code></td><td>8 Bit</td><td>-128 bis 127</td><td>Kleinste Ganzzahl. Typisch für rohe Binärdaten, Dateiinhalte und Netzwerkpuffer (<code>byte[]</code>). Standardwert <code>0</code>.</td><td><code>byte b = 10;</code></td></tr><tr><td><code>short</code></td><td>16 Bit</td><td>-32.768 bis 32.767</td><td>Kleine Ganzzahl, selten genutzt. Spart nur in großen Arrays Speicher. Standardwert <code>0</code>.</td><td><code>short s = 1000;</code></td></tr><tr><td><code>int</code></td><td>32 Bit</td><td>ca. ±2,1 Mrd.<br>(-2.147.483.648 bis 2.147.483.647)</td><td>Standardtyp für Ganzzahlen: Zähler, Indizes, Alter, Mengen. Läuft ohne Warnung über (<code>Integer.MAX_VALUE + 1</code> ergibt eine negative Zahl). Standardwert <code>0</code>.</td><td><code>int i = 42;</code></td></tr><tr><td><code>long</code></td><td>64 Bit</td><td>ca. ±9,2 · 10<sup>18</sup></td><td>Für große Ganzzahlen wie Zeitstempel in Millisekunden, IDs oder Dateigrößen. Literal braucht ein <code>L</code> am Ende, Unterstriche gliedern Zahlen. Standardwert <code>0L</code>.</td><td><code>long l = 10_000L;</code></td></tr><tr><td><code>float</code></td><td>32 Bit</td><td>ca. ±3,4 · 10<sup>38</sup>, etwa 7 Stellen genau</td><td>Kommazahl mit einfacher Genauigkeit. Literal braucht ein <code>f</code>. Nur sinnvoll bei viel Speicher- oder Grafikbedarf. Standardwert <code>0.0f</code>.</td><td><code>float f = 1.5f;</code></td></tr><tr><td><code>double</code></td><td>64 Bit</td><td>ca. ±1,8 · 10<sup>308</sup>, etwa 15 Stellen genau</td><td>Standardtyp für Kommazahlen. Rundungsfehler sind möglich (<code>0.1 + 0.2 != 0.3</code>), für Geld deshalb <code>BigDecimal</code>. Standardwert <code>0.0</code>.</td><td><code>double d = 3.14;</code></td></tr><tr><td><code>char</code></td><td>16 Bit</td><td>0 bis 65.535 (Unicode-Zeichen, UTF-16)</td><td>Ein einzelnes Zeichen in einfachen Anführungszeichen. Intern eine Zahl, daher geht <code>c + 1</code>. Standardwert <code>'\u0000'</code>.</td><td><code>char c = 'A';</code></td></tr><tr><td><code>boolean</code></td><td>logisch 1 Bit</td><td><code>true</code> oder <code>false</code></td><td>Wahrheitswert für Bedingungen und Flags. Kein Zusammenhang mit Zahlen, <code>if (1)</code> ist in Java ungültig. Standardwert <code>false</code>.</td><td><code>boolean ok = true;</code></td></tr>
 </table></div></div>
 <div class="blk"><h3>Umwandlung &amp; var</h3><p class="ex">Ein Cast (<code class="i">(int)</code>) schneidet Nachkommastellen ab. Strings wandelt man mit <code class="i">parseXxx</code> in Zahlen um. <code class="i">var</code> lässt den Compiler den Typ erkennen, gilt aber nur für lokale Variablen.</p>
 <p>Wrapper-Klassen: <code class="i">Integer</code>, <code class="i">Long</code>, <code class="i">Double</code>, <code class="i">Boolean</code>, <code class="i">Character</code> (Autoboxing).</p>
