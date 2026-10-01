@@ -60,6 +60,7 @@ h2 small{font-family:var(--f-body);font-size:12px;font-weight:500;color:var(--ac
 .blk h3{margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
 .blk p{margin:0 0 8px}
 .blk p:last-child{margin-bottom:0}
+.blk p.ex{color:var(--muted);font-size:13.5px}
 .code{position:relative;margin:0 0 8px}
 .code:last-child{margin-bottom:0}
 pre{margin:0;background:var(--code-bg);color:var(--code-fg);border-radius:6px;padding:12px 14px;overflow-x:auto;font-family:var(--f-mono);font-size:12.5px;line-height:1.6;tab-size:4}
@@ -95,13 +96,13 @@ footer{grid-column:1/-1;color:var(--muted);font-size:13px}
 <main id="main">
 
 <section id="grundgeruest" data-grp="Sprache"><h2>Grundgerüst</h2><div class="grid">
-<div class="blk"><h3>Hello World</h3>
+<div class="blk"><h3>Hello World</h3><p class="ex">Jedes Java-Programm startet in der <code class="i">main</code>-Methode. Der Dateiname muss zum Namen der <code class="i">public</code>-Klasse passen.</p>
 <pre><code>public class Main {
     public static void main(String[] args) {
         System.out.println("Hallo Welt");
     }
 }</code></pre></div>
-<div class="blk"><h3>Kompilieren &amp; starten</h3>
+<div class="blk"><h3>Kompilieren &amp; starten</h3><p class="ex"><code class="i">javac</code> übersetzt Quellcode in Bytecode (<code class="i">.class</code>), <code class="i">java</code> führt ihn auf der JVM aus. <code class="i">jshell</code> eignet sich zum schnellen Ausprobieren.</p>
 <pre data-lang="sh"><code>javac Main.java      # kompilieren
 java Main            # ausführen
 java Main.java       # Single-File direkt starten (ab Java 11)
@@ -109,7 +110,7 @@ jshell               # interaktive Konsole</code></pre></div>
 </div></section>
 
 <section id="datentypen" data-grp="Sprache"><h2>Datentypen</h2><div class="grid">
-<div class="blk"><h3>Primitive Typen</h3><div class="tw"><table>
+<div class="blk"><h3>Primitive Typen</h3><p class="ex">Primitive Typen speichern den Wert direkt und sind nie <code class="i">null</code>. Ganzzahlen: <code class="i">byte</code> bis <code class="i">long</code>, Kommazahlen: <code class="i">float</code>/<code class="i">double</code>. Für Geldbeträge <code class="i">BigDecimal</code> statt <code class="i">double</code> nehmen.</p><div class="tw"><table>
 <tr><th>Typ</th><th>Größe</th><th>Beispiel</th></tr>
 <tr><td><code>byte</code></td><td>8 Bit</td><td><code>byte b = 10;</code></td></tr>
 <tr><td><code>short</code></td><td>16 Bit</td><td><code>short s = 1000;</code></td></tr>
@@ -120,7 +121,7 @@ jshell               # interaktive Konsole</code></pre></div>
 <tr><td><code>char</code></td><td>16 Bit</td><td><code>char c = 'A';</code></td></tr>
 <tr><td><code>boolean</code></td><td>1 Bit</td><td><code>true / false</code></td></tr>
 </table></div></div>
-<div class="blk"><h3>Umwandlung &amp; var</h3>
+<div class="blk"><h3>Umwandlung &amp; var</h3><p class="ex">Ein Cast (<code class="i">(int)</code>) schneidet Nachkommastellen ab. Strings wandelt man mit <code class="i">parseXxx</code> in Zahlen um. <code class="i">var</code> lässt den Compiler den Typ erkennen, gilt aber nur für lokale Variablen.</p>
 <p>Wrapper-Klassen: <code class="i">Integer</code>, <code class="i">Long</code>, <code class="i">Double</code>, <code class="i">Boolean</code>, <code class="i">Character</code> (Autoboxing).</p>
 <pre><code>var x = 10;                        // Typinferenz (ab Java 10)
 int n = (int) 3.9;                 // Cast -> 3
@@ -131,7 +132,7 @@ long big = Long.MAX_VALUE;</code></pre></div>
 </div></section>
 
 <section id="operatoren" data-grp="Sprache"><h2>Operatoren</h2><div class="grid">
-<div class="blk"><h3>Übersicht</h3>
+<div class="blk"><h3>Übersicht</h3><p class="ex">Bei <code class="i">int</code> ist die Division ganzzahlig, <code class="i">%</code> liefert den Rest. <code class="i">&amp;&amp;</code> und <code class="i">||</code> werten den rechten Teil nur aus, wenn nötig. <code class="i">==</code> vergleicht bei Objekten Referenzen, nicht Inhalte.</p>
 <pre><code>+ - * / %           // Arithmetik (7 / 2 == 3 bei int)
 ++ --  += -= *= /=
 == != &lt; &gt; &lt;= &gt;=
@@ -142,7 +143,7 @@ obj instanceof Foo f // Pattern Matching</code></pre></div>
 </div></section>
 
 <section id="kontrollfluss" data-grp="Sprache"><h2>Kontrollfluss</h2><div class="grid">
-<div class="blk"><h3>if / Schleifen</h3>
+<div class="blk"><h3>if / Schleifen</h3><p class="ex"><code class="i">for</code> eignet sich für Zählschleifen, for-each zum Durchlaufen von Arrays und Collections, <code class="i">while</code> prüft vor dem Durchlauf, <code class="i">do-while</code> danach. <code class="i">break</code> beendet die Schleife, <code class="i">continue</code> springt zum nächsten Durchlauf.</p>
 <pre><code>if (x &gt; 0) { } else if (x == 0) { } else { }
 
 for (int i = 0; i &lt; 10; i++) { }
@@ -151,7 +152,7 @@ while (cond) { }
 do { } while (cond);
 break; continue;
 outer: for (...) { break outer; }</code></pre></div>
-<div class="blk"><h3>switch-Expression (ab Java 14)</h3>
+<div class="blk"><h3>switch-Expression (ab Java 14)</h3><p class="ex">Die neue Schreibweise mit <code class="i">-&gt;</code> liefert direkt einen Wert und braucht kein <code class="i">break</code>. Mehrere Fälle lassen sich mit Komma zusammenfassen.</p>
 <pre><code>String name = switch (day) {
     case 1, 7 -&gt; "Wochenende";
     case 2, 3, 4, 5, 6 -&gt; "Werktag";
@@ -160,7 +161,7 @@ outer: for (...) { break outer; }</code></pre></div>
 </div></section>
 
 <section id="strings" data-grp="Sprache"><h2>Strings</h2><div class="grid">
-<div class="blk"><h3>Wichtige Methoden</h3>
+<div class="blk"><h3>Wichtige Methoden</h3><p class="ex">Strings sind unveränderlich: Methoden wie <code class="i">replace</code> oder <code class="i">toUpperCase</code> geben ein neues String-Objekt zurück. Die Zählung von Positionen beginnt bei 0.</p>
 <pre><code>String s = "Hallo";
 s.length();  s.charAt(0);  s.substring(1, 3);
 s.indexOf("l");  s.contains("al");  s.replace("a", "e");
@@ -171,7 +172,7 @@ String.join(", ", list);
 "a".repeat(3);
 String.format("%s ist %d Jahre, %.2f m", name, age, h);</code></pre>
 <p class="note">Strings immer mit <code class="i">equals()</code> vergleichen, nie mit <code class="i">==</code>.</p></div>
-<div class="blk"><h3>Textblock &amp; StringBuilder</h3>
+<div class="blk"><h3>Textblock &amp; StringBuilder</h3><p class="ex">Textblöcke (<code class="i">"""</code>) erlauben mehrzeilige Strings ohne Escapes. Wer in Schleifen viele Teile zusammenfügt, nimmt <code class="i">StringBuilder</code>, das ist schneller als <code class="i">+</code>.</p>
 <pre><code>String json = """
     { "a": 1 }
     """;                              // ab Java 15
@@ -181,7 +182,7 @@ sb.append("a").append(1).reverse().toString();</code></pre></div>
 </div></section>
 
 <section id="arrays" data-grp="Sprache"><h2>Arrays</h2><div class="grid">
-<div class="blk"><h3>Anlegen &amp; Arrays-Helfer</h3>
+<div class="blk"><h3>Anlegen &amp; Arrays-Helfer</h3><p class="ex">Arrays haben eine feste Länge und beginnen bei Index 0. Wenn die Größe wechselt, ist eine <code class="i">ArrayList</code> besser. Die Klasse <code class="i">Arrays</code> bringt Sortieren, Kopieren und Ausgeben mit.</p>
 <pre><code>int[] a = new int[5];
 int[] b = {1, 2, 3};
 int[][] m = new int[3][3];
@@ -196,7 +197,7 @@ Arrays.stream(b).sum();</code></pre></div>
 </div></section>
 
 <section id="oop" data-grp="Sprache"><h2>Klassen &amp; OOP</h2><div class="grid">
-<div class="blk"><h3>Klasse mit equals / hashCode</h3>
+<div class="blk"><h3>Klasse mit equals / hashCode</h3><p class="ex">Eine Klasse bündelt Daten (Felder) und Verhalten (Methoden). Der Konstruktor initialisiert das Objekt, <code class="i">this</code> meint das aktuelle Objekt. <code class="i">equals</code> und <code class="i">hashCode</code> definieren, wann zwei Objekte gleich sind (wichtig für <code class="i">HashMap</code> und <code class="i">HashSet</code>).</p>
 <pre><code>public class Person {
     private String name;
     private int age;
@@ -224,7 +225,7 @@ Arrays.stream(b).sum();</code></pre></div>
     @Override
     public int hashCode() { return Objects.hash(name, age); }
 }</code></pre></div>
-<div class="blk"><h3>Vererbung, Interface, abstract</h3>
+<div class="blk"><h3>Vererbung, Interface, abstract</h3><p class="ex"><code class="i">extends</code> erbt von genau einer Klasse, <code class="i">implements</code> erfüllt beliebig viele Interfaces. Ein Interface beschreibt nur, was eine Klasse kann. Eine abstrakte Klasse kann nicht instanziiert werden und gibt Teile der Umsetzung vor.</p>
 <pre><code>public class Student extends Person implements Lernbar {
     public Student(String n, int a) { super(n, a); }
     @Override public void lernen() { }
@@ -239,7 +240,7 @@ interface Lernbar {
 abstract class Tier {
     abstract void laut();
 }</code></pre></div>
-<div class="blk"><h3>Zugriffsmodifizierer</h3><div class="tw"><table>
+<div class="blk"><h3>Zugriffsmodifizierer</h3><p class="ex">Sie legen fest, wer auf eine Klasse, ein Feld oder eine Methode zugreifen darf. Faustregel: so restriktiv wie möglich, Felder meist <code class="i">private</code>.</p><div class="tw"><table>
 <tr><th>Modifier</th><th>Klasse</th><th>Package</th><th>Subklasse</th><th>Überall</th></tr>
 <tr><td><code>private</code></td><td>✔</td><td></td><td></td><td></td></tr>
 <tr><td><i>default</i></td><td>✔</td><td>✔</td><td></td><td></td></tr>
@@ -247,7 +248,7 @@ abstract class Tier {
 <tr><td><code>public</code></td><td>✔</td><td>✔</td><td>✔</td><td>✔</td></tr>
 </table></div>
 <p><code class="i">final</code>: nicht änderbar, nicht vererbbar, nicht überschreibbar. <code class="i">static</code>: gehört zur Klasse.</p></div>
-<div class="blk"><h3>Enum, Record, sealed</h3>
+<div class="blk"><h3>Enum, Record, sealed</h3><p class="ex"><code class="i">enum</code> ist eine feste Menge an Konstanten. <code class="i">record</code> ist eine kompakte, unveränderliche Datenklasse mit automatischem Konstruktor, Gettern, <code class="i">equals</code> und <code class="i">toString</code>. <code class="i">sealed</code> begrenzt, welche Klassen ein Interface implementieren dürfen.</p>
 <pre><code>enum Farbe { ROT, GRUEN, BLAU }
 Farbe.valueOf("ROT");  Farbe.values();
 
