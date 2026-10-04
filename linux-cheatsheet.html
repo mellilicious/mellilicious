@@ -4545,6 +4545,121 @@ cat projects/bericht.txt</code></pre>
 <p class="ex">Mit <code class="i">$(…)</code> setzen Sie die Ausgabe der Befehle in den Text ein. So entsteht ein lesbarer Bericht, den Sie zum Beispiel per <code class="i">cron</code> regelmäßig erzeugen lassen könnten (Übung 32).</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 43 · Die eigene Arbeit zusammenfassen</h3>
+<p><b>Aufgabe:</b> Prüfe die Anzahl der <code class="i">ERROR</code>-Zeilen mit <code class="i">grep</code> und lege dann <code class="i">projects/summary.txt</code> mit genau drei Zeilen an: <code class="i">Linux</code>, <code class="i">5</code> und Ihren persönlichen Code (in der Kursaufgabe <code class="i">c2610475054</code>, hier <code class="i">anna</code>).</p>
+<p class="ex">Geübt wird: das Zusammenspiel von <code class="i">grep -c</code> (Übung 13), <code class="i">printf</code> mit Zeilenumbrüchen (Übung 8) und der Umleitung. Erst die Zahl <i>prüfen</i>, dann festhalten. Wir nehmen das Beispiel-Log <code class="i">~/daten/events.log</code> aus Übung 13, das fünf <code class="i">ERROR</code>-Zeilen hat. Setzen Sie Ihren Pfad, die Zahl und Ihren Code aus der Aufgabenstellung ein.</p>
+<details><summary>Voraussetzung: Beispiel-Log</summary>
+<pre><code>mkdir -p ~/daten
+cat &gt; ~/daten/events.log &lt;&lt;'EOF'
+2026-10-01 10:00:01 INFO start
+2026-10-01 10:00:05 ERROR disk full
+2026-10-01 10:01:12 WARN slow response
+2026-10-01 10:02:30 ERROR timeout
+2026-10-01 10:03:44 INFO request ok
+2026-10-01 10:04:10 ERROR connection refused
+2026-10-01 10:05:02 DEBUG cache hit
+2026-10-01 10:06:19 ERROR out of memory
+2026-10-01 10:07:45 INFO request ok
+2026-10-01 10:08:30 ERROR disk full
+2026-10-01 10:09:00 INFO stop
+EOF</code></pre></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p projects
+
+grep -c ' ERROR ' ~/daten/events.log                  # Kontrolle: 5
+
+printf 'Linux\n5\nanna\n' &gt; projects/summary.txt
+
+cat -A projects/summary.txt                           # Linux$  5$  anna$
+wc -l projects/summary.txt                            # 3</code></pre>
+<p class="ex">Die Zahl in der Datei ist hier geprüft: <code class="i">grep -c</code> hat <code class="i">5</code> gemeldet. Wenn bei Ihnen eine andere Zahl herauskommt, schreiben Sie diese hinein.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Teil macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>grep -c ' ERROR ' datei</code></td><td>Zählt die Zeilen mit dem Level <code>ERROR</code> und gibt nur die Zahl aus. Das ist die „Verifikation“ aus der Aufgabe.</td></tr>
+<tr><td class="nw"><code>printf 'Linux\n5\nanna\n'</code></td><td>Gibt drei Zeilen aus. <code>\n</code> ist der Zeilenumbruch. Der letzte Umbruch beendet die dritte Zeile.</td></tr>
+<tr><td class="nw"><code>&gt; projects/summary.txt</code></td><td>Schreibt die Ausgabe in die Datei.</td></tr>
+<tr><td class="nw"><code>cat -A</code>, <code>wc -l</code></td><td>Kontrolle: <code>$</code> markiert jedes Zeilenende, <code>wc -l</code> zählt die Zeilen (3).</td></tr>
+</table></div>
+<pre><code>Zeile 1:  Linux      (das Betriebssystem)
+Zeile 2:  5          (Anzahl der ERROR-Zeilen, geprüft mit grep -c)
+Zeile 3:  anna       (Ihr persönlicher Code)</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Erst prüfen, dann festhalten:</b> Eine Zahl, die man abtippt, kann falsch sein. Mit <code class="i">grep -c</code> vergewissern Sie sich vorher. So steht nur ein Wert in der Zusammenfassung, den Sie selbst nachvollzogen haben.</p>
+<p><b>Ein Befehl für alle Zeilen:</b> <code class="i">printf</code> mit mehreren <code class="i">\n</code> schreibt die Datei in einem Schritt. Sie legen den Inhalt fest und können ihn genau kontrollieren, ohne Editor und ohne mehrere Umleitungen.</p>
+<p><b>Genau drei Zeilen:</b> Jede Zeile endet mit einem Zeilenumbruch, nach der dritten kommt keine Leerzeile. Mit <code class="i">cat -A</code> sehen Sie das sofort.</p>
+<p><b>Zusammenfassung der bisherigen Arbeit:</b> Die Übung kombiniert mehrere Werkzeuge: <code class="i">grep</code>, <code class="i">printf</code>, Umleitung und Kontrolle mit <code class="i">cat</code> und <code class="i">wc</code>. Das ist das Muster, nach dem man in der Praxis Berichte baut.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td>Kein <code>\n</code> am Ende</td><td>Die dritte Zeile hat kein Zeilenende, <code>wc -l</code> zählt nur 2 Zeilen.</td></tr>
+<tr><td><code>echo "Linux\n5\nanna"</code></td><td>In Bash eine einzige Zeile mit den Zeichen <code>\n</code>. <code>printf</code> ist hier die richtige Wahl.</td></tr>
+<tr><td>Alles in einer Zeile mit Kommas (<code>Linux, 5, anna</code>)</td><td>Eine Zeile statt drei. Die Aufgabe verlangt drei Zeilen.</td></tr>
+<tr><td>Leerzeichen am Zeilenende (<code>Linux </code>)</td><td>Der Inhalt weicht ab. <code>cat -A</code> zeigt <code>Linux $</code>.</td></tr>
+<tr><td>Jede Zeile mit <code>&gt;</code> geschrieben</td><td>Jeder Befehl überschreibt die Datei, übrig bleibt nur die letzte Zeile (<code>anna</code>).</td></tr>
+<tr><td><code>&gt;&gt;</code> mehrfach ausgeführt</td><td>Die Zeilen stehen doppelt (6 Zeilen).</td></tr>
+<tr><td>Zahl nicht geprüft</td><td>Ihre Datei enthält eine andere Zahl als das Log. Mit <code>grep -c</code> vorher kontrollieren, mit <code>grep ERROR</code> (ohne Leerzeichen) könnten Sie auch Meldungen mitzählen.</td></tr>
+<tr><td>Datei am falschen Ort</td><td>Die Aufgabe nennt <code>projects/summary.txt</code>, nicht <code>notes/</code>.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 43 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie im Übungsordner <code class="i">~/uebung</code> mit dem Beispiel-Log. Alle Ergebnisse sehen Sie direkt im Terminal.</p>
+<p><b>a)</b> Berechne die Werte, statt sie zu tippen.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>{ uname -s; grep -c ' ERROR ' ~/daten/events.log; echo anna; } &gt; projects/s2.txt
+diff projects/summary.txt projects/s2.txt &amp;&amp; echo "gleich"
+
+OS=$(uname -s); N=$(grep -c ' ERROR ' ~/daten/events.log); NAME=anna
+printf '%s\n%s\n%s\n' "$OS" "$N" "$NAME" &gt; projects/s10.txt</code></pre>
+<p class="ex">Die Zusammenfassung enthält dann stets den aktuellen Wert. Wird das Log länger, ändert sich die Zahl mit. In der Aufgabe ist sie fest vorgegeben, die berechnete Variante zeigt den Unterschied zwischen „erfassen“ und „berechnen“.</p></details>
+<p><b>b)</b> Schreibe die drei Zeilen auf andere Weisen.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>printf '%s\n' Linux 5 anna &gt; projects/s3.txt         # ein Format, drei Argumente
+
+cat &gt; projects/s8.txt &lt;&lt;'EOF'                       # Here-Document
+Linux
+5
+anna
+EOF
+
+printf 'Linux\n5\nanna\n' | tee projects/s9.txt | wc -l   # speichern und zählen: 3</code></pre>
+<p class="ex"><code class="i">printf '%s\n'</code> wiederholt das Format für jedes Argument (Übung 9). Das Here-Document (Übung 8) ist angenehm bei längeren Texten.</p></details>
+<p><b>c)</b> Prüfe die fertige Datei auf Inhalt und Aufbau.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>printf 'Linux\n5\nanna\n' | diff - projects/summary.txt &amp;&amp; echo "wie erwartet"
+cmp projects/summary.txt projects/s3.txt &amp;&amp; echo "Byte für Byte gleich"
+sed -n '2p' projects/summary.txt                      # Zeile 2: 5
+awk 'NR==2 &amp;&amp; $1 ~ /^[0-9]+$/ {print "Zeile 2 ist eine Zahl"}' projects/summary.txt
+test "$(grep -c ' ERROR ' ~/daten/events.log)" -eq 5 &amp;&amp; echo "Zahl stimmt"</code></pre>
+<p class="ex">Mit <code class="i">diff -</code> vergleichen Sie die Datei mit dem Soll aus einer Pipe. <code class="i">test … -eq</code> vergleicht Zahlen und eignet sich als Prüfung in Skripten.</p></details>
+<p><b>d)</b> Führe die Zeilen zusammen oder zähle sie.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>paste -sd, projects/summary.txt                       # Linux,5,anna  (Zeilen in eine Zeile)
+wc -l &lt; projects/summary.txt                          # 3
+head -n 1 projects/summary.txt; tail -n 1 projects/summary.txt   # erste und letzte Zeile</code></pre>
+<p class="ex"><code class="i">paste -sd,</code> hängt alle Zeilen mit einem Komma zusammen. So lassen sich Ergebnisse in eine CSV-Zeile verwandeln.</p></details>
+<p><b>e)</b> Schreibe nach dem Prüfen eine Zusammenfassung, die sich selbst kontrolliert.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>N=$(grep -c ' ERROR ' ~/daten/events.log)
+if [ "$N" -eq 5 ]; then
+    printf 'Linux\n%s\nanna\n' "$N" &gt; projects/summary.txt
+    echo "Zusammenfassung geschrieben: $N Fehler"
+else
+    echo "Unerwartet: $N Fehler, nichts geschrieben" &gt;&amp;2
+fi</code></pre>
+<p class="ex">Ein Skript schreibt nur dann, wenn die Prüfung stimmt. <code class="i">&gt;&amp;2</code> leitet die Meldung auf die Fehlerausgabe (Übung 34). Im Alltag macht man das so, damit falsche Werte nicht stillschweigend festgehalten werden.</p></details>
+<p><b>f)</b> Zähle ohne Prüfung falsch, und vergleiche.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>grep -c ' ERROR ' ~/daten/events.log        # 5   (Level ERROR)
+grep -c ERROR ~/daten/events.log            # 5   (hier gleich; bei Logs mit ERROR in Meldungen oft mehr)
+grep ' ERROR ' ~/daten/events.log | wc -l   # 5   (anderer Weg, gleiches Ergebnis)</code></pre>
+<p class="ex">Mehrere Wege führen zur selben Zahl. Mit Mustern ohne Leerzeichen werden aber in Logs gelegentlich auch Meldungen gezählt (Übung 24 und 27). Gleichen Sie deshalb zwei Wege ab, wenn die Zahl wichtig ist.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
