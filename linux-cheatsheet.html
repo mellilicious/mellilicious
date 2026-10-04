@@ -942,6 +942,77 @@ ls -d mein\ projekt         # alternativ: Leerzeichen mit \ maskieren</code></pr
 <p class="ex"><code class="i">-d</code> ist hier ein <i>Test</i>, nicht die Option von <code class="i">ls</code>. Der Befehl vor <code class="i">&amp;&amp;</code> liefert nur bei Erfolg den Exit-Code 0, dann läuft <code class="i">echo</code>.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 5 · Verschachtelte Ordner anlegen</h3>
+<p><b>Aufgabe:</b> Lege <code class="i">~/uebung/projects/linux/basics</code> an.</p>
+<p class="ex">Geübt wird: <code class="i">mkdir -p</code> legt eine ganze Ordnerkette in einem Schritt an. Der Ordner <code class="i">projects</code> stammt aus Übung 4, er muss aber nicht existieren.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>mkdir -p ~/uebung/projects/linux/basics
+
+find ~/uebung/projects -type d       # Kontrolle: alle Ordner darunter
+ls -R ~/uebung/projects              # alternativ: rekursive Auflistung</code></pre>
+<p class="ex">Erwartete Ausgabe von <code class="i">find</code>: <code class="i">~/uebung/projects</code>, <code class="i">~/uebung/projects/linux</code> und <code class="i">~/uebung/projects/linux/basics</code> (jeweils mit ausgeschriebenem Home-Pfad).</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Befehl</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>mkdir -p pfad</code></td><td><code>-p</code> steht für <b>p</b>arents (Elternordner). <code>mkdir</code> prüft jede Ebene des Pfads von links nach rechts und legt nur die an, die noch fehlen.</td></tr>
+<tr><td class="nw"><code>find pfad -type d</code></td><td>Listet alle Einträge unterhalb von <code>pfad</code>, die Verzeichnisse sind (<code>-type d</code>), also die ganze Ordnerstruktur.</td></tr>
+<tr><td class="nw"><code>ls -R pfad</code></td><td><b>R</b>ekursiv: zeigt den Inhalt jedes Unterordners, jeweils unter dessen Namen.</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Ohne <code class="i">-p</code> geht es nur Schritt für Schritt:</b> <code class="i">mkdir</code> legt immer nur die letzte Ebene an und erwartet, dass alle davor schon existieren. Fehlt <code class="i">linux</code>, bricht der Befehl ab.</p>
+<pre><code>mkdir ~/uebung/projects/linux/basics
+# mkdir: cannot create directory '…/projects/linux/basics': No such file or directory
+
+# ohne -p wären zwei getrennte Befehle nötig:
+mkdir ~/uebung/projects/linux
+mkdir ~/uebung/projects/linux/basics</code></pre>
+<p><b>Mit <code class="i">-p</code> ein Befehl:</b> Es spielt keine Rolle, wie viel vom Pfad schon existiert. Vorhandene Ebenen bleiben unverändert, es gibt keine Fehlermeldung, und das Ergebnis ist immer dasselbe. Deshalb setzt man <code class="i">-p</code> auch in Skripten ein, die mehrfach laufen.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>-p</code> vergessen</td><td><code>mkdir: cannot create directory '…': No such file or directory</code>, sobald eine Ebene fehlt.</td></tr>
+<tr><td>Tippfehler in einer Zwischenebene</td><td><code>-p</code> legt auch <code>projekts</code> brav an, ohne Warnung. Dann existiert ein zweiter, falscher Baum, und die Kontrolle mit <code>find</code> zeigt es.</td></tr>
+<tr><td>Eine Datei liegt im Weg</td><td>Existiert auf dem Pfad eine <i>Datei</i> gleichen Namens, meldet <code>mkdir</code> <code>Not a directory</code>.</td></tr>
+<tr><td>Leerzeichen im Pfad</td><td>Jedes Wort wird als eigener Pfad verstanden. Pfade ohne Leerzeichen wählen oder in Anführungszeichen setzen.</td></tr>
+<tr><td><code>-p</code> hinter dem Pfad</td><td>Meist egal, aber die Konvention ist: Optionen zuerst, dann der Pfad.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 5 · Zum Weiterüben</h3>
+<p class="ex">Alle Befehle im Übungsordner <code class="i">~/uebung</code> ausführen und mit <code class="i">find</code> oder <code class="i">ls -R</code> kontrollieren.</p>
+<p><b>a)</b> Lege <code class="i">a/b/c</code> an und lass dir anzeigen, welche Ordner dabei erzeugt werden.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>mkdir -p -v a/b/c
+# mkdir: created directory 'a'
+# mkdir: created directory 'a/b'
+# mkdir: created directory 'a/b/c'</code></pre>
+<p class="ex"><code class="i">-v</code> (verbose) listet jede neu angelegte Ebene. Läuft der Befehl ein zweites Mal, bleibt die Ausgabe leer, weil nichts mehr zu tun ist.</p></details>
+<p><b>b)</b> Lege in <code class="i">projects/linux</code> die Ordner <code class="i">basics</code> und <code class="i">advanced</code> an, und in beiden jeweils <code class="i">notes</code> und <code class="i">labs</code>.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>mkdir -p projects/linux/{basics,advanced}/{notes,labs}
+find projects -type d | sort</code></pre>
+<p class="ex">Die Shell löst die geschweiften Klammern zu allen vier Kombinationen auf (<code class="i">basics/notes</code>, <code class="i">basics/labs</code>, <code class="i">advanced/notes</code>, <code class="i">advanced/labs</code>), bevor <code class="i">mkdir</code> startet.</p></details>
+<p><b>c)</b> Zeige die Struktur unter <code class="i">projects</code> als Baum an.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>tree projects             # falls installiert
+tree -d projects          # nur Verzeichnisse
+find projects -type d | sort    # funktioniert immer</code></pre>
+<p class="ex"><code class="i">tree</code> ist nicht überall vorinstalliert. Unter Debian/Ubuntu: <code class="i">sudo apt install tree</code>.</p></details>
+<p><b>d)</b> Lege eine Datei <code class="i">hindernis</code> an und versuche dann, <code class="i">hindernis/unter</code> mit <code class="i">-p</code> zu erzeugen. Was meldet <code class="i">mkdir</code>?</p>
+<details><summary>Lösung d)</summary>
+<pre><code>touch hindernis
+mkdir -p hindernis/unter
+# mkdir: cannot create directory 'hindernis': Not a directory</code></pre>
+<p class="ex">Auch <code class="i">-p</code> kann eine Datei nicht in einen Ordner verwandeln. Entfernen oder verschieben Sie die Datei zuerst, zum Beispiel mit <code class="i">mv hindernis hindernis.txt</code>.</p></details>
+<p><b>e)</b> Lege den Pfad <code class="i">~/uebung/projects/linux/basics</code> noch einmal an. Woran sieht man, dass alles in Ordnung ist?</p>
+<details><summary>Lösung e)</summary>
+<pre><code>mkdir -p ~/uebung/projects/linux/basics
+echo $?            # 0 = Erfolg</code></pre>
+<p class="ex">Keine Meldung und Exit-Code <code class="i">0</code>: Alles war schon vorhanden, <code class="i">-p</code> hat nichts geändert. Ohne <code class="i">-p</code> käme <code class="i">File exists</code>.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
