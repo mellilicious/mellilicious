@@ -4660,6 +4660,115 @@ grep ' ERROR ' ~/daten/events.log | wc -l   # 5   (anderer Weg, gleiches Ergebni
 <p class="ex">Mehrere Wege führen zur selben Zahl. Mit Mustern ohne Leerzeichen werden aber in Logs gelegentlich auch Meldungen gezählt (Übung 24 und 27). Gleichen Sie deshalb zwei Wege ab, wenn die Zahl wichtig ist.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 44 · Abschluss: Rechte der Zusammenfassung setzen</h3>
+<p><b>Aufgabe:</b> Setze <code class="i">projects/summary.txt</code> auf den Modus <code class="i">640</code>.</p>
+<p class="ex">Das ist die letzte Aufgabe des Kurses. Der Modus <code class="i">640</code> kennen Sie aus Übung 3. Neu ist der Blick auf die <i>Gruppe</i>: Wer darf die Zusammenfassung lesen, und wer nicht? Die Datei stammt aus Übung 43. Falls sie fehlt, legt die Lösung sie an.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p projects
+printf 'Linux\n5\nanna\n' &gt; projects/summary.txt      # nur falls Übung 43 fehlt
+
+ls -l projects/summary.txt                              # vorher:  -rw-r--r--  (644)
+chmod 640 projects/summary.txt
+ls -l projects/summary.txt                              # nachher: -rw-r-----  (640)
+stat -c '%a %A %U:%G' projects/summary.txt              # 640 -rw-r----- besitzer:gruppe</code></pre>
+<p class="ex">Der Inhalt der Datei ändert sich nicht. Nur die Rechte werden angepasst.</p>
+</details>
+</div>
+
+<div class="blk"><h3>640 im Überblick</h3><div class="tw"><table>
+<tr><th></th><th>Besitzer (u)</th><th>Gruppe (g)</th><th>Andere (o)</th></tr>
+<tr><td class="nw">Text</td><td><code>rw-</code></td><td><code>r--</code></td><td><code>---</code></td></tr>
+<tr><td class="nw">Zahl</td><td>6 (4 + 2)</td><td>4</td><td>0</td></tr>
+<tr><td class="nw">Darf</td><td>lesen und ändern</td><td>nur lesen</td><td>nichts</td></tr>
+</table></div>
+<p>Dieselben Rechte symbolisch: <code class="i">chmod u=rw,g=r,o= datei</code>. Ausgehend von einer beliebigen Datei: <code class="i">chmod g-w,o-rw datei</code> entfernt Gruppenschreibrecht und alle Rechte der anderen.</p></div>
+
+<div class="blk"><h3>Wer darf was? Besitzer, Gruppe, andere</h3>
+<p class="ex">Jede Datei hat einen Besitzer <i>und</i> eine Gruppe (<code class="i">ls -l</code> zeigt beide). Linux prüft, wer zugreift, und wendet genau einen der drei Rechtesätze an.</p><div class="tw"><table>
+<tr><th>Wer greift zu?</th><th>Gilt</th><th>Ergebnis bei 640</th></tr>
+<tr><td class="nw">der Besitzer</td><td>erste Ziffer (6)</td><td>lesen und schreiben</td></tr>
+<tr><td class="nw">Mitglied der Gruppe der Datei</td><td>zweite Ziffer (4)</td><td>nur lesen (Schreiben: <code>Permission denied</code>)</td></tr>
+<tr><td class="nw">alle anderen</td><td>dritte Ziffer (0)</td><td><code>Permission denied</code></td></tr>
+</table></div>
+<p>Beides wurde mit einem zweiten Benutzerkonto getestet: Ein Mitglied der Gruppe konnte die Datei lesen, aber nicht anhängen. Ein Nichtmitglied bekam beim Lesen <code class="i">Permission denied</code>.</p></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Teilen, ohne zu öffnen:</b> Eine Zusammenfassung dürfen Kollegen in derselben Gruppe lesen, aber nicht ändern. Alle anderen sollen sie nicht sehen. <code class="i">640</code> ist genau das. Für ein Team ist das ein gängiger Standard.</p>
+<p><b>Rechte nach Zweck wählen:</b> <code class="i">600</code> für Privates (Übung 39), <code class="i">640</code> zum Lesen für die Gruppe, <code class="i">644</code> zum Lesen für alle, <code class="i">750</code> und <code class="i">755</code> für Skripte und Ordner. Je weniger, desto sicherer.</p>
+<p><b>Zum Schluss prüfen:</b> <code class="i">stat</code> zeigt Zahl, Text, Besitzer und Gruppe in einer Zeile. Damit sind Rechte und Inhalt der Abschlussdatei nachvollziehbar.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>chmod 600</code> oder <code>644</code></td><td>Entweder darf die Gruppe nicht lesen oder jeder darf es. Die Aufgabe verlangt genau <code>640</code>.</td></tr>
+<tr><td>Zu kurze Zahl (<code>chmod 64</code>)</td><td>Wird als <code>064</code> gelesen. Der Besitzer verliert alle Rechte. Immer drei Ziffern.</td></tr>
+<tr><td>Ziffern vertauscht (<code>chmod 046</code>)</td><td>Der Besitzer hat keine Rechte, die anderen dürfen schreiben. Das Gegenteil des Gewünschten.</td></tr>
+<tr><td>Falscher Pfad</td><td><code>chmod: cannot access 'projects/nix.txt': No such file or directory</code>.</td></tr>
+<tr><td>Datei nicht geprüft</td><td>Der Befehl schweigt bei Erfolg. Erst <code>ls -l</code> oder <code>stat</code> zeigt das Ergebnis.</td></tr>
+<tr><td>Rechte mit Besitz verwechselt</td><td><code>chmod</code> ändert die Rechte, nicht den Besitzer oder die Gruppe. Dafür gibt es <code>chown</code> und <code>chgrp</code> (nur Administrator).</td></tr>
+<tr><td>Datei in der falschen Gruppe</td><td>Die Gruppe steht neben dem Besitzer in <code>ls -l</code>. Nur deren Mitglieder profitieren vom Gruppenrecht.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 44 · Zum Weiterüben und Abschlusskontrolle</h3>
+<p class="ex">Hier finden Sie Werkzeuge, um die Ergebnisse des ganzen Kurses zu prüfen. Alle Beispiele laufen im Übungsordner <code class="i">~/uebung</code>.</p>
+<p><b>a)</b> Zeige die Rechte aller Dateien übersichtlich.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>find . -type f -printf '%m %p\n' | sort -k2     # Modus als Zahl und Pfad
+stat -c '%a %n' projects/* | sort -k2           # alle Dateien in projects
+ls -l projects | awk 'NR&gt;1 {print $1, $NF}'     # Rechte als Text und Name</code></pre>
+<p class="ex">Beispielausgabe: <code class="i">640 ./projects/summary.txt</code>, <code class="i">600 ./projects/private.txt</code>, <code class="i">750 ./projects/check-errors.sh</code>. <code class="i">%m</code> in <code class="i">find -printf</code> ist der Modus als Zahl, <code class="i">%p</code> der Pfad.</p></details>
+<p><b>b)</b> Finde Dateien nach ihren Rechten.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>find . -type f -perm 640                        # genau 640
+find . -type f -perm -o=r                       # für andere lesbar
+find . -type f -perm -o=w                       # für andere schreibbar (sollte 0 Treffer sein)
+find . -type f -perm -u+x                       # für den Besitzer ausführbar</code></pre>
+<p class="ex"><code class="i">-perm 640</code> verlangt genau diesen Modus, <code class="i">-perm -o=r</code> mindestens dieses Recht. Mit <code class="i">-o=w</code> findet man unsichere, offene Dateien.</p></details>
+<p><b>c)</b> Prüfe, ob alle Ergebnisdateien des Kurses vorhanden sind.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>cd ~/uebung
+for f in notes/listing.txt notes/commands.txt notes/words.txt notes/sorted.txt \
+         notes/unique.txt notes/count.txt notes/people.csv notes/people.csv.gz \
+         projects/summary.txt projects/check-errors.sh projects/private.txt; do
+  if [ -e "$f" ]; then printf 'ok     %s\n' "$f"; else printf 'FEHLT  %s\n' "$f"; fi
+done</code></pre>
+<p class="ex">Passen Sie die Liste an Ihre eigenen Dateinamen an. Die Schleife prüft jede Datei und meldet <code class="i">ok</code> oder <code class="i">FEHLT</code>. Dieselbe Idee eignet sich für jedes Projekt: Eine Liste von Soll-Dateien und eine Schleife.</p></details>
+<p><b>d)</b> Prüfe auch die Rechte gegen eine Soll-Liste.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>check() {
+  m=$(stat -c %a "$1" 2&gt;/dev/null) || { echo "FEHLT  $1"; return; }
+  [ "$m" = "$2" ] &amp;&amp; echo "ok     $1 ($m)" || echo "FALSCH $1 ist $m, erwartet $2"
+}
+check projects/summary.txt 640
+check projects/private.txt 600
+check projects/check-errors.sh 750</code></pre>
+<p class="ex">Eine kleine Funktion fasst die Prüfung zusammen. Sie meldet fehlende Dateien, falsche Rechte und richtige Ergebnisse. Mit <code class="i">[ -s datei ]</code> prüfen Sie zusätzlich, ob eine Datei <i>nicht leer</i> ist.</p></details>
+<p><b>e)</b> Setze Rechte für einen ganzen Ordnerbaum sinnvoll.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>cp -a notes notes-test                       # Testkopie: das Original bleibt unberührt
+chmod -R u=rwX,g=rX,o= notes-test             # Ordner 750, Dateien 640
+find notes-test -printf '%m %p\n' | sort      # alles prüfen
+rm -r notes-test                              # Testkopie wieder löschen</code></pre>
+<p class="ex">Das große <code class="i">X</code> (Übung 38) vergibt das Ausführungsrecht nur an Ordner und an schon ausführbare Dateien. Danach haben Ordner 750 und normale Dateien 640. Wenden Sie <code class="i">chmod -R</code> nie auf den ganzen Übungsordner an: Es würde auch Ihre privaten Dateien (<code class="i">600</code>) für die Gruppe lesbar machen.</p></details>
+<p><b>f)</b> Wechsle zwischen den Schreibweisen.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>for m in 640 600 750; do chmod $m projects/summary.txt; echo "$m $(stat -c %A projects/summary.txt)"; done
+# 640 -rw-r-----   600 -rw-------   750 -rwxr-x---
+chmod 640 projects/summary.txt           # zum Schluss wieder auf den Zielwert</code></pre>
+<p class="ex">Rechnen Sie mit: <code class="i">4 + 2 + 1 = 7</code> für <code class="i">rwx</code>. Wer die Zahlen kennt, liest <code class="i">ls -l</code> sofort: <code class="i">-rw-r-----</code> ist <code class="i">640</code>.</p></details>
+<p><b>g)</b> Fasse den Kurs in einer Merkliste zusammen.</p>
+<details><summary>Lösung g)</summary>
+<pre data-lang="plain"><code>Navigation      pwd  ls  cd  man  history
+Dateien         mkdir  touch  cp  mv  rm  rmdir  find  ln
+Text            cat  head  tail  less  grep  cut  sort  uniq  tr  sed  awk  wc
+Umleitung       &gt;  &gt;&gt;  2&gt;  |  tee  xargs
+Archive         tar  gzip  gunzip  zip
+Rechte          chmod  chown  chgrp  umask  stat  id  whoami
+Skripte         #!/bin/sh  chmod +x  ./skript  sh  $(…)  if  for
+System          uname  df  free  lscpu  uptime  systemctl</code></pre>
+<p class="ex">Diese Liste ist ein Gerüst. Die ausführlichen Beschreibungen, Fehlerfälle und Übungen finden Sie oben im CheatSheet.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
