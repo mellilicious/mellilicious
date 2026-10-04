@@ -3446,6 +3446,124 @@ check-errors.sh                                             # nur Name, 5 (Skrip
 <p class="ex">Alle 5 Minuten wird das Skript gestartet und die Zahl an <code class="i">check.log</code> angehängt. Dafür muss das Skript ausführbar sein und einen Shebang haben. Diese Zeile habe ich nicht in <code class="i">cron</code> eingetragen.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 33 · Ein Skript ausführbar machen</h3>
+<p><b>Aufgabe:</b> Setze die Rechte von <code class="i">projects/check-errors.sh</code> auf den Modus <code class="i">750</code>.</p>
+<p class="ex">Geübt wird: <code class="i">chmod</code> mit einer Zahl, diesmal mit dem Ausführungsrecht <code class="i">x</code>. Das Skript stammt aus Übung 32. Die Zahlen und Buchstaben kennen Sie aus Übung 3 (<code class="i">640</code>). Neu ist die Bedeutung des <code class="i">x</code> bei Skripten.</p>
+<details><summary>Voraussetzung: Skript anlegen</summary>
+<pre><code>cd ~/uebung
+mkdir -p projects
+cat &gt; projects/check-errors.sh &lt;&lt;'EOF'
+#!/bin/sh
+grep -c ' ERROR ' "$HOME/daten/events.log"
+EOF
+ls -l projects/check-errors.sh        # -rw-r--r--  (644, nicht ausführbar)</code></pre></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+ls -l projects/check-errors.sh            # vorher:  -rw-r--r--  (644)
+
+chmod 750 projects/check-errors.sh
+
+ls -l projects/check-errors.sh            # nachher: -rwxr-x---  (750)
+stat -c '%a %A' projects/check-errors.sh  # 750 -rwxr-x---
+./projects/check-errors.sh                # jetzt direkt startbar</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Rechte als Zahl: 750</h3>
+<p class="ex">Jede Ziffer steht für eine Gruppe (Besitzer, Gruppe, andere) und ist die Summe aus lesen = 4, schreiben = 2, ausführen = 1.</p><div class="tw"><table>
+<tr><th></th><th>Besitzer (u)</th><th>Gruppe (g)</th><th>Andere (o)</th></tr>
+<tr><td class="nw">Text</td><td><code>rwx</code></td><td><code>r-x</code></td><td><code>---</code></td></tr>
+<tr><td class="nw">Rechnung</td><td>4 + 2 + 1</td><td>4 + 0 + 1</td><td>0</td></tr>
+<tr><td class="nw">Ziffer</td><td><code>7</code></td><td><code>5</code></td><td><code>0</code></td></tr>
+</table></div>
+<p>Ergebnis: <code class="i">750</code>. Der Besitzer darf lesen, ändern und ausführen, die Gruppe darf lesen und ausführen, alle anderen haben keinen Zugriff.</p></div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Befehl</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>chmod 750 datei</code></td><td>Setzt alle neun Rechte auf genau diesen Wert. Vorherige Rechte werden ersetzt.</td></tr>
+<tr><td class="nw"><code>ls -l datei</code></td><td>Zeigt die Rechte als Text. Statt <code>-rw-r--r--</code> steht danach <code>-rwxr-x---</code>.</td></tr>
+<tr><td class="nw"><code>stat -c '%a %A' datei</code></td><td>Zeigt die Rechte als Zahl und als Text.</td></tr>
+<tr><td class="nw"><code>./projects/check-errors.sh</code></td><td>Startet das Skript direkt. Das geht nur mit dem Recht <code>x</code>.</td></tr>
+</table></div>
+<pre><code>vorher:   -rw-r--r--   644   (kein x: nicht direkt startbar)
+nachher:  -rwxr-x---   750   (Besitzer und Gruppe dürfen starten)</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Ohne <code class="i">x</code> ist es nur Text:</b> Eine neu angelegte Datei bekommt kein Ausführungsrecht (meist <code class="i">644</code>). Erst mit <code class="i">x</code> lässt sie sich direkt aufrufen: <code class="i">./skript</code> statt <code class="i">sh skript</code>.</p>
+<p><b>Warum 750 und nicht 755 oder 777?</b> Möglichst wenige Rechte vergeben: Der Besitzer braucht alles, seine Gruppe darf das Skript nutzen, alle anderen müssen nichts sehen. <code class="i">777</code> erlaubt jedem, das Skript zu ändern und auszuführen. Das ist unsicher.</p>
+<p><b>Genauer Wert statt <code class="i">+x</code>:</b> <code class="i">chmod +x</code> fügt <code class="i">x</code> hinzu, und zwar abhängig von der <code class="i">umask</code> Ihrer Sitzung. Bei <code class="i">umask 022</code> ergibt <code class="i">+x</code> den Modus <code class="i">755</code>, bei <code class="i">077</code> den Modus <code class="i">700</code>. Die Aufgabe verlangt genau <code class="i">750</code>.</p>
+<p><b>Auch mit Rechten kein Skript ohne Shebang:</b> Das <code class="i">x</code> erlaubt den Start, die Zeile <code class="i">#!/bin/sh</code> (Übung 32) sagt, womit das Skript läuft.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>chmod +x</code> statt <code>750</code></td><td>Der Modus ist 755 (bei <code>umask 022</code>), nicht 750. Die Aufgabe verlangt den genauen Wert.</td></tr>
+<tr><td>Zu kurze Zahl (<code>chmod 75 datei</code>)</td><td>Wird als <code>075</code> gelesen: Der Besitzer verliert alle Rechte (<code>---rwxr-x</code>). Immer drei Ziffern.</td></tr>
+<tr><td>Vier Ziffern (<code>chmod 7500</code>)</td><td>Die erste Ziffer setzt Sonderrechte (setuid, setgid, sticky). Das ist hier nicht gemeint.</td></tr>
+<tr><td>Ziffer über 7 (<code>chmod 758</code>)</td><td><code>chmod: invalid mode: '758'</code>.</td></tr>
+<tr><td>Falscher Pfad</td><td><code>chmod: cannot access 'projects/nix.sh': No such file or directory</code>.</td></tr>
+<tr><td>Ziffern vertauscht (<code>057</code> statt <code>750</code>)</td><td>Besitzer ohne Rechte, andere mit allen Rechten: das Gegenteil des Gewünschten.</td></tr>
+<tr><td>Skript nicht ausführbar, aber mit <code>./</code> gestartet</td><td><code>Permission denied</code> (Exit-Code 126). Selbst der Administrator braucht mindestens ein <code>x</code>.</td></tr>
+<tr><td><code>chmod -R 750 projects</code></td><td>Setzt <i>alle</i> Dateien und Unterordner darin auf 750, nicht nur das Skript.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 33 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit <code class="i">projects/check-errors.sh</code> und neuen Testdateien im Übungsordner.</p>
+<p><b>a)</b> Setze den Modus auf drei Arten: mit Zahl, symbolisch und schrittweise.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>chmod 750 projects/check-errors.sh                   # Zahl
+chmod u=rwx,g=rx,o= projects/check-errors.sh         # symbolisch, gleicher Erfolg
+chmod 644 projects/check-errors.sh
+chmod u+x,g+x projects/check-errors.sh               # nur x für Besitzer und Gruppe hinzufügen
+stat -c '%a' projects/check-errors.sh                # 754 (o behält r)</code></pre>
+<p class="ex">Symbolisch: <code class="i">u</code> (user), <code class="i">g</code> (group), <code class="i">o</code> (others), <code class="i">a</code> (alle). <code class="i">=</code> setzt, <code class="i">+</code> fügt hinzu, <code class="i">-</code> entfernt. Aus <code class="i">644</code> wird mit <code class="i">u+x,g+x</code> der Modus <code class="i">754</code>, nicht <code class="i">750</code>, weil <code class="i">o=r</code> bleibt.</p></details>
+<p><b>b)</b> Zeige, wie die <code class="i">umask</code> das Ergebnis von <code class="i">+x</code> verändert.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>for m in 022 077 027; do
+  ( umask $m
+    echo '#!/bin/sh' &gt; t$m.sh
+    stat -c "umask $m neu: %a" t$m.sh
+    chmod +x t$m.sh
+    stat -c "  nach +x: %a" t$m.sh )
+done
+# umask 022 neu: 644 / nach +x: 755
+# umask 077 neu: 600 / nach +x: 700
+# umask 027 neu: 640 / nach +x: 750</code></pre>
+<p class="ex">Die <code class="i">umask</code> sagt, welche Rechte <i>nicht</i> vergeben werden. Beachten Sie: Mit <code class="i">umask 027</code> ergibt schon <code class="i">+x</code> den Modus 750. Nach dem Ausprobieren <code class="i">rm t022.sh t077.sh t027.sh</code>.</p></details>
+<p><b>c)</b> Teste, ob eine Datei ausführbar ist, und finde ausführbare Dateien.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>[ -x projects/check-errors.sh ] &amp;&amp; echo "ausführbar"
+find projects -type f -perm 750               # genau dieser Modus
+find projects -type f -perm -u+x              # Besitzer darf ausführen
+find projects -type f -executable             # ausführbar für den aktuellen Benutzer</code></pre>
+<p class="ex"><code class="i">-perm 750</code> verlangt genau diesen Modus, <code class="i">-perm -u+x</code> verlangt mindestens das Bit <code class="i">x</code> für den Besitzer. <code class="i">test -x</code> eignet sich in Skripten.</p></details>
+<p><b>d)</b> Starte das Skript auch ohne Ausführungsrecht.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>chmod 640 projects/check-errors.sh
+./projects/check-errors.sh                    # Permission denied (Exit-Code 126)
+sh projects/check-errors.sh                   # geht trotzdem: sh liest nur
+chmod 750 projects/check-errors.sh</code></pre>
+<p class="ex">Mit <code class="i">sh skript</code> startet man die Shell und lässt sie die Datei <i>lesen</i>, dafür genügt das Leserecht. <code class="i">./skript</code> verlangt das Ausführungsrecht.</p></details>
+<p><b>e)</b> Vergib den Modus gleich beim Kopieren oder Anlegen.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>install -m 750 projects/check-errors.sh kopie.sh      # kopieren und Modus setzen
+stat -c '%a' kopie.sh                                 # 750
+cp projects/check-errors.sh c1.sh                     # cp übernimmt den Modus: 750
+echo "x" &gt; neu.sh; stat -c '%a' neu.sh                # 644: neue Dateien sind nie ausführbar</code></pre>
+<p class="ex"><code class="i">install -m</code> erledigt Kopieren und <code class="i">chmod</code> in einem Schritt. Neu angelegte Dateien bekommen nie ein <code class="i">x</code> (wegen der Grundeinstellung 666 minus <code class="i">umask</code>).</p></details>
+<p><b>f)</b> Rechne die Zahlen aus und wieder zurück.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>echo $((4+2+1)) $((4+1)) 0       # 7 5 0   -&gt; 750
+stat -c '%a %A' projects/check-errors.sh
+# 750 -rwxr-x---</code></pre>
+<p class="ex">Merkhilfe: <code class="i">7</code> = alles, <code class="i">6</code> = rw-, <code class="i">5</code> = r-x, <code class="i">4</code> = r--, <code class="i">0</code> = nichts. Gängig: <code class="i">755</code> für Programme und Ordner, <code class="i">644</code> für Dateien, <code class="i">600</code> und <code class="i">700</code> für Privates, <code class="i">750</code> mit Gruppenzugriff.</p></details>
+<p><b>g)</b> Warum braucht ein Ordner das Recht <code class="i">x</code>?</p>
+<details><summary>Lösung g)</summary>
+<pre><code>mkdir d
+chmod 750 d                                   # rwx r-x ---: Besitzer und Gruppe dürfen hinein
+cd d &amp;&amp; echo "cd ok"; cd ..</code></pre>
+<p class="ex">Bei Ordnern heißt <code class="i">x</code>: „hineinwechseln und auf Einträge zugreifen“, <code class="i">r</code>: „Namen auflisten“, <code class="i">w</code>: „Einträge anlegen oder löschen“. Darum haben Ordner meist <code class="i">755</code> oder <code class="i">750</code>. Ein Ordner mit <code class="i">640</code> wäre für normale Benutzer nicht betretbar.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
