@@ -3682,6 +3682,104 @@ fi</code></pre>
 <p class="ex"><code class="i">grep -c</code> beendet sich mit Exit-Code 1, wenn es nichts gefunden hat (auch wenn die Zahl 0 ausgegeben wird). Das Skript übernimmt den Exit-Code seines letzten Befehls, <code class="i">if</code> wertet ihn aus. Stellen Sie danach das Beispiel-Log wieder her (Vorbereitung).</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 35 · Datei komprimieren</h3>
+<p><b>Aufgabe:</b> Erstelle <code class="i">notes/people.csv.gz</code> als mit <code class="i">gzip</code> komprimierte <i>Kopie</i> von <code class="i">notes/people.csv</code>. Das Original soll bleiben.</p>
+<p class="ex">Geübt wird: <code class="i">gzip</code> mit <code class="i">-c</code> (Ausgabe auf die Standardausgabe), dazu die Umleitung <code class="i">&gt;</code>. Die Datei <code class="i">notes/people.csv</code> stammt aus Übung 18. Falls sie fehlt, legen Sie sie mit dem Befehl am Anfang der Lösung an.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+printf 'id,name,city\nu3,Carla,Köln\n' &gt; notes/people.csv      # nur falls Übung 18 fehlt
+
+gzip -c notes/people.csv &gt; notes/people.csv.gz
+
+ls notes                          # people.csv  und  people.csv.gz
+file notes/people.csv.gz          # gzip compressed data
+zcat notes/people.csv.gz          # Inhalt ansehen, ohne zu entpacken</code></pre>
+<p class="ex">Gleichwertig und kürzer: <code class="i">gzip -k notes/people.csv</code>. <code class="i">-k</code> (keep) behält das Original und legt <code class="i">people.csv.gz</code> daneben. In der Aufgabe wird aber <code class="i">gzip -c</code> verlangt.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Teil macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>gzip datei</code></td><td>Komprimiert die Datei und <b>ersetzt</b> sie durch <code>datei.gz</code>. Das Original ist danach weg.</td></tr>
+<tr><td class="nw"><code>-c</code></td><td><b>c</b>onsole/stdout: schreibt das Ergebnis auf die Standardausgabe und lässt die Originaldatei unberührt.</td></tr>
+<tr><td class="nw"><code>&gt; notes/people.csv.gz</code></td><td>Leitet diese Ausgabe in die neue Datei um. Ohne Umleitung käme komprimierter Binärtext auf den Bildschirm.</td></tr>
+<tr><td class="nw"><code>zcat datei.gz</code></td><td>Gibt den <i>entpackten</i> Inhalt aus, ohne die Datei zu verändern. Mit <code>| diff - original</code> vergleicht man ihn mit dem Original.</td></tr>
+<tr><td class="nw"><code>gzip -t datei.gz</code></td><td>Testet, ob die Archivdatei fehlerfrei ist.</td></tr>
+</table></div>
+<pre><code>notes/people.csv   --gzip -c--&gt;   notes/people.csv.gz   (komprimiert)
+(bleibt erhalten)</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Kopie statt Ersatz:</b> Normalerweise ersetzt <code class="i">gzip</code> die Datei. Wer das Original behalten will, nutzt <code class="i">-c</code> mit Umleitung oder <code class="i">-k</code>. Die Aufgabe nennt ausdrücklich eine <i>Kopie</i>.</p>
+<p><b>Ein Strom, viele Wege:</b> <code class="i">gzip -c</code> arbeitet wie <code class="i">tr</code> oder <code class="i">sort</code> als Filter. Es lässt sich in Pipes einsetzen: <code class="i">cat datei | gzip &gt; datei.gz</code>.</p>
+<p><b>Nur eine Datei:</b> Anders als <code class="i">tar</code> (Übung 26) fasst <code class="i">gzip</code> nichts zusammen. Es komprimiert genau einen Datenstrom. Darum entstehen bei Ordnern <code class="i">.tar.gz</code>: erst bündeln, dann komprimieren.</p>
+<p><b>Kleine Dateien lohnen nicht:</b> Eine 28 Byte kleine Datei wird als <code class="i">.gz</code> 59 Byte groß, weil der Kopfbereich mehr Platz braucht. Bei Text in größerer Menge sinkt die Größe oft auf ein Viertel.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>gzip notes/people.csv</code> ohne <code>-c</code></td><td>Das Original wird ersetzt. <code>people.csv</code> existiert nicht mehr, nur noch <code>people.csv.gz</code>. Die Aufgabe verlangt aber beides.</td></tr>
+<tr><td><code>-c</code> ohne <code>&gt;</code></td><td>Die Binärdaten erscheinen als unlesbare Zeichen auf dem Bildschirm (je nach Version verweigert <code>gzip</code> die Ausgabe auf dem Terminal).</td></tr>
+<tr><td>Ausgabe in die Quelle (<code>gzip -c a &gt; a</code>)</td><td>Die Shell leert <code>a</code>, bevor <code>gzip</code> liest. Die Originaldaten sind weg.</td></tr>
+<tr><td>Falsche Endung (<code>people.gz</code>)</td><td>Die Datei ist korrekt komprimiert, hat aber nicht den verlangten Namen <code>people.csv.gz</code>.</td></tr>
+<tr><td><code>.gz</code> existiert schon (<code>gzip -k</code>)</td><td><code>gzip: … already exists; not overwritten</code>. Mit <code>-f</code> erzwingen.</td></tr>
+<tr><td>Ordner übergeben (<code>gzip ordner</code>)</td><td><code>gzip: ordner is a directory -- ignored</code>. Dafür gibt es <code>tar -czf</code> oder <code>gzip -r</code> (jede Datei einzeln).</td></tr>
+<tr><td>Falscher Pfad</td><td><code>gzip: …: No such file or directory</code>. Die Zieldatei wird trotzdem leer angelegt.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 35 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit <code class="i">notes/people.csv</code> und einer größeren Testdatei: <code class="i">for i in $(seq 1 2000); do echo "u$i,Name$i,Berlin"; done &gt; big.csv</code>.</p>
+<p><b>a)</b> Prüfe, ob die komprimierte Datei dem Original entspricht.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>zcat notes/people.csv.gz | diff - notes/people.csv &amp;&amp; echo "identisch"
+gzip -t notes/people.csv.gz &amp;&amp; echo "Archiv ok"
+gzip -c big.csv | gunzip -c | cmp - big.csv &amp;&amp; echo "Rundreise ok"</code></pre>
+<p class="ex"><code class="i">diff -</code> liest die erste Datei von der Standardeingabe. Keine Ausgabe heißt: gleich. <code class="i">gzip -t</code> prüft nur die Integrität.</p></details>
+<p><b>b)</b> Vergleiche Größen und Kompressionsstufen.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>wc -c &lt; big.csv                              # 41786 Bytes
+gzip -c big.csv | wc -c                       # 9910   (Standard, Stufe 6)
+gzip -9 -c big.csv | wc -c                    # 9904   (stärkste Kompression)
+gzip -1 -c big.csv | wc -c                    # 9967   (schnellste)
+gzip -l notes/people.csv.gz                   # Übersicht: komprimiert / unkomprimiert / Rate</code></pre>
+<p class="ex">Die Stufen <code class="i">-1</code> bis <code class="i">-9</code> tauschen Geschwindigkeit gegen Größe. Bei dieser Datei sind die Unterschiede klein. <code class="i">gzip -l</code> zeigt bei kleinen Dateien sogar negative Raten.</p></details>
+<p><b>c)</b> Entpacke wieder, ohne etwas zu verlieren.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>cp notes/people.csv p.csv
+gzip -k p.csv                           # p.csv und p.csv.gz
+rm p.csv
+gunzip p.csv.gz                         # wieder p.csv (die .gz-Datei verschwindet)
+gzip -dk p.csv.gz                       # (wenn nötig) -d entpackt, -k behält die .gz-Datei</code></pre>
+<p class="ex"><code class="i">gunzip</code> ist dasselbe wie <code class="i">gzip -d</code>. Auch beim Entpacken gilt: ohne <code class="i">-k</code> verschwindet die <code class="i">.gz</code>-Datei, mit <code class="i">-c</code> kommt der Inhalt auf die Standardausgabe.</p></details>
+<p><b>d)</b> Lies und durchsuche komprimierte Dateien direkt.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>zcat notes/people.csv.gz                 # Inhalt ausgeben
+zgrep Carla notes/people.csv.gz          # grep in der komprimierten Datei
+zless notes/people.csv.gz                # wie less
+zcat notes/people.csv.gz | wc -l         # Zeilen zählen</code></pre>
+<p class="ex">Die Befehle mit <code class="i">z</code> davor entpacken im Hintergrund. So sind auch gepackte Logdateien (<code class="i">syslog.2.gz</code>) schnell durchsuchbar.</p></details>
+<p><b>e)</b> Komprimiere in einer Pipe.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>cat notes/people.csv | gzip &gt; pipe.gz
+zcat pipe.gz | head -n 1                 # id,name,city
+ls ~ | gzip -c &gt; liste.gz                # beliebige Ausgabe direkt komprimieren</code></pre>
+<p class="ex">Ohne Dateiname liest <code class="i">gzip</code> von der Standardeingabe und schreibt auf die Standardausgabe. So können Sie z. B. Datenbanksicherungen direkt komprimiert speichern.</p></details>
+<p><b>f)</b> Komprimiere mehrere Dateien, und lege Ordnerinhalt einzeln ab.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>echo a &gt; a.txt; echo b &gt; b.txt
+gzip -c a.txt b.txt &gt; ab.gz              # zusammengehängt in einem Strom
+zcat ab.gz                               # a  b  (beide Inhalte)
+
+mkdir dd; echo x &gt; dd/f
+gzip -r dd                               # jede Datei im Ordner einzeln: dd/f.gz</code></pre>
+<p class="ex">Mit <code class="i">-c</code> wird alles zu <i>einem</i> Strom zusammengefügt, die Dateinamen gehen verloren. Für Ordner und Dateinamen ist <code class="i">tar -czf</code> (Übung 26) die bessere Wahl.</p></details>
+<p><b>g)</b> Vergleiche <code class="i">gzip</code> mit <code class="i">bzip2</code> und <code class="i">xz</code>.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>gzip  -c big.csv | wc -c           # 9910
+bzip2 -kc big.csv | wc -c          # 4793
+xz    -kc big.csv | wc -c          # 1856</code></pre>
+<p class="ex"><code class="i">gzip</code> ist am schnellsten und überall verfügbar. <code class="i">bzip2</code> und <code class="i">xz</code> komprimieren stärker, brauchen aber länger. Die Zahlen gelten für diese Testdatei mit stark wiederholtem Text. <code class="i">-k</code> behält das Original, <code class="i">-c</code> schreibt auf die Standardausgabe.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
