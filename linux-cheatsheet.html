@@ -2108,6 +2108,93 @@ echo "abcdef" | cut -c2-4                             # bcd</code></pre>
 <p class="ex"><code class="i">awk</code> ist flexibler: Es kann Felder umstellen und mit Text verbinden. <code class="i">cut -c</code> wählt Zeichen nach Position und passt zu Dateien mit fester Spaltenbreite.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 20 · Text ersetzen</h3>
+<p><b>Aufgabe:</b> Erzeuge <code class="i">notes/replaced.txt</code>, indem Sie in <code class="i">hello.txt</code> ein Wort durch einen anderen Text ersetzen. In der Kursaufgabe wird <code class="i">c2610475054</code> durch <code class="i">Server-00fbe14e</code> ersetzt. Hier ersetzen wir <code class="i">world</code> durch <code class="i">Server-01</code>.</p>
+<p class="ex">Geübt wird: <code class="i">sed 's/alt/neu/'</code>, der wichtigste Befehl zum Ersetzen von Text. <code class="i">hello.txt</code> steht im Übungsordner, der Inhalt ist <code class="i">hello world</code>. Setzen Sie Ihre eigenen Werte aus der Aufgabenstellung ein.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes
+echo "hello world" &gt; hello.txt                       # nur falls hello.txt fehlt
+
+sed 's/world/Server-01/' hello.txt &gt; notes/replaced.txt
+
+cat notes/replaced.txt         # hello Server-01
+cat hello.txt                  # hello world  (Original unverändert)</code></pre>
+<p class="ex">Mit Ihren Werten aus der Kursaufgabe: <code class="i">sed 's/c2610475054/Server-00fbe14e/' hello.txt &gt; notes/replaced.txt</code>.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>sed</code></td><td><b>s</b>tream <b>ed</b>itor: Liest Text Zeile für Zeile, bearbeitet ihn und gibt ihn aus. Die Datei selbst bleibt unverändert.</td></tr>
+<tr><td class="nw"><code>'s/world/Server-01/'</code></td><td>Der Befehl <code>s</code> (substitute) in der Form <code>s/suchen/ersetzen/</code>. Pro Zeile wird das <i>erste</i> Vorkommen von <code>world</code> durch <code>Server-01</code> ersetzt.</td></tr>
+<tr><td class="nw"><code>hello.txt</code></td><td>Die Eingabedatei.</td></tr>
+<tr><td class="nw"><code>&gt; notes/replaced.txt</code></td><td>Schreibt die bearbeitete Ausgabe in eine neue Datei.</td></tr>
+</table></div>
+<pre><code>hello.txt        --sed 's/world/Server-01/'--&gt;   notes/replaced.txt
+hello world                                      hello Server-01</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Strom statt Editor:</b> <code class="i">sed</code> ändert Text automatisch und wiederholbar. Derselbe Befehl bearbeitet eine Zeile oder eine Million. Das ist die Grundlage für Skripte, die Konfigurationen anpassen.</p>
+<p><b>Original bleibt:</b> Mit <code class="i">&gt;</code> entsteht eine neue Datei, Sie können das Ergebnis prüfen, bevor Sie etwas überschreiben.</p>
+<p><b>Einfache Anführungszeichen:</b> Der Ausdruck steht in <code class="i">'…'</code>, damit die Shell Zeichen wie <code class="i">$</code>, <code class="i">&amp;</code> oder <code class="i">\</code> nicht selbst auswertet.</p>
+<p><b>Unterschied zu <code class="i">tr</code>:</b> <code class="i">tr</code> ersetzt einzelne Zeichen (Übung 16), <code class="i">sed</code> ersetzt ganze Zeichenfolgen und versteht Muster.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>g</code> vergessen</td><td>Pro Zeile wird nur das <i>erste</i> Vorkommen ersetzt. Aus <code>world world</code> wird <code>X world</code>. Mit <code>s/world/X/g</code> werden alle ersetzt.</td></tr>
+<tr><td>Ausgabe in dieselbe Datei (<code>sed … a &gt; a</code>)</td><td>Die Shell leert die Datei, bevor <code>sed</code> liest. Ergebnis: 0 Bytes. Besser <code>sed -i</code> oder eine zweite Datei.</td></tr>
+<tr><td>Groß-/Kleinschreibung</td><td><code>s/world/X/</code> trifft <code>World</code> nicht. Mit <code>I</code> am Ende (GNU sed) ignoriert man die Schreibweise.</td></tr>
+<tr><td>Sonderzeichen im Suchtext</td><td>Der Punkt in <code>a.b</code> steht für ein beliebiges Zeichen. Wörtlich: <code>a\.b</code>.</td></tr>
+<tr><td><code>/</code> im Text (Pfade)</td><td>Bricht den Ausdruck. Anderes Trennzeichen nehmen: <code>s|/usr|/opt|</code>.</td></tr>
+<tr><td>Variable in einfachen Anführungszeichen</td><td><code>'s/world/$NAME/'</code> setzt den Text <code>$NAME</code> ein. Für Variablen doppelte Anführungszeichen nehmen: <code>"s/world/$NAME/"</code>.</td></tr>
+<tr><td>Kein Treffer</td><td><code>sed</code> gibt den Text unverändert aus, ohne Fehler. Tippfehler im Suchtext fallen nicht auf. Ergebnis mit <code>cat</code> oder <code>diff</code> prüfen.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 20 · Zum Weiterüben</h3>
+<p class="ex">Alle Beispiele laufen im Terminal. Die Ausgabe sehen Sie sofort, die Dateien bleiben unverändert, wenn nicht anders angegeben.</p>
+<p><b>a)</b> Ersetze alle Vorkommen, auch ohne Rücksicht auf die Schreibweise.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>echo "world world" | sed 's/world/X/g'          # X X
+echo "World world" | sed 's/world/X/Ig'          # X X   (I = ignore case, GNU sed)</code></pre>
+<p class="ex">Hinter dem letzten Schrägstrich stehen die Optionen: <code class="i">g</code> für „alle“, <code class="i">I</code> für „Schreibweise ignorieren“. Mit <code class="i">2</code> ersetzt man nur das zweite Vorkommen (<code class="i">s/a/b/2</code>).</p></details>
+<p><b>b)</b> Ändere die Datei direkt, mit und ohne Sicherungskopie.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>cp hello.txt h2.txt
+cp hello.txt h3.txt
+sed -i 's/world/X/' h2.txt              # direkt in der Datei ändern
+sed -i.bak 's/world/Y/' h3.txt          # vorher Sicherung h3.txt.bak anlegen
+cat h2.txt h3.txt h3.txt.bak            # hello X / hello Y / hello world</code></pre>
+<p class="ex"><code class="i">-i</code> (in place) überschreibt die Datei. <code class="i">-i.bak</code> legt vorher eine Kopie mit dieser Endung an. Das ist die sichere Wahl. Unter macOS (BSD-<code class="i">sed</code>) heißt es <code class="i">-i ''</code> bzw. <code class="i">-i .bak</code>.</p></details>
+<p><b>c)</b> Ersetze mit einem Wert aus einer Variable und in einem Pfad.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>NAME=Server-01
+echo "hello world" | sed "s/world/$NAME/"       # hello Server-01
+echo "/usr/bin" | sed 's|/usr|/opt|'            # /opt/bin</code></pre>
+<p class="ex">In doppelten Anführungszeichen setzt die Shell die Variable ein, bevor <code class="i">sed</code> startet. Als Trennzeichen geht jedes Zeichen, das nicht im Text vorkommt (<code class="i">|</code>, <code class="i">#</code>, <code class="i">,</code>).</p></details>
+<p><b>d)</b> Ersetze nur in einer bestimmten Zeile oder einem Bereich.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>printf 'a a\na a\na a\n' | sed '2s/a/X/g'       # nur Zeile 2: X X
+printf '1\n2\n3\n4\n' | sed '2,3s/^/&gt; /'          # Zeilen 2 bis 3 mit "&gt; " beginnen</code></pre>
+<p class="ex">Eine Zahl oder ein Bereich <i>vor</i> dem <code class="i">s</code> beschränkt den Befehl auf diese Zeilen. <code class="i">^</code> steht für den Zeilenanfang, <code class="i">$</code> für das Zeilenende.</p></details>
+<p><b>e)</b> Führe mehrere Ersetzungen auf einmal aus.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>echo "hello world" | sed -e 's/hello/Hi/' -e 's/world/there/'      # Hi there
+echo "hello world" | sed 's/hello/Hi/;s/world/there/'              # gleichwertig</code></pre>
+<p class="ex">Die Befehle laufen nacheinander, jeder arbeitet auf dem Ergebnis des vorherigen.</p></details>
+<p><b>f)</b> Entferne Zeilen, lösche Leerzeichen an den Rändern und füge Text an Anfang und Ende an.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>printf 'keep\nskip me\nkeep\n' | sed '/skip/d'          # keep keep
+echo "   hi  " | sed 's/^ *//;s/ *$//'                   # hi
+echo "x" | sed 's/^/START /;s/$/ END/'                    # START x END</code></pre>
+<p class="ex"><code class="i">/muster/d</code> löscht alle passenden Zeilen. Eine Ersetzung durch nichts (<code class="i">s/…//</code>) entfernt Text, ohne etwas einzufügen.</p></details>
+<p><b>g)</b> Vertausche zwei Wörter mit Gruppen.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>echo "Carla Koeln" | sed -E 's/(\w+) (\w+)/\2 \1/'      # Koeln Carla
+echo "world" | sed 's/world/[&amp;]/'                       # [world]</code></pre>
+<p class="ex">Mit <code class="i">-E</code> (erweiterte Ausdrücke) bilden Klammern Gruppen, <code class="i">\1</code> und <code class="i">\2</code> setzen sie wieder ein. Ein <code class="i">&amp;</code> im Ersatz steht für den gefundenen Text. Wörtlich schreibt man <code class="i">\&amp;</code>.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
