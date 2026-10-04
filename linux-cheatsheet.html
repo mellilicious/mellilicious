@@ -1083,6 +1083,90 @@ echo .*            # Namen, die mit . beginnen</code></pre>
 <p class="ex">Der Platzhalter <code class="i">*</code> trifft Namen mit führendem Punkt nicht. Deshalb löscht <code class="i">rm *</code> versteckte Dateien nicht mit. Je nach Bash-Version enthält <code class="i">.*</code> auch <code class="i">.</code> und <code class="i">..</code>. Mit <code class="i">rm -r .*</code> kann man dann den Ordner darüber erwischen, daher solche Muster vermeiden.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 7 · Leere Datei und leeres Verzeichnis</h3>
+<p><b>Aufgabe:</b> Lege in <code class="i">~/uebung</code> eine leere Datei <code class="i">projects/empty.txt</code> und ein leeres Verzeichnis <code class="i">projects/empty-dir</code> an.</p>
+<p class="ex">Geübt wird: <code class="i">touch</code> für leere Dateien, <code class="i">mkdir</code> für Verzeichnisse und der Unterschied zwischen beiden. Der Ordner <code class="i">projects</code> stammt aus Übung 4.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p projects                 # nur nötig, falls projects fehlt
+touch projects/empty.txt          # leere Datei
+mkdir projects/empty-dir          # leeres Verzeichnis
+
+ls -l projects                    # Kontrolle: Datei (-) und Verzeichnis (d)
+find projects -empty              # listet beide, weil beide leer sind</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Befehl</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>touch datei</code></td><td>Legt eine leere Datei an, falls sie nicht existiert. Existiert sie schon, ändert <code>touch</code> nur den Zeitstempel und lässt den Inhalt unberührt.</td></tr>
+<tr><td class="nw"><code>mkdir ordner</code></td><td>Legt ein leeres Verzeichnis an.</td></tr>
+<tr><td class="nw"><code>ls -l ordner</code></td><td>Zeigt Typ und Größe. Die Datei beginnt mit <code>-</code> und hat die Größe 0, das Verzeichnis beginnt mit <code>d</code>.</td></tr>
+<tr><td class="nw"><code>find pfad -empty</code></td><td>Findet leere Dateien (Größe 0) und leere Verzeichnisse (ohne Inhalt).</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Datei oder Verzeichnis?</h3>
+<p class="ex">Beides sind „Einträge“, aber verschiedene Dinge. Die Aufgabe prüft genau diesen Unterschied.</p><div class="tw"><table>
+<tr><th></th><th>Datei</th><th>Verzeichnis</th></tr>
+<tr><td class="nw">anlegen mit</td><td><code>touch</code></td><td><code>mkdir</code></td></tr>
+<tr><td class="nw">kann enthalten</td><td>Daten (Text, Bilder, ...)</td><td>weitere Dateien und Ordner</td></tr>
+<tr><td class="nw">erster Buchstabe in <code>ls -l</code></td><td><code>-</code></td><td><code>d</code></td></tr>
+<tr><td class="nw">„leer“ heißt</td><td>0 Bytes</td><td>keine Einträge darin</td></tr>
+<tr><td class="nw">Test in der Shell</td><td><code>test -f</code></td><td><code>test -d</code></td></tr>
+</table></div>
+<p>Ein leeres Verzeichnis zeigt in <code class="i">ls -l</code> trotzdem eine Größe von <code class="i">4096</code>. Das ist die Verwaltungsgröße des Eintrags selbst und kein Inhalt.</p></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Leere Platzhalter:</b> Leere Dateien und Ordner braucht man, um eine Struktur vorzubereiten, Programme zu testen oder Marker zu setzen (zum Beispiel eine leere Datei, deren bloße Existenz etwas bedeutet).</p>
+<p><b><code class="i">touch</code> ist ungefährlich:</b> Es löscht nie Inhalt. Deshalb kann man es gefahrlos auf eine vorhandene Datei anwenden, etwa um ihren Änderungszeitpunkt zu aktualisieren.</p>
+<p><b>Kontrolle:</b> <code class="i">touch</code> und <code class="i">mkdir</code> sind bei Erfolg still. Erst <code class="i">ls -l</code> oder <code class="i">find -empty</code> zeigt, dass beides richtig angelegt wurde.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>projects</code> existiert nicht</td><td><code>touch: cannot touch 'projects/empty.txt': No such file or directory</code>. <code>touch</code> legt nur die Datei an, nicht den Ordner davor. Erst <code>mkdir -p projects</code>.</td></tr>
+<tr><td><code>touch</code> statt <code>mkdir</code> für den Ordner</td><td>Es entsteht eine leere <i>Datei</i> namens <code>empty-dir</code>. Man erkennt es am <code>-</code> in <code>ls -l</code>.</td></tr>
+<tr><td><code>mkdir</code> statt <code>touch</code> für die Datei</td><td>Es entsteht ein <i>Verzeichnis</i> <code>empty.txt</code>. Der Name sagt nichts über den Typ aus.</td></tr>
+<tr><td>Falscher Ort (<code>empty.txt</code> statt <code>projects/empty.txt</code>)</td><td>Die Datei liegt im aktuellen Ordner statt in <code>projects</code>.</td></tr>
+<tr><td>Text in die Datei geschrieben</td><td>Sie ist dann nicht mehr leer. <code>touch</code> auf eine gefüllte Datei leert sie <i>nicht</i>.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 7 · Zum Weiterüben</h3>
+<p class="ex">Alle Befehle im Übungsordner <code class="i">~/uebung</code> ausführen.</p>
+<p><b>a)</b> Lege die drei leeren Dateien <code class="i">a</code>, <code class="i">b</code> und <code class="i">c</code> sowie <code class="i">f1.txt</code> bis <code class="i">f3.txt</code> mit je einem Befehl an.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>touch a b c
+touch f{1..3}.txt        # wird zu f1.txt f2.txt f3.txt
+ls</code></pre>
+<p class="ex"><code class="i">touch</code> nimmt beliebig viele Namen. <code class="i">{1..3}</code> ist eine Zahlenfolge, die die Shell vor dem Start von <code class="i">touch</code> ausschreibt.</p></details>
+<p><b>b)</b> Aktualisiere den Änderungszeitpunkt von <code class="i">a</code> und sieh dir den Unterschied an.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>stat -c '%y' a      # Zeitstempel vorher
+sleep 1
+touch a
+stat -c '%y' a      # Zeitstempel nachher: eine Sekunde später</code></pre>
+<p class="ex">Existiert die Datei schon, setzt <code class="i">touch</code> nur die Zeit auf „jetzt“. Das nutzen Build-Werkzeuge, um Dateien als geändert zu markieren.</p></details>
+<p><b>c)</b> Lege eine leere Datei ohne <code class="i">touch</code> an.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>: &gt; leer.txt          # ":" macht nichts, die Umleitung legt die Datei an
+&gt; leer2.txt         # in Bash auch ohne Befehl möglich
+ls -l leer.txt leer2.txt</code></pre>
+<p class="ex">Die Umleitung <code class="i">&gt;</code> legt die Datei an, bevor der Befehl läuft. Ein Befehl ohne Ausgabe ergibt eine Datei der Größe 0.</p></details>
+<p><b>d)</b> Mache die gefüllte Datei <code class="i">b</code> wieder leer, ohne sie zu löschen.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>echo hallo &gt; b
+&gt; b                     # Inhalt wird entfernt
+truncate -s 0 b         # gleichwertig
+[ -s b ] || echo "b ist leer"    # -s: wahr, wenn Größe &gt; 0</code></pre>
+<p class="ex">Beide Wege lassen die Datei bestehen, nur der Inhalt verschwindet. <code class="i">touch</code> kann das nicht.</p></details>
+<p><b>e)</b> Finde alle leeren Dateien und Ordner unterhalb von <code class="i">~/uebung</code> und prüfe den Typ von <code class="i">projects/empty.txt</code> und <code class="i">projects/empty-dir</code>.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>find ~/uebung -empty
+file projects/empty.txt projects/empty-dir
+# projects/empty.txt: empty
+# projects/empty-dir: directory</code></pre>
+<p class="ex"><code class="i">file</code> erkennt den Typ am Inhalt und nicht am Namen, bei leeren Dateien meldet es <code class="i">empty</code>.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
