@@ -3985,6 +3985,110 @@ tar -xf notes.tar.gz -C y1              # GNU tar erkennt die Kompression selbst
 <p class="ex">Merkhilfe: <b>x</b>trahieren, g<b>z</b>ip, <b>f</b>ile, <b>C</b>hange directory. Das <code class="i">f</code> muss unmittelbar vor dem Archivnamen stehen.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 38 · Ein Verzeichnis schützen</h3>
+<p><b>Aufgabe:</b> Setze die Rechte des Verzeichnisses <code class="i">projects/linux</code> auf den Modus <code class="i">750</code>.</p>
+<p class="ex">Geübt wird: Rechte bei <i>Verzeichnissen</i>. Die Zahlen sind dieselben wie bei Dateien (Übung 3 und 33), die Bedeutung ist aber eine andere. Der Ordner <code class="i">projects/linux</code> stammt aus Übung 5.</p>
+<details><summary>Vorbereitung: Ordner anlegen</summary>
+<pre><code>cd ~/uebung
+mkdir -p projects/linux/basics
+echo "hi" &gt; projects/linux/basics/f.txt
+ls -ld projects/linux              # drwxr-xr-x  (755), der Normalfall</code></pre></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+ls -ld projects/linux              # vorher:  drwxr-xr-x  (755)
+
+chmod 750 projects/linux
+
+ls -ld projects/linux              # nachher: drwxr-x---  (750)
+stat -c '%a %A' projects/linux     # 750 drwxr-x---</code></pre>
+<p class="ex"><code class="i">ls -ld</code> mit <code class="i">-d</code> zeigt den Ordner <i>selbst</i>. Ohne <code class="i">-d</code> würde <code class="i">ls -l</code> den <i>Inhalt</i> auflisten, und Sie sähen die Rechte der Dateien darin.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was r, w und x bei Ordnern bedeuten</h3>
+<p class="ex">Ein Verzeichnis ist eine Liste von Namen. Die Rechte regeln, wer die Liste lesen, ändern und durchlaufen darf.</p><div class="tw"><table>
+<tr><th>Recht</th><th>Bei Dateien</th><th>Bei Ordnern</th></tr>
+<tr><td class="nw"><code>r</code></td><td>Inhalt lesen</td><td>die <i>Namen</i> im Ordner auflisten (<code>ls</code>)</td></tr>
+<tr><td class="nw"><code>w</code></td><td>Inhalt ändern</td><td>Einträge anlegen, löschen und umbenennen</td></tr>
+<tr><td class="nw"><code>x</code></td><td>als Programm ausführen</td><td>den Ordner <i>betreten</i> (<code>cd</code>) und auf Einträge zugreifen</td></tr>
+</table></div>
+<p><code class="i">750</code> heißt hier: Der Besitzer darf alles (<code class="i">rwx</code>), die Gruppe darf auflisten und betreten (<code class="i">r-x</code>), alle anderen haben keinen Zugang (<code class="i">---</code>).</p></div>
+
+<div class="blk"><h3>Was ein fremder Benutzer sieht</h3>
+<p class="ex">Getestet mit einem Benutzer, der weder Besitzer noch in der Gruppe ist. Der Ordner enthält <code class="i">basics/f.txt</code>.</p><div class="tw"><table>
+<tr><th>Modus</th><th><code>ls ordner</code></th><th><code>cat ordner/basics/f.txt</code></th></tr>
+<tr><td class="nw"><code>755</code> (<code>r-x</code> für andere)</td><td>zeigt <code>basics</code></td><td>funktioniert</td></tr>
+<tr><td class="nw"><code>750</code> (<code>---</code> für andere)</td><td><code>Permission denied</code></td><td><code>Permission denied</code></td></tr>
+<tr><td class="nw"><code>644</code> (<code>r--</code>, kein <code>x</code>)</td><td>zeigt Namen, aber <code>ls -l</code> meldet je Eintrag <code>Permission denied</code></td><td><code>Permission denied</code></td></tr>
+<tr><td class="nw"><code>711</code> (<code>--x</code>, kein <code>r</code>)</td><td><code>Permission denied</code></td><td>funktioniert, wenn man den Pfad kennt</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Zugang regeln:</b> Mit <code class="i">750</code> bleibt der Inhalt für Fremde unsichtbar und unerreichbar, auch wenn die Dateien darin lesbar wären. Der Ordner wirkt wie eine verschlossene Tür.</p>
+<p><b>Ordner brauchen <code class="i">x</code>:</b> Ohne <code class="i">x</code> kommt niemand an die Einträge heran, auch der Besitzer nicht. Ein Ordner mit <code class="i">640</code> (kein <code class="i">x</code>) lässt sich auflisten, aber nicht betreten (<code class="i">cd</code> schlägt fehl, <code class="i">cat</code> auf Dateien darin auch).</p>
+<p><b>Die ganze Kette zählt:</b> Wer eine Datei öffnen will, braucht <code class="i">x</code> auf <i>jedem</i> Ordner des Pfads. Ist ein übergeordneter Ordner gesperrt, nützt eine offene Datei nichts. Das war im Test der Fall: <code class="i">projects/linux/basics/f.txt</code> blieb unzugänglich, solange <code class="i">projects</code> keine Rechte für andere gab.</p>
+<p><b>Dateien behalten ihre eigenen Rechte:</b> <code class="i">chmod 750 ordner</code> ändert nur den Ordner, nicht den Inhalt.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>chmod 640</code> auf einen Ordner</td><td>Ohne <code>x</code> lässt er sich nicht betreten: <code>cd</code> schlägt fehl (<code>can't cd</code>), <code>cat ordner/datei</code> ergibt <code>Permission denied</code>.</td></tr>
+<tr><td><code>chmod -R 750 projects/linux</code></td><td>Setzt <i>alle</i> Dateien darin ebenfalls auf 750, sie werden ausführbar. Die Aufgabe nennt nur den Ordner selbst.</td></tr>
+<tr><td>Falscher Ordner (<code>chmod 750 projects</code>)</td><td>Der Elternordner statt <code>projects/linux</code> wird geändert.</td></tr>
+<tr><td><code>ls -l</code> statt <code>ls -ld</code> zur Kontrolle</td><td>Sie sehen den Inhalt, nicht den Ordner selbst, und halten die falschen Rechte für die Ergebnisse.</td></tr>
+<tr><td>Falscher Pfad</td><td><code>chmod: cannot access 'projects/nix': No such file or directory</code>.</td></tr>
+<tr><td>Nur <code>w</code> erwartet</td><td>Zum <i>Anlegen</i> von Dateien braucht man <code>w</code> <i>und</i> <code>x</code>. Mit <code>r-x</code> (550) meldet <code>touch</code>: <code>Permission denied</code>.</td></tr>
+<tr><td>Eltern-Ordner gesperrt</td><td>Auch ein geöffneter Ordner ist unerreichbar, wenn ein Ordner davor kein <code>x</code> für Sie hat.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 38 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie im Übungsordner <code class="i">~/uebung</code>. Beispielausgaben zu fremden Benutzern stammen aus einem Test mit einem zweiten Benutzerkonto.</p>
+<p><b>a)</b> Lies die Rechte eines Ordners auf mehrere Arten.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>ls -ld projects projects/linux            # beide Ordner selbst
+stat -c '%a %A %U:%G %n' projects/linux   # 750 drwxr-x--- besitzer:gruppe projects/linux
+find projects -type d -perm 750           # alle Ordner mit genau diesem Modus</code></pre>
+<p class="ex">Das erste Zeichen von <code class="i">ls -l</code> ist <code class="i">d</code> für Directory. <code class="i">stat</code> zeigt zusätzlich Besitzer und Gruppe.</p></details>
+<p><b>b)</b> Setze Ordner und Dateien unterschiedlich, im ganzen Baum.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>find projects/linux -type d -exec chmod 750 {} +      # alle Ordner 750
+find projects/linux -type f -exec chmod 640 {} +      # alle Dateien 640
+stat -c '%a %n' projects/linux projects/linux/basics projects/linux/basics/f.txt</code></pre>
+<p class="ex">Ordner brauchen <code class="i">x</code>, normale Dateien meist nicht. Mit <code class="i">find</code> trennt man beides sauber. <code class="i">-type d</code> wählt Ordner, <code class="i">-type f</code> Dateien.</p></details>
+<p><b>c)</b> Nutze das große <code class="i">X</code>, um nur Ordner ausführbar zu machen.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>chmod -R 644 projects/linux                          # erst alles zurücksetzen
+chmod -R u=rwX,g=rX,o= projects/linux
+stat -c '%a %n' projects/linux projects/linux/basics projects/linux/basics/f.txt
+# 750 projects/linux   750 projects/linux/basics   640 projects/linux/basics/f.txt</code></pre>
+<p class="ex">Das große <code class="i">X</code> setzt das Ausführungsrecht nur bei Ordnern (und bei Dateien, die schon irgendwo <code class="i">x</code> haben). So bekommen Ordner <code class="i">750</code> und Dateien <code class="i">640</code>, mit einem einzigen Befehl.</p></details>
+<p><b>d)</b> Lege neue Ordner gleich mit dem richtigen Modus an.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>mkdir -m 750 m4                    # Ordner mit Modus anlegen
+install -d -m 750 m5               # auch möglich
+(umask 027; mkdir m2; stat -c '%a' m2)    # 750
+(umask 077; mkdir m3; stat -c '%a' m3)    # 700
+(umask 022; mkdir m1; stat -c '%a' m1)    # 755</code></pre>
+<p class="ex">Neue Ordner starten mit 777 minus <code class="i">umask</code>. Mit <code class="i">umask 027</code> ergibt das genau <code class="i">750</code>. <code class="i">mkdir -m</code> setzt den Modus direkt und ignoriert die <code class="i">umask</code>.</p></details>
+<p><b>e)</b> Prüfe die Rechte aus Sicht des aktuellen Benutzers.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>[ -r projects/linux ] &amp;&amp; echo "lesen (r)"
+[ -w projects/linux ] &amp;&amp; echo "schreiben (w)"
+[ -x projects/linux ] &amp;&amp; echo "betreten (x)"</code></pre>
+<p class="ex"><code class="i">-r</code>, <code class="i">-w</code> und <code class="i">-x</code> prüfen, ob <i>Sie</i> das Recht haben. Der Administrator hat meist alle, unabhängig vom Modus.</p></details>
+<p><b>f)</b> Verstehe die Reihenfolge der Rechteprüfung.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>ls -ld projects/linux                    # Besitzer, Gruppe, Rechte ablesen
+id                                       # eigener Benutzer und eigene Gruppen
+groups</code></pre>
+<p class="ex">Linux prüft in dieser Reihenfolge: Sind Sie der <b>Besitzer</b>, gilt die erste Gruppe der Rechte. Sonst, wenn Sie in der <b>Gruppe</b> sind, die zweite. Sonst gilt die dritte für <b>andere</b>. Es gilt immer genau eine Gruppe, nicht die Summe.</p></details>
+<p><b>g)</b> Schließe einen Ordner komplett und öffne ihn wieder.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>chmod 000 projects/linux                 # niemand darf etwas (außer dem Administrator)
+ls -ld projects/linux                    # d---------
+chmod 750 projects/linux                 # wieder öffnen</code></pre>
+<p class="ex">Der Besitzer darf die Rechte seines Ordners jederzeit ändern, auch wenn er ihn gerade nicht betreten darf. Der Administrator ignoriert die Sperren und kann trotzdem zugreifen.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
