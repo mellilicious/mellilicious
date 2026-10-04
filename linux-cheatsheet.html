@@ -3318,6 +3318,134 @@ diff projects/runbook.txt projects/runbook2.txt &amp;&amp; echo "identisch"</cod
 <p class="ex">Das Ergebnis ist dasselbe wie in <code class="i">nano</code>. Der Editor lohnt sich bei Änderungen an bestehenden Dateien, <code class="i">printf</code> bei festem Text in Skripten.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 32 · Ein erstes Shell-Skript</h3>
+<p><b>Aufgabe:</b> Lege <code class="i">projects/check-errors.sh</code> an. Die Datei soll genau zwei Zeilen enthalten: <code class="i">#!/bin/sh</code> und <code class="i">grep -c ' ERROR ' "$HOME/…/events.log"</code>. In der Kursaufgabe zeigt der Pfad in einen Datenordner. Hier ist es <code class="i">"$HOME/daten/events.log"</code> aus Übung 13.</p>
+<p class="ex">Geübt wird: ein Shell-Skript mit Shebang schreiben, es ausführen und prüfen. Das Skript zählt die <code class="i">ERROR</code>-Zeilen einer Logdatei. Beachten Sie die Anführungszeichen: außen doppelte um den Pfad, innen einfache um das Muster. Setzen Sie Ihren Pfad aus der Aufgabenstellung ein.</p>
+<details><summary>Voraussetzung: Beispiel-Log anlegen</summary>
+<pre><code>mkdir -p ~/daten
+cat &gt; ~/daten/events.log &lt;&lt;'EOF'
+2026-10-01 10:00:01 INFO start
+2026-10-01 10:00:05 ERROR disk full
+2026-10-01 10:01:12 WARN slow response
+2026-10-01 10:02:30 ERROR timeout
+2026-10-01 10:03:44 INFO request ok
+2026-10-01 10:04:10 ERROR connection refused
+2026-10-01 10:05:02 DEBUG cache hit
+2026-10-01 10:06:19 ERROR out of memory
+2026-10-01 10:07:45 INFO request ok
+2026-10-01 10:08:30 ERROR disk full
+2026-10-01 10:09:00 INFO stop
+EOF</code></pre>
+<p class="ex">Wie in Übung 13: elf Zeilen, davon fünf mit dem Level <code class="i">ERROR</code>.</p></details>
+<details><summary>Lösung anzeigen</summary>
+<p>Variante 1, mit <code class="i">nano</code> (Übung 31): Öffnen Sie <code class="i">nano projects/check-errors.sh</code> und tippen Sie die beiden Zeilen ab, ohne Enter nach der zweiten. Speichern mit Strg+O, beenden mit Strg+X.</p>
+<pre data-lang="plain"><code>#!/bin/sh
+grep -c ' ERROR ' "$HOME/daten/events.log"</code></pre>
+<p>Variante 2, ohne Editor, mit einem Here-Document:</p>
+<pre><code>cd ~/uebung
+mkdir -p projects
+cat &gt; projects/check-errors.sh &lt;&lt;'EOF'
+#!/bin/sh
+grep -c ' ERROR ' "$HOME/daten/events.log"
+EOF</code></pre>
+<p>Dann prüfen und ausführen:</p>
+<pre><code>cat -A projects/check-errors.sh        # beide Zeilen, jede endet mit $
+wc -l projects/check-errors.sh         # 2
+
+sh projects/check-errors.sh            # gibt 5 aus</code></pre>
+<p class="ex">Das <code class="i">'EOF'</code> in einfachen Anführungszeichen ist wichtig: Dann schreibt die Shell den Text unverändert in die Datei und setzt <code class="i">$HOME</code> nicht schon beim Anlegen ein.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was die zwei Zeilen bedeuten</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>#!/bin/sh</code></td><td>Die <b>Shebang</b>-Zeile. Sie steht ganz oben und nennt das Programm, das die Datei ausführen soll (hier <code>sh</code>). Für die Shell ist sie sonst ein Kommentar.</td></tr>
+<tr><td class="nw"><code>grep -c</code></td><td>Zählt die passenden Zeilen und gibt nur die Zahl aus (<code>-c</code> = count).</td></tr>
+<tr><td class="nw"><code>' ERROR '</code></td><td>Das Muster, mit Leerzeichen davor und dahinter. Es trifft den Level, nicht Wörter wie <code>ERRORS</code> oder <code>NO_ERROR</code>. Einfache Anführungszeichen halten die Leerzeichen zusammen.</td></tr>
+<tr><td class="nw"><code>"$HOME/daten/events.log"</code></td><td>Der Pfad. <code>$HOME</code> ist Ihr Home-Verzeichnis. Doppelte Anführungszeichen erlauben die Ersetzung der Variable und schützen vor Leerzeichen im Pfad.</td></tr>
+</table></div>
+<pre><code>Datei:  #!/bin/sh                              &lt;- welches Programm führt aus?
+        grep -c ' ERROR ' "$HOME/.../events.log" &lt;- was wird gemacht?
+Aufruf: sh projects/check-errors.sh   -&gt;   5</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Ein Skript ist gespeicherte Arbeit:</b> Statt jedes Mal denselben Befehl zu tippen, legen Sie ihn in eine Datei. Sie rufen sie auf, wann immer Sie wollen. Auch <code class="i">cron</code> kann sie regelmäßig starten.</p>
+<p><b>Ohne feste Pfade im Skript:</b> Mit <code class="i">$HOME</code> funktioniert das Skript für jeden Benutzer und aus jedem Verzeichnis, ohne dass der Benutzername im Skript stehen muss.</p>
+<p><b><code class="i">sh</code> statt <code class="i">bash</code>:</b> <code class="i">#!/bin/sh</code> verlangt die einfache, überall vorhandene Shell. Das Skript läuft damit auf fast jedem System. Auf Debian und Ubuntu ist <code class="i">sh</code> die <code class="i">dash</code>, die schneller, aber kleiner als <code class="i">bash</code> ist.</p>
+<p><b>Zeilenzahl zählt:</b> Die Aufgabe verlangt genau zwei Zeilen. Keine Leerzeile, kein Kommentar, kein <code class="i">exit</code>.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td>Skript mit <code>echo "…$HOME…"</code> in doppelten Anführungszeichen angelegt</td><td>Die Shell setzt <code>$HOME</code> schon beim Schreiben ein. In der Datei steht dann der ausgeschriebene Pfad statt <code>$HOME</code>. Das Skript läuft, entspricht aber nicht der Vorgabe.</td></tr>
+<tr><td>Here-Document ohne Anführungszeichen (<code>&lt;&lt;EOF</code>)</td><td>Dasselbe: <code>$HOME</code> wird eingesetzt. Mit <code>&lt;&lt;'EOF'</code> bleibt der Text unverändert.</td></tr>
+<tr><td>Leerzeile oder Kommentar eingefügt</td><td>Die Datei hat mehr als zwei Zeilen.</td></tr>
+<tr><td>Shebang falsch (<code>#/bin/sh</code>, <code>! #/bin/sh</code>, Leerzeichen davor)</td><td>Wird nicht als Shebang erkannt. Muss mit <code>#!</code> in der ersten Zeile und ersten Spalte stehen.</td></tr>
+<tr><td>Ohne <code>chmod +x</code> mit <code>./</code> aufgerufen</td><td><code>Permission denied</code> (Exit-Code 126). Starten Sie das Skript mit <code>sh projects/check-errors.sh</code> oder machen Sie es ausführbar.</td></tr>
+<tr><td>Windows-Zeilenenden (<code>\r\n</code>)</td><td><code>cannot execute: required file not found</code>, weil die Shell einen Interpreter namens <code>/bin/sh\r</code> sucht. Datei mit Unix-Zeilenenden speichern.</td></tr>
+<tr><td>Log-Pfad falsch</td><td><code>grep: …: No such file or directory</code> (Exit-Code 2).</td></tr>
+<tr><td>Pfad in einfachen Anführungszeichen (<code>'$HOME/daten/events.log'</code>)</td><td>Einfache Anführungszeichen verhindern die Ersetzung von <code>$HOME</code>. <code>grep</code> sucht dann eine Datei, die buchstäblich <code>$HOME/daten/events.log</code> heißt. Für den Pfad doppelte Anführungszeichen nehmen.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 32 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit <code class="i">projects/check-errors.sh</code> und dem Beispiel-Log. Alle Ergebnisse sehen Sie direkt im Terminal.</p>
+<p><b>a)</b> Mache das Skript ausführbar und starte es auf drei Arten.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>chmod +x projects/check-errors.sh
+./projects/check-errors.sh                 # direkt (Shebang bestimmt das Programm)
+sh projects/check-errors.sh                # mit sh
+bash projects/check-errors.sh              # mit bash
+ls -l projects/check-errors.sh             # -rwxr-xr-x</code></pre>
+<p class="ex">Mit <code class="i">./</code> sagt man der Shell „im aktuellen Ordner“, denn der aktuelle Ordner steht nicht im Suchpfad. Das Recht <code class="i">x</code> (Übung 3) erlaubt das direkte Starten. Ohne <code class="i">x</code> kann man das Skript trotzdem mit <code class="i">sh skript</code> aufrufen.</p></details>
+<p><b>b)</b> Zeige den Exit-Code, und was bei null Treffern passiert.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>sh projects/check-errors.sh; echo "exit=$?"       # 5, exit=0
+
+printf 'INFO a\n' &gt; k.log
+grep -c ' ERROR ' k.log; echo "exit=$?"            # 0, exit=1</code></pre>
+<p class="ex"><code class="i">grep</code> meldet „nichts gefunden“ mit Exit-Code 1, obwohl die ausgegebene Zahl 0 korrekt ist. Fehler wie eine fehlende Datei ergeben Exit-Code 2. Skripte und <code class="i">cron</code> werten den Exit-Code aus.</p></details>
+<p><b>c)</b> Übergib die Logdatei als Argument, mit Standardwert.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>cat &gt; projects/check2.sh &lt;&lt;'EOF'
+#!/bin/sh
+LOG="${1:-$HOME/daten/events.log}"
+grep -c ' ERROR ' "$LOG"
+EOF
+sh projects/check2.sh                      # Standard-Log: 5
+sh projects/check2.sh k.log                # andere Datei: 0</code></pre>
+<p class="ex"><code class="i">$1</code> ist das erste Argument. <code class="i">${1:-Standard}</code> nimmt den Standardwert, wenn keines angegeben wurde.</p></details>
+<p><b>d)</b> Gib das Ergebnis in einem Satz aus und warne bei vielen Fehlern.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>cat &gt; projects/check3.sh &lt;&lt;'EOF'
+#!/bin/sh
+n=$(grep -c ' ERROR ' "$HOME/daten/events.log")
+if [ "$n" -gt 3 ]; then
+    echo "ALARM: $n Fehler"
+else
+    echo "ok: $n Fehler"
+fi
+EOF
+sh projects/check3.sh                      # ALARM: 5 Fehler</code></pre>
+<p class="ex"><code class="i">$(…)</code> speichert die Ausgabe eines Befehls in einer Variable (Übung 25). <code class="i">[ "$n" -gt 3 ]</code> vergleicht Zahlen. Leerzeichen innerhalb der Klammern sind Pflicht.</p></details>
+<p><b>e)</b> Prüfe die Syntax und verfolge die Ausführung.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>sh -n projects/check-errors.sh &amp;&amp; echo "Syntax ok"     # prüft ohne auszuführen
+sh -x projects/check-errors.sh                          # zeigt jeden Befehl vor der Ausführung
+# + grep -c  ERROR  /…/daten/events.log
+# 5</code></pre>
+<p class="ex"><code class="i">-n</code> findet Syntaxfehler wie ein fehlendes Anführungszeichen. <code class="i">-x</code> zeigt, welche Werte die Shell tatsächlich einsetzt. Beides hilft bei der Fehlersuche.</p></details>
+<p><b>f)</b> Rufe das Skript von überall auf und lege es in den Suchpfad.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>(cd /tmp &amp;&amp; sh ~/uebung/projects/check-errors.sh)           # aus anderem Ordner: 5
+PATH="$PWD/projects:$PATH"                                  # Ordner für diese Sitzung in den Suchpfad
+check-errors.sh                                             # nur Name, 5 (Skript muss ausführbar sein)</code></pre>
+<p class="ex">Weil das Skript <code class="i">$HOME</code> statt eines festen Pfads nutzt, liefert es überall dasselbe. Der Suchpfad <code class="i">PATH</code> bestimmt, wo die Shell nach Befehlen sucht.</p></details>
+<p><b>g)</b> Lass das Skript regelmäßig laufen (nur lesen, nicht einrichten).</p>
+<details><summary>Lösung g)</summary>
+<pre data-lang="plain"><code># in crontab -e (siehe Abschnitt "cron"):
+*/5 * * * *  $HOME/uebung/projects/check-errors.sh &gt;&gt; $HOME/check.log</code></pre>
+<p class="ex">Alle 5 Minuten wird das Skript gestartet und die Zahl an <code class="i">check.log</code> angehängt. Dafür muss das Skript ausführbar sein und einen Shebang haben. Diese Zeile habe ich nicht in <code class="i">cron</code> eingetragen.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
