@@ -3564,6 +3564,124 @@ cd d &amp;&amp; echo "cd ok"; cd ..</code></pre>
 <p class="ex">Bei Ordnern heißt <code class="i">x</code>: „hineinwechseln und auf Einträge zugreifen“, <code class="i">r</code>: „Namen auflisten“, <code class="i">w</code>: „Einträge anlegen oder löschen“. Darum haben Ordner meist <code class="i">755</code> oder <code class="i">750</code>. Ein Ordner mit <code class="i">640</code> wäre für normale Benutzer nicht betretbar.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 34 · Skript ausführen und Ausgabe speichern</h3>
+<p><b>Aufgabe:</b> Führe <code class="i">projects/check-errors.sh</code> aus und speichere nur seine Ausgabe, die Anzahl der <code class="i">ERROR</code>-Einträge, in <code class="i">projects/output.txt</code>.</p>
+<p class="ex">Geübt wird: ein eigenes Skript starten und seine Ausgabe mit <code class="i">&gt;</code> in eine Datei umleiten. Wichtig ist der Unterschied zwischen <i>Standardausgabe</i> und <i>Fehlerausgabe</i>. Das Skript stammt aus Übung 32, das Ausführungsrecht aus Übung 33. Falls etwas fehlt, legt die Vorbereitung es an.</p>
+<details><summary>Vorbereitung: Skript, Rechte und Beispiel-Log</summary>
+<pre><code>cd ~/uebung
+mkdir -p projects ~/daten
+cat &gt; ~/daten/events.log &lt;&lt;'EOF'
+2026-10-01 10:00:01 INFO start
+2026-10-01 10:00:05 ERROR disk full
+2026-10-01 10:01:12 WARN slow response
+2026-10-01 10:02:30 ERROR timeout
+2026-10-01 10:03:44 INFO request ok
+2026-10-01 10:04:10 ERROR connection refused
+2026-10-01 10:05:02 DEBUG cache hit
+2026-10-01 10:06:19 ERROR out of memory
+2026-10-01 10:07:45 INFO request ok
+2026-10-01 10:08:30 ERROR disk full
+2026-10-01 10:09:00 INFO stop
+EOF
+cat &gt; projects/check-errors.sh &lt;&lt;'EOF'
+#!/bin/sh
+grep -c ' ERROR ' "$HOME/daten/events.log"
+EOF
+chmod 750 projects/check-errors.sh</code></pre></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+./projects/check-errors.sh &gt; projects/output.txt
+
+cat projects/output.txt            # 5
+wc -l projects/output.txt          # 1  (eine Zeile mit der Zahl)</code></pre>
+<p class="ex">Ohne das Ausführungsrecht geht es auch mit <code class="i">sh projects/check-errors.sh &gt; projects/output.txt</code>.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Teil macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>./projects/check-errors.sh</code></td><td>Startet das Skript. <code>./</code> bedeutet: „im aktuellen Ordner“, <code>projects/</code> ist der Unterordner. Das Skript führt <code>grep -c</code> aus und gibt die Anzahl aus.</td></tr>
+<tr><td class="nw"><code>&gt; projects/output.txt</code></td><td>Leitet die <i>Standardausgabe</i> des Skripts in die Datei um. Auf dem Bildschirm erscheint nichts, die Datei enthält die Zahl.</td></tr>
+<tr><td class="nw"><code>cat</code>, <code>wc -l</code></td><td>Kontrolle: Inhalt ansehen, Zeilen zählen (1).</td></tr>
+</table></div>
+<pre><code>events.log --grep -c--&gt; 5 --stdout--&gt; projects/output.txt
+                          (Fehlermeldungen gehen separat über stderr)</code></pre></div>
+
+<div class="blk"><h3>Standardausgabe und Fehlerausgabe</h3>
+<p class="ex">Jeder Befehl hat zwei Ausgabekanäle. Beide landen normalerweise auf dem Bildschirm, aber sie lassen sich getrennt umleiten.</p><div class="tw"><table>
+<tr><th>Kanal</th><th>Nr.</th><th>Inhalt</th><th>Umleiten</th></tr>
+<tr><td class="nw">stdout</td><td>1</td><td>das eigentliche Ergebnis (hier die Zahl)</td><td><code>&gt;</code> oder <code>1&gt;</code></td></tr>
+<tr><td class="nw">stderr</td><td>2</td><td>Fehlermeldungen und Warnungen</td><td><code>2&gt;</code></td></tr>
+<tr><td class="nw">beide</td><td></td><td>alles zusammen</td><td><code>&gt; datei 2&gt;&amp;1</code> oder <code>&amp;&gt; datei</code> (Bash)</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Nur das Ergebnis:</b> Die Aufgabe verlangt „nur die Anzahl“. Weil <code class="i">&gt;</code> ausschließlich die Standardausgabe umleitet, landet eine Fehlermeldung nicht in der Datei, sondern auf dem Bildschirm. So bleibt <code class="i">output.txt</code> sauber.</p>
+<p><b>Skripte sind wiederverwendbar:</b> Dasselbe Skript liefert bei jedem Lauf den aktuellen Wert. Mit <code class="i">&gt;</code> halten Sie ihn fest, mit <code class="i">&gt;&gt;</code> sammeln Sie mehrere Messungen.</p>
+<p><b>Skript aufrufen heißt Pfad angeben:</b> Der aktuelle Ordner steht nicht im Suchpfad. Deshalb schreibt man <code class="i">./skript</code> oder den vollen Pfad.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>&gt;</code> vergessen</td><td>Die Zahl erscheint nur auf dem Bildschirm, <code>output.txt</code> bleibt leer oder fehlt.</td></tr>
+<tr><td><code>&gt;&gt;</code> statt <code>&gt;</code></td><td>Jeder Lauf hängt eine Zeile an. Nach zwei Läufen steht <code>5</code> doppelt in der Datei.</td></tr>
+<tr><td>Nur der Name ohne Pfad (<code>check-errors.sh</code>)</td><td><code>command not found</code>, weil die Shell nur in den Ordnern des Suchpfads sucht. Ein Pfad wie <code>./check-errors.sh</code> oder <code>projects/check-errors.sh</code> funktioniert.</td></tr>
+<tr><td>Kein Ausführungsrecht</td><td><code>Permission denied</code> (Exit-Code 126). Mit <code>chmod 750</code> (Übung 33) oder <code>sh skript</code> lösen.</td></tr>
+<tr><td>Log-Datei fehlt oder Pfad falsch</td><td><code>grep</code> meldet <code>No such file or directory</code> (Exit-Code 2) auf stderr. <code>output.txt</code> bleibt leer (0 Bytes), die Meldung steht auf dem Bildschirm.</td></tr>
+<tr><td><code>2&gt;&amp;1</code> vor <code>&gt;</code> geschrieben (<code>2&gt;&amp;1 &gt; datei</code>)</td><td>Die Reihenfolge zählt: Die Fehlermeldung geht noch auf den Bildschirm. Richtig: erst <code>&gt; datei</code>, dann <code>2&gt;&amp;1</code>.</td></tr>
+<tr><td>Anderes Verzeichnis beim Aufruf</td><td>Relative Pfade zeigen ins Leere. Mit <code>pwd</code> prüfen.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 34 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie im Übungsordner <code class="i">~/uebung</code> mit dem Skript und dem Beispiel-Log.</p>
+<p><b>a)</b> Leite Ergebnis und Fehler getrennt oder zusammen um.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>mv ~/daten/events.log ~/daten/events.bak         # Log verschwinden lassen: Fehler erzwingen
+
+./projects/check-errors.sh &gt; ergebnis.txt 2&gt; fehler.txt
+cat fehler.txt                                    # grep: …/events.log: No such file or directory
+wc -c &lt; ergebnis.txt                              # 0
+
+./projects/check-errors.sh &gt; alles.txt 2&gt;&amp;1       # beide in eine Datei
+bash -c './projects/check-errors.sh &amp;&gt; alles.txt'      # Kurzform in Bash
+
+mv ~/daten/events.bak ~/daten/events.log          # Log zurück</code></pre>
+<p class="ex"><code class="i">2&gt;</code> leitet nur Fehlermeldungen um. <code class="i">2&gt;&amp;1</code> heißt: „Kanal 2 geht dorthin, wo Kanal 1 hingeht“, darum muss es <i>nach</i> der Umleitung von Kanal 1 stehen.</p></details>
+<p><b>b)</b> Verwirf Meldungen oder die Ausgabe ganz.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>./projects/check-errors.sh &gt; /dev/null           # Ausgabe verwerfen, nur der Exit-Code zählt
+./projects/check-errors.sh 2&gt; /dev/null          # nur Fehlermeldungen verwerfen</code></pre>
+<p class="ex"><code class="i">/dev/null</code> ist ein „Mülleimer“: Alles, was hineingeschrieben wird, verschwindet. Praktisch, wenn man nur wissen will, ob ein Befehl funktioniert hat.</p></details>
+<p><b>c)</b> Zeige das Ergebnis und speichere es gleichzeitig.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>./projects/check-errors.sh | tee projects/output.txt     # Bildschirm und Datei
+./projects/check-errors.sh | tee -a projects/history.txt # anhängen statt überschreiben</code></pre>
+<p class="ex"><code class="i">tee</code> verzweigt den Datenstrom. Mit <code class="i">-a</code> (append) wird angehängt, wie bei <code class="i">&gt;&gt;</code>.</p></details>
+<p><b>d)</b> Speichere das Ergebnis in einer Variable und werte es aus.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>N=$(./projects/check-errors.sh)
+echo "Es gibt $N Fehler"
+
+if [ "$N" -gt 3 ]; then echo "viele Fehler"; fi</code></pre>
+<p class="ex">Mit <code class="i">$(…)</code> wird die Ausgabe des Skripts zum Wert der Variable. Dann kann ein anderes Skript oder eine Bedingung damit arbeiten.</p></details>
+<p><b>e)</b> Führe das Skript von einem anderen Ordner aus und schreibe Datum und Zahl in eine Verlaufsdatei.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>(cd /tmp &amp;&amp; "$HOME/uebung/projects/check-errors.sh" &gt; "$HOME/uebung/projects/output.txt")
+
+echo "$(date +%F) $(./projects/check-errors.sh)" &gt;&gt; projects/verlauf.txt
+cat projects/verlauf.txt                          # z. B.  2026-10-04 5</code></pre>
+<p class="ex">Mit dem vollen Pfad (<code class="i">$HOME/…</code>) läuft das Skript aus jedem Ordner. Für den Verlauf hängt jede Zeile ein Datum und die Zahl an. Genau das würde später <code class="i">cron</code> regelmäßig erledigen.</p></details>
+<p><b>f)</b> Werte nur den Exit-Code aus.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>printf 'INFO a\n' &gt; ~/daten/events.log        # Log ohne ERROR-Zeilen (Original vorher sichern!)
+./projects/check-errors.sh; echo "exit=$?"    # Ausgabe 0, exit=1
+if ./projects/check-errors.sh &gt; /dev/null; then
+    echo "ERROR gefunden"
+else
+    echo "keine ERROR-Zeilen"
+fi</code></pre>
+<p class="ex"><code class="i">grep -c</code> beendet sich mit Exit-Code 1, wenn es nichts gefunden hat (auch wenn die Zahl 0 ausgegeben wird). Das Skript übernimmt den Exit-Code seines letzten Befehls, <code class="i">if</code> wertet ihn aus. Stellen Sie danach das Beispiel-Log wieder her (Vorbereitung).</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
