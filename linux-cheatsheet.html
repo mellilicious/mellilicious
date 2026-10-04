@@ -1864,6 +1864,82 @@ s="hello world"; echo "${s^^}"                       # HELLO WORLD (Bash 4+)</co
 <p class="ex"><code class="i">awk</code> hat <code class="i">toupper</code>, GNU-<code class="i">sed</code> <code class="i">\U</code> und Bash 4 die Ersetzung <code class="i">${var^^}</code>. <code class="i">tr</code> bleibt die kürzeste Variante.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 17 · Wieder in Kleinbuchstaben umwandeln</h3>
+<p><b>Aufgabe:</b> Lege <code class="i">notes/lower.txt</code> an. Sie soll den ursprünglichen Text in Kleinbuchstaben enthalten (in der Kursaufgabe <code class="i">hello c2610475054</code>, hier <code class="i">hello world</code>).</p>
+<p class="ex">Geübt wird: <code class="i">tr</code> in die Gegenrichtung, die Eingabe aus einer Datei (<code class="i">&lt;</code>) und die Ausgabe in eine andere (<code class="i">&gt;</code>). Die Datei <code class="i">notes/upper.txt</code> aus Übung 16 ist die Quelle. Falls sie fehlt, legen Sie sie mit dem Befehl am Anfang der Lösung an.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes
+echo "hello world" | tr 'a-z' 'A-Z' &gt; notes/upper.txt    # nur falls Übung 16 fehlt
+
+tr 'A-Z' 'a-z' &lt; notes/upper.txt &gt; notes/lower.txt
+
+cat notes/lower.txt            # hello world</code></pre>
+<p class="ex">Auch möglich, mit Pipe: <code class="i">cat notes/upper.txt | tr 'A-Z' 'a-z' &gt; notes/lower.txt</code>. Das Ergebnis ist dasselbe.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>tr 'A-Z' 'a-z'</code></td><td>Ersetzt jeden Großbuchstaben durch den passenden Kleinbuchstaben. Es ist die umgekehrte Richtung zu Übung 16: Die Mengen sind vertauscht.</td></tr>
+<tr><td class="nw"><code>&lt; notes/upper.txt</code></td><td>Die Datei wird zur Eingabe von <code>tr</code>. Das ist nötig, weil <code>tr</code> keine Dateinamen als Argument kennt.</td></tr>
+<tr><td class="nw"><code>&gt; notes/lower.txt</code></td><td>Die Ausgabe landet in einer <i>anderen</i> Datei.</td></tr>
+</table></div>
+<pre><code>notes/upper.txt  --&lt;--&gt;  tr 'A-Z' 'a-z'  --&gt;--&gt;  notes/lower.txt
+HELLO WORLD                                  hello world</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Eingabe und Ausgabe sind getrennt:</b> Mit <code class="i">&lt;</code> wird gelesen, mit <code class="i">&gt;</code> geschrieben. Beides lässt sich in einem Befehl kombinieren. Die Quelle bleibt unverändert, Sie können jederzeit zurückgehen.</p>
+<p><b>Ohne <code class="i">cat</code>:</b> <code class="i">tr … &lt; datei</code> spart den Umweg über <code class="i">cat | tr</code>. Beides funktioniert, die Umleitung ist kürzer und braucht keinen zweiten Prozess.</p>
+<p><b>Hin und zurück:</b> Das Umwandeln lässt sich umkehren, solange die ursprüngliche Schreibweise nur klein war. Aus <code class="i">Hello World</code> wird nach „groß, dann klein“ <code class="i">hello world</code>. Die alte Mischung ist dann verloren, die Umwandlung ist nicht verlustfrei.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td>Mengen nicht vertauscht (<code>'a-z' 'A-Z'</code>)</td><td>Der Text bleibt in Großbuchstaben, <code>lower.txt</code> enthält <code>HELLO WORLD</code>.</td></tr>
+<tr><td><code>tr 'A-Z' 'a-z' notes/upper.txt</code></td><td><code>tr: extra operand 'notes/upper.txt'</code>. Fehlt das <code>&lt;</code>, hält <code>tr</code> den Dateinamen für ein drittes Argument.</td></tr>
+<tr><td>Ausgabe in dieselbe Datei (<code>&lt; a &gt; a</code>)</td><td>Die Shell leert die Datei, bevor <code>tr</code> liest. Ergebnis: leere Datei (0 Bytes). Besser in eine neue Datei schreiben, bei Bedarf danach mit <code>mv</code> ersetzen.</td></tr>
+<tr><td><code>upper.txt</code> fehlt</td><td><code>bash: notes/upper.txt: No such file or directory</code>. Bei der Reihenfolge <code>&lt; … &gt; …</code> bricht die Shell schon beim Lesen ab, <code>lower.txt</code> wird nicht angelegt. Steht <code>&gt;</code> zuerst, entsteht eine leere Datei.</td></tr>
+<tr><td>Zahlen und Leerzeichen</td><td>Bleiben unverändert, das ist richtig so. Der Code <code>c2610475054</code> bleibt gleich.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 17 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit <code class="i">notes/upper.txt</code> (<code class="i">HELLO WORLD</code>) und <code class="i">notes/lower.txt</code>.</p>
+<p><b>a)</b> Prüfe, ob <code class="i">lower.txt</code> genau dem Original entspricht.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>echo "hello world" | diff - notes/lower.txt &amp;&amp; echo "identisch"
+wc -c &lt; notes/upper.txt; wc -c &lt; notes/lower.txt       # beide 12 Bytes</code></pre>
+<p class="ex"><code class="i">diff -</code> vergleicht die Pipe-Eingabe mit der Datei. Keine Ausgabe heißt: gleich. Die Länge bleibt bei <code class="i">tr</code> immer gleich, weil Zeichen eins zu eins ersetzt werden.</p></details>
+<p><b>b)</b> Wandle in einem Schritt hin und zurück um.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>echo "Hello World" | tr 'a-z' 'A-Z' | tr 'A-Z' 'a-z'      # hello world</code></pre>
+<p class="ex">Zwei <code class="i">tr</code> hintereinander ergeben die Rundreise. Aus <code class="i">Hello World</code> wird <code class="i">hello world</code>: Die ursprüngliche Mischschreibweise geht verloren.</p></details>
+<p><b>c)</b> Wandle direkt auf dem Bildschirm um und speichere gleichzeitig.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>tr 'A-Z' 'a-z' &lt; notes/upper.txt | tee notes/l2.txt</code></pre>
+<p class="ex"><code class="i">tee</code> zeigt die Ausgabe und schreibt sie zugleich in die Datei.</p></details>
+<p><b>d)</b> Wandle mehrere Zeilen einer Datei um.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>printf 'ABC\nDEF\n' | tr 'A-Z' 'a-z'      # abc, def (zwei Zeilen)</code></pre>
+<p class="ex"><code class="i">tr</code> arbeitet auf dem ganzen Datenstrom, die Zeilenumbrüche bleiben erhalten.</p></details>
+<p><b>e)</b> Ändere eine Datei „an Ort und Stelle“, ohne sie zu leeren.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>tr 'A-Z' 'a-z' &lt; notes/upper.txt &gt; notes/upper.tmp &amp;&amp; mv notes/upper.tmp notes/upper.txt
+cat notes/upper.txt            # hello world</code></pre>
+<p class="ex">Erst in eine Zwischendatei schreiben, dann mit <code class="i">mv</code> ersetzen. <code class="i">&amp;&amp;</code> sorgt dafür, dass <code class="i">mv</code> nur bei Erfolg läuft. Danach hat <code class="i">upper.txt</code> nur noch Kleinbuchstaben, legen Sie sie für Übung 16 neu an.</p></details>
+<p><b>f)</b> Mache nur den ersten Buchstaben eines Worts groß.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>w=hello
+echo "$(echo ${w:0:1} | tr a-z A-Z)${w:1}"      # Hello</code></pre>
+<p class="ex"><code class="i">${w:0:1}</code> ist das erste Zeichen von <code class="i">w</code>, <code class="i">${w:1}</code> der Rest. Das erste wird mit <code class="i">tr</code> umgewandelt und wieder davorgesetzt. In Bash 4 geht es kürzer mit <code class="i">${w^}</code>.</p></details>
+<p><b>g)</b> Wandle ohne <code class="i">tr</code> in Kleinbuchstaben um: mit <code class="i">awk</code>, <code class="i">sed</code> und Bash, und suche ohne Rücksicht auf Groß/Klein mit <code class="i">grep</code>.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>echo "HELLO" | awk '{print tolower($0)}'      # hello
+echo "HELLO" | sed 's/.*/\L&amp;/'                # hello (GNU sed)
+s="HELLO WORLD"; echo "${s,,}"                # hello world (Bash 4+)
+echo "Hello" | grep -i hello                  # findet ohne Rücksicht auf die Schreibweise</code></pre>
+<p class="ex">Oft muss man gar nicht umwandeln: Viele Werkzeuge haben eine Option, die Schreibweise zu ignorieren (<code class="i">grep -i</code>, <code class="i">sort -f</code>, <code class="i">uniq -i</code>).</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
