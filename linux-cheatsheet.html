@@ -3876,6 +3876,115 @@ gzip a b; gunzip a.gz b.gz                 # mehrere Dateien auf einmal</code></
 <p class="ex">Ein <code class="i">.tar.gz</code> ist ein <code class="i">tar</code>, das mit <code class="i">gzip</code> komprimiert wurde. <code class="i">tar -xzf</code> erledigt beide Schritte, <code class="i">gzip -dc … | tar -tf -</code> zeigt die einzelnen Stufen.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 37 · Archiv in einen Ordner entpacken</h3>
+<p><b>Aufgabe:</b> Entpacke <code class="i">notes.tar.gz</code> in den Ordner <code class="i">projects/extracted</code>, sodass dort <code class="i">notes/greeting.txt</code> entsteht.</p>
+<p class="ex">Geübt wird: <code class="i">tar -xzf</code> mit <code class="i">-C</code> (in einen anderen Ordner entpacken). Das Archiv stammt aus Übung 26. Der Zielordner muss vorher existieren. Falls das Archiv fehlt, legt die Vorbereitung es an.</p>
+<details><summary>Vorbereitung: Archiv anlegen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes/archiv projects
+echo "Hallo" &gt; notes/greeting.txt
+printf 'pwd\nls\nmkdir\ngrep\n' &gt; notes/commands.txt
+echo "alt" &gt; notes/archiv/old.txt
+tar -czf notes.tar.gz notes</code></pre></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+tar -tzf notes.tar.gz                        # erst ansehen: was ist drin?
+
+mkdir -p projects/extracted                  # Zielordner anlegen
+tar -xzf notes.tar.gz -C projects/extracted  # dort hinein entpacken
+
+cat projects/extracted/notes/greeting.txt    # Kontrolle
+find projects/extracted | sort</code></pre>
+<p class="ex">Die Pfade im Archiv beginnen mit <code class="i">notes/</code>. Deshalb entsteht <code class="i">projects/extracted/notes/greeting.txt</code>, genau wie verlangt.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Teil macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>tar -t</code></td><td>Listet den Inhalt, ohne etwas zu entpacken. Damit prüfen Sie vorher, welche Pfade im Archiv stehen.</td></tr>
+<tr><td class="nw"><code>-x</code></td><td>e<b>x</b>tract: Dateien aus dem Archiv herausholen.</td></tr>
+<tr><td class="nw"><code>-z</code></td><td>Das Archiv ist mit <b>gz</b>ip komprimiert. (GNU <code>tar</code> erkennt das beim Entpacken auch selbst.)</td></tr>
+<tr><td class="nw"><code>-f notes.tar.gz</code></td><td><b>f</b>ile: Name des Archivs. Direkt hinter <code>-f</code> steht der Name.</td></tr>
+<tr><td class="nw"><code>-C projects/extracted</code></td><td>Wechselt vor dem Entpacken in diesen Ordner (<b>C</b>hange directory). Der Ordner muss existieren.</td></tr>
+</table></div>
+<pre><code>notes.tar.gz                         projects/extracted/
+  notes/                    -x--&gt;      notes/
+  notes/greeting.txt                     greeting.txt
+  notes/commands.txt                     commands.txt
+  notes/archiv/old.txt                   archiv/old.txt</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Nie blind im aktuellen Ordner entpacken:</b> Ohne <code class="i">-C</code> landen die Dateien im aktuellen Ordner. Haben Sie dort schon einen Ordner <code class="i">notes</code>, überschreibt <code class="i">tar</code> gleichnamige Dateien <i>ohne Rückfrage</i>. Im Test wurde aus <code class="i">GEAENDERT</code> wieder <code class="i">Hallo</code>: Die Änderung war weg.</p>
+<p><b>Zielordner als Sandkasten:</b> Ein eigener, leerer Ordner hält das Ergebnis getrennt. Sie sehen, was entsteht, und können es mit dem Original vergleichen (<code class="i">diff -r</code>).</p>
+<p><b>Erst listen, dann entpacken:</b> <code class="i">tar -tzf</code> zeigt die Pfade. Beginnen alle mit <code class="i">notes/</code>, entsteht beim Entpacken ein Ordner <code class="i">notes</code>. Archive ohne gemeinsamen Ordner „verstreuen“ ihren Inhalt im Zielordner.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td>Zielordner fehlt</td><td><code>tar: projects/nix: Cannot open: No such file or directory</code> (Exit-Code 2). Erst <code>mkdir -p</code>.</td></tr>
+<tr><td>Ziel ist eine Datei</td><td><code>tar: dateiziel: Cannot open: Not a directory</code>.</td></tr>
+<tr><td><code>-C</code> vergessen</td><td>Es wird im aktuellen Ordner entpackt. Vorhandene Dateien werden überschrieben, hier das Original unter <code>notes/</code>.</td></tr>
+<tr><td><code>-f</code> falsch platziert (<code>-xfz archiv</code>)</td><td><code>-f</code> nimmt das nächste Wort als Archivnamen, also <code>z</code>: <code>tar: z: Cannot open: No such file or directory</code>. Richtig: <code>-xzf archiv</code>.</td></tr>
+<tr><td>Falscher Archivname oder -pfad</td><td><code>tar (child): nix.tar.gz: Cannot open: No such file or directory</code>.</td></tr>
+<tr><td>Kein gzip-Archiv bei <code>-z</code></td><td><code>gzip: stdin: not in gzip format</code>.</td></tr>
+<tr><td>Dateinamen ohne <code>notes/</code> angegeben</td><td>Zum Herausholen einer einzelnen Datei muss der <i>Pfad aus dem Archiv</i> stehen: <code>notes/greeting.txt</code>. Mit <code>greeting.txt</code> kommt <code>Not found in archive</code>.</td></tr>
+<tr><td>Ergebnis nicht geprüft</td><td>Nach dem Entpacken mit <code>find</code> oder <code>cat</code> kontrollieren, ob <code>notes/greeting.txt</code> wirklich im Zielordner liegt.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 37 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie im Übungsordner <code class="i">~/uebung</code>. Legen Sie vor jedem Beispiel einen neuen leeren Zielordner an.</p>
+<p><b>a)</b> Entpacke ohne den Ordner <code class="i">notes</code>, direkt in den Zielordner.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>mkdir x4
+tar -xzf notes.tar.gz -C x4 --strip-components=1
+ls x4                                  # archiv  commands.txt  greeting.txt</code></pre>
+<p class="ex"><code class="i">--strip-components=1</code> entfernt die erste Ebene der Pfade (<code class="i">notes/</code>). Die Dateien liegen dann direkt im Zielordner.</p></details>
+<p><b>b)</b> Hole nur eine Datei oder nur den Inhalt auf den Bildschirm.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>mkdir x5
+tar -xzf notes.tar.gz -C x5 notes/greeting.txt    # nur diese Datei
+find x5 -type f                                   # x5/notes/greeting.txt
+
+tar -xzOf notes.tar.gz notes/greeting.txt         # Inhalt ausgeben, nichts anlegen</code></pre>
+<p class="ex">Hinter dem Archivnamen stehen die gewünschten Pfade, genau wie <code class="i">tar -tzf</code> sie zeigt. <code class="i">-O</code> schreibt auf die Standardausgabe.</p></details>
+<p><b>c)</b> Verhindere das Überschreiben vorhandener Dateien.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>echo "GEAENDERT" &gt; notes/greeting.txt
+tar -xzkf notes.tar.gz                  # -k: keine vorhandenen Dateien überschreiben
+# tar: notes/greeting.txt: Cannot open: File exists   (Exit-Code 2)
+
+tar --skip-old-files -xzf notes.tar.gz  # vorhandene still überspringen (Exit-Code 0)
+cat notes/greeting.txt                  # GEAENDERT: unverändert</code></pre>
+<p class="ex"><code class="i">-k</code> (<code class="i">--keep-old-files</code>) meldet jede vorhandene Datei als Fehler, <code class="i">--skip-old-files</code> überspringt sie ohne Fehler. Standard ist: überschreiben.</p></details>
+<p><b>d)</b> Zeige beim Entpacken jede Datei, und vergleiche mit dem Original.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>mkdir x6
+tar -xzvf notes.tar.gz -C x6            # -v: jede Datei auflisten
+diff -r notes x6/notes &amp;&amp; echo "identisch"</code></pre>
+<p class="ex"><code class="i">diff -r</code> vergleicht zwei Ordner. Weicht ein Inhalt ab (zum Beispiel wegen Änderungen seit der Sicherung), listet es die Unterschiede.</p></details>
+<p><b>e)</b> Achte auf Zeitstempel und Rechte.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>touch -d '2020-01-02 03:04' notes/commands.txt
+tar -czf t2.tar.gz notes
+mkdir x7 x8
+tar -xzf  t2.tar.gz -C x7              # Zeit aus dem Archiv: 2020-01-02 03:04
+tar -xzmf t2.tar.gz -C x8              # -m: Zeitstempel = jetzt
+stat -c '%y' x7/notes/commands.txt x8/notes/commands.txt | cut -c1-16</code></pre>
+<p class="ex">Standardmäßig übernimmt <code class="i">tar</code> die gespeicherten Änderungszeiten. Mit <code class="i">-m</code> (modification) wird stattdessen die aktuelle Zeit gesetzt.</p></details>
+<p><b>f)</b> Arbeite mit relativen Pfaden und aus einem anderen Ordner.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>(cd projects &amp;&amp; tar -xzf ../notes.tar.gz -C extracted &amp;&amp; ls extracted)       # notes
+tar -xzf ~/uebung/notes.tar.gz -C ~/uebung/x7       # Archiv und Ziel mit vollem Pfad (Ziel muss existieren)</code></pre>
+<p class="ex">Wenn Sie vorher mit <code class="i">cd</code> den Ordner wechseln, gelten alle Pfade ab dort. Das Archiv gibt man dann relativ (<code class="i">../notes.tar.gz</code>) oder absolut an.</p></details>
+<p><b>g)</b> Optionen mit und ohne Bindestrich, und vor oder nach dem Archivnamen.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>mkdir -p y1
+tar -xzf notes.tar.gz -C y1             # klassisch
+tar -C y1 -xzf notes.tar.gz             # -C zuerst: gleiches Ergebnis
+tar xzf notes.tar.gz -C y1              # ohne Bindestrich (alte Schreibweise) funktioniert auch
+tar -xf notes.tar.gz -C y1              # GNU tar erkennt die Kompression selbst</code></pre>
+<p class="ex">Merkhilfe: <b>x</b>trahieren, g<b>z</b>ip, <b>f</b>ile, <b>C</b>hange directory. Das <code class="i">f</code> muss unmittelbar vor dem Archivnamen stehen.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
