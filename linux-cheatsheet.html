@@ -655,11 +655,20 @@ trap 'rm -f "$tmp"' EXIT         # beim Beenden ausführen</code></pre></div>
 
 <section id="uebungen" data-grp="Übungen"><h2>Übungen <small>mit Lösung</small></h2><div class="grid">
 
+<div class="blk wide"><h3>Vorbereitung</h3>
+<p class="ex">Alle Übungen laufen in einem eigenen Übungsordner. So kann nichts Wichtiges kaputtgehen. Wenn Ihr Kurs oder Ihre Aufgabe einen anderen Ordner vorgibt, nehmen Sie diesen Pfad statt <code class="i">~/uebung</code>.</p>
+<pre><code>mkdir -p ~/uebung                 # Übungsordner anlegen (falls nicht vorhanden)
+cd ~/uebung                       # hineinwechseln
+echo "Hallo Welt" &gt; hello.txt     # Beispieldatei für Übung 2
+pwd                               # Kontrolle: /home/&lt;name&gt;/uebung
+ls</code></pre>
+<p class="note">Aufräumen am Ende: <code class="i">cd ~ &amp;&amp; rm -r ~/uebung</code> löscht den ganzen Übungsordner. Vorher mit <code class="i">pwd</code> prüfen, dass Sie nicht im falschen Verzeichnis sind.</p></div>
+
 <div class="blk wide"><h3>Übung 1 · Verzeichnis anlegen und auflisten</h3>
-<p><b>Aufgabe:</b> Lege im Arbeitsverzeichnis <code class="i">~/teachme-linux-00fbe14e</code> das Verzeichnis <code class="i">notes</code> an und speichere die Ausgabe von <code class="i">ls -d notes</code> in der Datei <code class="i">notes/listing.txt</code>.</p>
+<p><b>Aufgabe:</b> Lege im Übungsordner <code class="i">~/uebung</code> das Verzeichnis <code class="i">notes</code> an und speichere die Ausgabe von <code class="i">ls -d notes</code> in der Datei <code class="i">notes/listing.txt</code>.</p>
 <p class="ex">Geübt wird: Verzeichnis anlegen, relative Pfade, die Option <code class="i">-d</code> und die Umleitung der Ausgabe in eine Datei. Versuchen Sie es zuerst selbst, die Lösung ist eingeklappt.</p>
 <details><summary>Lösung anzeigen</summary>
-<pre><code>cd ~/teachme-linux-00fbe14e       # ins Arbeitsverzeichnis wechseln
+<pre><code>cd ~/uebung       # in den Übungsordner wechseln
 mkdir notes                       # Verzeichnis "notes" anlegen
 ls -d notes &gt; notes/listing.txt   # Ausgabe von ls -d in die Datei schreiben
 cat notes/listing.txt             # Kontrolle: zeigt  notes</code></pre>
@@ -668,7 +677,7 @@ cat notes/listing.txt             # Kontrolle: zeigt  notes</code></pre>
 
 <div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
 <tr><th>Befehl</th><th>Wirkung</th></tr>
-<tr><td class="nw"><code>cd ~/teachme-linux-…</code></td><td><b>c</b>hange <b>d</b>irectory: Die Shell wechselt in dieses Verzeichnis. <code>~</code> steht für Ihr Home-Verzeichnis.</td></tr>
+<tr><td class="nw"><code>cd ~/uebung</code></td><td><b>c</b>hange <b>d</b>irectory: Die Shell wechselt in dieses Verzeichnis. <code>~</code> steht für Ihr Home-Verzeichnis.</td></tr>
 <tr><td class="nw"><code>mkdir notes</code></td><td><b>m</b>a<b>k</b>e <b>dir</b>ectory: legt einen neuen, leeren Ordner <code>notes</code> im aktuellen Verzeichnis an.</td></tr>
 <tr><td class="nw"><code>ls</code></td><td><b>l</b>i<b>s</b>t: zeigt den <i>Inhalt</i> eines Verzeichnisses.</td></tr>
 <tr><td class="nw"><code>ls -d notes</code></td><td>Option <code>-d</code> (<b>d</b>irectory): zeigt den <i>Eintrag selbst</i> statt seines Inhalts. Die Ausgabe ist einfach der Name <code>notes</code>.</td></tr>
@@ -679,7 +688,7 @@ cat notes/listing.txt             # Kontrolle: zeigt  notes</code></pre>
 <div class="blk"><h3>Warum macht man es so?</h3>
 <p><b>Reihenfolge:</b> <code class="i">mkdir</code> muss zuerst kommen. Die Umleitung <code class="i">&gt;</code> legt zwar die Datei an, aber nie fehlende Verzeichnisse. Ohne <code class="i">notes</code> bricht die Shell mit <code class="i">No such file or directory</code> ab.</p>
 <p><b>Warum <code class="i">-d</code>?</b> Ohne die Option würde <code class="i">ls notes</code> den Inhalt des Ordners zeigen, und der ist leer. Mit <code class="i">-d</code> erhalten Sie den Namen des Ordners selbst. So prüft man zum Beispiel, ob ein Verzeichnis existiert, oder listet mit <code class="i">ls -d */</code> nur die Unterverzeichnisse.</p>
-<p><b>Warum umleiten?</b> Ein Befehl schreibt normalerweise in das Terminal (Standardausgabe). Mit <code class="i">&gt;</code> können Sie das Ergebnis speichern, weiterverarbeiten oder, wie hier, automatisch prüfen lassen. Die Prüfung liest die Datei auf dem Server, deshalb muss sie am richtigen Pfad liegen.</p>
+<p><b>Warum umleiten?</b> Ein Befehl schreibt normalerweise in das Terminal (Standardausgabe). Mit <code class="i">&gt;</code> können Sie das Ergebnis speichern, weiterverarbeiten oder, wie hier, später von einem Skript oder einer Lehrkraft prüfen lassen. Damit das klappt, muss die Datei genau am verlangten Pfad liegen.</p>
 <p><b>Relative Pfade:</b> <code class="i">notes/listing.txt</code> gilt vom aktuellen Verzeichnis aus. Deshalb zuerst <code class="i">cd</code> und im Zweifel <code class="i">pwd</code> zur Kontrolle.</p></div>
 
 <div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
@@ -715,10 +724,10 @@ ls projekt | wc -l              # wc -l zählt Zeilen, hier: 1 (src)</code></pre
 </div>
 
 <div class="blk wide"><h3>Übung 2 · Datei kopieren und lesen</h3>
-<p><b>Aufgabe:</b> Kopiere in <code class="i">~/teachme-linux-00fbe14e</code> die Datei <code class="i">hello.txt</code> nach <code class="i">notes/hello-copy.txt</code>, ohne das Original zu entfernen. Lies die Kopie mit <code class="i">cat</code> und speichere die Ausgabe in <code class="i">notes/copy-check.txt</code>.</p>
+<p><b>Aufgabe:</b> Kopiere in <code class="i">~/uebung</code> die Datei <code class="i">hello.txt</code> nach <code class="i">notes/hello-copy.txt</code>, ohne das Original zu entfernen. Lies die Kopie mit <code class="i">cat</code> und speichere die Ausgabe in <code class="i">notes/copy-check.txt</code>.</p>
 <p class="ex">Geübt wird: Kopieren mit <code class="i">cp</code>, der Unterschied zu <code class="i">mv</code>, Quelle und Ziel angeben, Dateien mit <code class="i">cat</code> lesen und die Ausgabe wieder mit <code class="i">&gt;</code> speichern. Der Ordner <code class="i">notes</code> stammt aus Übung 1.</p>
 <details><summary>Lösung anzeigen</summary>
-<pre><code>cd ~/teachme-linux-00fbe14e
+<pre><code>cd ~/uebung
 cp hello.txt notes/hello-copy.txt           # kopieren, Original bleibt
 cat notes/hello-copy.txt &gt; notes/copy-check.txt   # Kopie lesen, Ausgabe speichern
 
@@ -739,7 +748,7 @@ diff hello.txt notes/copy-check.txt         # keine Ausgabe = Inhalt identisch</
 <div class="blk"><h3>Warum macht man es so?</h3>
 <p><b><code class="i">cp</code> statt <code class="i">mv</code>:</b> <code class="i">mv</code> verschiebt, danach gäbe es <code class="i">hello.txt</code> nicht mehr. Die Aufgabe verlangt ausdrücklich, das Original zu behalten, also kopiert man.</p>
 <p><b>Ziel mit Dateiname:</b> Mit <code class="i">notes/hello-copy.txt</code> bestimmen Sie den neuen Namen. Schreiben Sie nur <code class="i">notes/</code>, behält die Kopie den alten Namen <code class="i">hello.txt</code>.</p>
-<p><b>Zwei Schritte:</b> Erst kopieren, dann die <i>Kopie</i> lesen. So sehen Sie, dass das Kopieren funktioniert hat, denn <code class="i">cat</code> meldet einen Fehler, wenn die Datei fehlt. Das Ergebnis in <code class="i">copy-check.txt</code> belegt es auch für die automatische Prüfung.</p>
+<p><b>Zwei Schritte:</b> Erst kopieren, dann die <i>Kopie</i> lesen. So sehen Sie, dass das Kopieren funktioniert hat, denn <code class="i">cat</code> meldet einen Fehler, wenn die Datei fehlt. Das Ergebnis in <code class="i">copy-check.txt</code> belegt es auch für jede spätere Kontrolle.</p>
 <p><b>Ausgabe statt Bildschirm:</b> <code class="i">cat</code> schreibt wie <code class="i">ls</code> in die Standardausgabe. Mit <code class="i">&gt;</code> wird daraus eine Datei, genau wie in Übung 1.</p></div>
 
 <div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
