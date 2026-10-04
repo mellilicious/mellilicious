@@ -1389,6 +1389,89 @@ grep -n '^lab:' ~/daten/words.list      # mit Zeilennummern in der Quelldatei</c
 <p class="ex"><code class="i">-c5-</code> gibt ab Zeichen 5 bis zum Zeilenende aus. Das Präfix <code class="i">lab:</code> hat vier Zeichen. Das funktioniert nur bei einem Präfix fester Länge, bei wechselnden Präfixen ist <code class="i">-d</code> und <code class="i">-f</code> robuster.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 11 · Text sortieren</h3>
+<p><b>Aufgabe:</b> Lege <code class="i">notes/sorted.txt</code> mit fünf Zeilen in alphabetischer Reihenfolge an: <code class="i">amber</code>, <code class="i">amber</code>, <code class="i">blue</code>, <code class="i">blue</code>, <code class="i">coral</code>. Doppelte Zeilen bleiben erhalten.</p>
+<p class="ex">Geübt wird: <code class="i">sort</code> und die Umleitung des Ergebnisses. In der Kursaufgabe stehen die Wörter mit einem Zusatz am Ende (<code class="i">amber00fb</code> usw.) und liegen vermutlich in einer unsortierten Datei vor. Hier nehmen wir die Beispieldatei <code class="i">~/daten/unsorted.txt</code>. Setzen Sie Ihre eigenen Wörter oder Ihren Pfad ein.</p>
+<details><summary>Beispieldaten anlegen</summary>
+<pre><code>mkdir -p ~/daten
+printf 'coral\nblue\namber\nblue\namber\n' &gt; ~/daten/unsorted.txt
+cat ~/daten/unsorted.txt        # fünf Zeilen, durcheinander</code></pre></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes
+sort ~/daten/unsorted.txt &gt; notes/sorted.txt
+
+cat notes/sorted.txt           # amber amber blue blue coral
+wc -l notes/sorted.txt         # 5</code></pre>
+<p class="ex">Falls die Wörter nur in der Aufgabe stehen und keine Datei vorliegt, geht es auch direkt: <code class="i">printf 'amber\namber\nblue\nblue\ncoral\n' &gt; notes/sorted.txt</code> (siehe Übung 8). Auch ohne <code class="i">sort</code> ist das Ergebnis dasselbe, solange die Reihenfolge stimmt.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Befehl</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>sort datei</code></td><td>Liest alle Zeilen, sortiert sie alphabetisch und gibt sie aus. Doppelte Zeilen bleiben erhalten und stehen direkt untereinander.</td></tr>
+<tr><td class="nw"><code>&gt; notes/sorted.txt</code></td><td>Schreibt das sortierte Ergebnis in die Datei.</td></tr>
+<tr><td class="nw"><code>cat</code>, <code>wc -l</code></td><td>Kontrolle: Reihenfolge ansehen und Zeilen zählen (5).</td></tr>
+</table></div>
+<pre><code>vorher:  coral  blue  amber  blue  amber
+nachher: amber  amber  blue   blue  coral</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Sortieren ist ein Filter:</b> <code class="i">sort</code> liest die Eingabe und gibt sie geordnet wieder aus. Deshalb lässt es sich gut in Pipes einsetzen, etwa vor <code class="i">uniq</code>, das nur <i>direkt aufeinanderfolgende</i> Duplikate erkennt.</p>
+<p><b>Original unverändert:</b> Die Quelldatei bleibt, wie sie ist. Das Ergebnis geht in eine neue Datei.</p>
+<p><b>Duplikate bleiben:</b> Die Aufgabe verlangt fünf Zeilen mit je zwei Mal <code class="i">amber</code> und <code class="i">blue</code>. Mit <code class="i">sort -u</code> würden sie entfernt, die Datei hätte nur drei Zeilen.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>sort -u</code></td><td>Doppelte Zeilen verschwinden, die Datei hat 3 statt 5 Zeilen.</td></tr>
+<tr><td><code>sort datei &gt; datei</code> (gleiche Datei)</td><td>Die Shell leert die Datei, <i>bevor</i> <code>sort</code> liest. Ergebnis: eine leere Datei. Richtig: <code>sort -o datei datei</code> oder über eine Zwischendatei.</td></tr>
+<tr><td>Nicht sortiert, nur kopiert</td><td>Die Reihenfolge stimmt nicht. Mit <code>cat</code> kontrollieren.</td></tr>
+<tr><td>Zahlen mit <code>sort</code> statt <code>sort -n</code></td><td><code>10</code> kommt vor <code>9</code>, weil Zeichen verglichen werden, keine Werte.</td></tr>
+<tr><td>Leerzeichen am Zeilenende</td><td><code>amber </code> und <code>amber</code> sind verschiedene Zeilen und werden nicht als gleich behandelt.</td></tr>
+<tr><td>Falscher Pfad</td><td><code>sort: cannot read: …: No such file or directory</code>, die Zieldatei bleibt leer.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 11 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit <code class="i">~/daten/unsorted.txt</code> aus den Beispieldaten.</p>
+<p><b>a)</b> Sortiere in umgekehrter Reihenfolge.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>sort -r ~/daten/unsorted.txt</code></pre>
+<p class="ex"><code class="i">-r</code> (reverse) dreht die Reihenfolge um: <code class="i">coral</code>, <code class="i">blue</code>, <code class="i">blue</code>, <code class="i">amber</code>, <code class="i">amber</code>.</p></details>
+<p><b>b)</b> Zähle, wie oft jede Zeile vorkommt.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>sort ~/daten/unsorted.txt | uniq -c
+#   2 amber
+#   2 blue
+#   1 coral</code></pre>
+<p class="ex"><code class="i">uniq -c</code> fasst gleiche, direkt aufeinanderfolgende Zeilen zusammen und zählt sie. Darum muss <code class="i">sort</code> davor stehen. Ohne <code class="i">sort</code> würde jede unsortierte Wiederholung einzeln gezählt.</p></details>
+<p><b>c)</b> Entferne Duplikate beim Sortieren.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>sort -u ~/daten/unsorted.txt        # amber blue coral
+sort ~/daten/unsorted.txt | uniq    # gleichwertig</code></pre>
+<p class="ex"><code class="i">-u</code> (unique) lässt von mehreren gleichen Zeilen nur eine übrig.</p></details>
+<p><b>d)</b> Sortiere Zahlen richtig. Vergleiche <code class="i">sort</code> und <code class="i">sort -n</code> bei <code class="i">10</code>, <code class="i">9</code>, <code class="i">100</code>.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>printf '10\n9\n100\n' | sort        # 10 100 9   (als Text)
+printf '10\n9\n100\n' | sort -n     # 9 10 100   (als Zahl)</code></pre>
+<p class="ex">Ohne <code class="i">-n</code> vergleicht <code class="i">sort</code> Zeichen für Zeichen, und <code class="i">1</code> kommt vor <code class="i">9</code>. Mit <code class="i">-n</code> zählt der Zahlenwert. Ähnlich sortiert <code class="i">-h</code> Größenangaben wie <code class="i">2K</code>, <code class="i">1M</code>, das ist praktisch für <code class="i">du -h</code>.</p></details>
+<p><b>e)</b> Sortiere <code class="i">blue</code>, <code class="i">Coral</code>, <code class="i">amber</code> einmal normal und einmal ohne Rücksicht auf Groß- und Kleinschreibung.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>printf 'blue\nCoral\namber\n' | LC_ALL=C sort       # Coral amber blue
+printf 'blue\nCoral\namber\n' | LC_ALL=C sort -f    # amber blue Coral</code></pre>
+<p class="ex">In der Grundeinstellung <code class="i">C</code> stehen Großbuchstaben vor Kleinbuchstaben, <code class="i">-f</code> (fold) ignoriert die Schreibweise. Je nach Spracheinstellung (Locale) kann die Standardreihenfolge anders aussehen. <code class="i">LC_ALL=C</code> macht sie eindeutig.</p></details>
+<p><b>f)</b> Sortiere die Zeilen <code class="i">x,3</code>, <code class="i">y,1</code>, <code class="i">z,2</code> nach der zweiten Spalte.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>printf 'x,3\ny,1\nz,2\n' | sort -t, -k2 -n     # y,1  z,2  x,3</code></pre>
+<p class="ex"><code class="i">-t,</code> setzt das Komma als Trenner, <code class="i">-k2</code> sortiert nach Spalte 2, <code class="i">-n</code> numerisch.</p></details>
+<p><b>g)</b> Sortiere eine Datei direkt in sich selbst und prüfe, ob eine Datei sortiert ist.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>cp ~/daten/unsorted.txt u.txt
+sort -o u.txt u.txt                 # -o schreibt erst nach dem Lesen
+sort -c u.txt; echo $?              # 0 = sortiert
+sort -c ~/daten/unsorted.txt; echo $?   # 1 = nicht sortiert, mit Fundstelle</code></pre>
+<p class="ex"><code class="i">-o</code> ist die sichere Variante zu <code class="i">&gt; datei</code> auf derselben Datei. <code class="i">-c</code> (check) sortiert nichts, sondern prüft nur und meldet über den Exit-Code, ob die Reihenfolge stimmt.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
