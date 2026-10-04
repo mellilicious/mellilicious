@@ -2372,6 +2372,93 @@ sort -n -o ~/daten/zahlen.txt ~/daten/zahlen.txt    # sicher in sich selbst schr
 <p class="ex"><code class="i">-c</code> prüft nur und meldet über den Exit-Code. <code class="i">-o</code> schreibt erst, nachdem alles gelesen wurde, und ist deshalb für dieselbe Datei sicher. Danach ist <code class="i">zahlen.txt</code> sortiert, legen Sie sie für Übung 22 bei Bedarf neu an.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 23 · Zahlen addieren</h3>
+<p><b>Aufgabe:</b> Lege <code class="i">notes/sum.txt</code> an. Sie soll nur die Summe der Zahlen <code class="i">4</code>, <code class="i">17</code> und <code class="i">44</code> enthalten, also <code class="i">65</code>.</p>
+<p class="ex">Geübt wird: <code class="i">awk</code> als kleiner Rechner. Die Zahlen stehen in <code class="i">notes/numbers-sorted.txt</code> aus Übung 22. Falls die Datei fehlt, legen Sie sie mit dem <code class="i">printf</code>-Befehl am Anfang der Lösung an.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes
+printf '4\n17\n44\n' &gt; notes/numbers-sorted.txt      # nur falls Übung 22 fehlt
+
+awk '{s+=$1} END {print s}' notes/numbers-sorted.txt &gt; notes/sum.txt
+
+cat notes/sum.txt              # 65</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>awk '…' datei</code></td><td>Liest die Datei Zeile für Zeile und führt für jede Zeile das Programm in den Anführungszeichen aus.</td></tr>
+<tr><td class="nw"><code>{s+=$1}</code></td><td>Wird für <i>jede</i> Zeile ausgeführt. <code>$1</code> ist das erste Feld der Zeile (hier die Zahl). <code>s+=$1</code> addiert es zur Variablen <code>s</code>. Eine neue Variable beginnt bei 0.</td></tr>
+<tr><td class="nw"><code>END {print s}</code></td><td>Wird <i>einmal nach der letzten Zeile</i> ausgeführt und gibt die Summe aus.</td></tr>
+<tr><td class="nw"><code>&gt; notes/sum.txt</code></td><td>Schreibt das Ergebnis in die Datei.</td></tr>
+</table></div>
+<pre><code>Zeile 1:  4   -&gt; s = 0 + 4  =  4
+Zeile 2: 17   -&gt; s = 4 + 17 = 21
+Zeile 3: 44   -&gt; s = 21 + 44 = 65
+Ende:           print s     -&gt; 65</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b><code class="i">awk</code> ist für Zahlen gebaut:</b> Anders als <code class="i">cut</code> oder <code class="i">sort</code> rechnet es. Es zerlegt jede Zeile in Felder (<code class="i">$1</code>, <code class="i">$2</code>, ...) und hat Variablen, Vergleiche und Schleifen.</p>
+<p><b>Aufbau: <code class="i">Muster { Aktion }</code>:</b> Ohne Muster gilt die Aktion für jede Zeile. <code class="i">END</code> ist ein besonderes Muster für „nach dem letzten Datensatz“, <code class="i">BEGIN</code> für „vor dem ersten“.</p>
+<p><b>Nur die Zahl:</b> Die Aufgabe verlangt eine Datei, die ausschließlich <code class="i">65</code> enthält. <code class="i">print s</code> hängt nur einen Zeilenumbruch an, sonst nichts.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>print s</code> im Zeilenblock <code>{s+=$1; print s}</code></td><td>Es werden alle Zwischenstände ausgegeben: <code>4 21 65</code>. Die Datei hat drei Zeilen.</td></tr>
+<tr><td><code>END</code> vergessen oder <code>END {print}</code></td><td>Ohne <code>s</code> wird nur die letzte Zeile (<code>44</code>) ausgegeben, keine Summe.</td></tr>
+<tr><td><code>$2</code> statt <code>$1</code></td><td>Es gibt kein zweites Feld, jede Zeile zählt als 0. Die Datei enthält <code>0</code> statt <code>65</code>, ohne Fehlermeldung.</td></tr>
+<tr><td>Leere Eingabe</td><td><code>s</code> wurde nie gesetzt, <code>print s</code> gibt eine <i>leere Zeile</i> aus. Mit <code>print s+0</code> kommt sicher eine Zahl.</td></tr>
+<tr><td>Text in der Liste</td><td>Zeilen wie <code>abc</code> zählen als 0. Die Summe stimmt, aber der Fehler fällt nicht auf.</td></tr>
+<tr><td><code>awk … &gt; dieselbe-Eingabedatei</code></td><td>Die Datei wird geleert, bevor <code>awk</code> liest. Ergebnis: eine leere Zeile.</td></tr>
+<tr><td>Einfache Anführungszeichen vergessen</td><td>Die Shell deutet <code>{</code>, <code>$1</code> und Leerzeichen selbst, <code>awk</code> bekommt Unsinn.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 23 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit <code class="i">notes/numbers-sorted.txt</code> (4, 17, 44). Alle Ergebnisse sehen Sie direkt im Terminal.</p>
+<p><b>a)</b> Zähle die Zeilen, berechne den Durchschnitt, das Minimum und das Maximum.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>awk 'END {print NR}' notes/numbers-sorted.txt                      # 3
+awk '{s+=$1; n++} END {print s/n}' notes/numbers-sorted.txt        # 21.6667
+awk 'NR==1 || $1&lt;min {min=$1} NR==1 || $1&gt;max {max=$1} END {print min, max}' notes/numbers-sorted.txt   # 4 44</code></pre>
+<p class="ex"><code class="i">NR</code> ist die Nummer der aktuellen Zeile, am Ende also die Zeilenzahl. Für Minimum und Maximum wird beim ersten Wert initialisiert und danach verglichen.</p></details>
+<p><b>b)</b> Addiere nur Zahlen über 10, und addiere eine Spalte aus mehreren.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>awk '$1 &gt; 10 {s+=$1} END {print s}' notes/numbers-sorted.txt     # 61   (17 + 44)
+printf 'anna 4\nben 17\ncarla 44\n' | awk '{s+=$2} END {print s}'   # 65 (zweite Spalte)</code></pre>
+<p class="ex">Ein Muster vor der Klammer wählt die Zeilen aus. Mit <code class="i">$2</code> wird eine andere Spalte addiert.</p></details>
+<p><b>c)</b> Addiere eine Spalte einer CSV-Datei ohne Kopfzeile.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>printf 'id,name,pts\n1,A,4\n2,B,17\n3,C,44\n' | awk -F, 'NR&gt;1 {s+=$3} END {print s}'    # 65</code></pre>
+<p class="ex"><code class="i">-F,</code> setzt das Komma als Trenner (wie <code class="i">cut -d,</code>). <code class="i">NR&gt;1</code> überspringt die Kopfzeile.</p></details>
+<p><b>d)</b> Rechne mit Dezimalzahlen und formatiere die Ausgabe.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>printf '1.5\n2.25\n' | awk '{s+=$1} END {print s}'             # 3.75
+echo 7 | awk '{s+=$1} END {printf "%.2f\n", s}'                  # 7.00
+awk 'BEGIN {s=100} {s+=$1} END {print s}' notes/numbers-sorted.txt   # 165 (Startwert 100)</code></pre>
+<p class="ex"><code class="i">awk</code> rechnet mit Kommazahlen. Mit <code class="i">printf</code> bestimmen Sie die Nachkommastellen. <code class="i">BEGIN</code> setzt einen Startwert, bevor die erste Zeile gelesen wird.</p></details>
+<p><b>e)</b> Berechne Summen pro Gruppe.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>printf 'a 1\nb 2\na 3\n' | awk '{s[$1]+=$2} END {for (k in s) print k, s[k]}' | sort
+# a 4
+# b 2</code></pre>
+<p class="ex"><code class="i">s[$1]</code> ist eine Tabelle (assoziatives Array) mit dem ersten Feld als Schlüssel. So summiert <code class="i">awk</code> je Gruppe. Die Reihenfolge der Ausgabe ist nicht festgelegt, deshalb <code class="i">sort</code>.</p></details>
+<p><b>f)</b> Wie lässt sich dieselbe Summe ohne <code class="i">awk</code> berechnen?</p>
+<details><summary>Lösung f)</summary>
+<pre><code>paste -sd+ notes/numbers-sorted.txt | bc               # 65   (4+17+44)
+echo "4+17+44" | bc                                    # 65
+
+s=0
+while read -r n; do s=$((s+n)); done &lt; notes/numbers-sorted.txt
+echo $s                                                # 65</code></pre>
+<p class="ex"><code class="i">paste -sd+</code> klebt die Zeilen mit <code class="i">+</code> zusammen, <code class="i">bc</code> rechnet aus. Die Schleife in Bash geht nur mit ganzen Zahlen und ist bei großen Dateien langsam. <code class="i">awk</code> ist kürzer und kann auch Dezimalzahlen.</p></details>
+<p><b>g)</b> Addiere die Größen mehrerer Dateien.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>printf 'a\n' &gt; f1; printf 'bbb\n' &gt; f2
+ls -l f1 f2 | awk '{s+=$5} END {print s}'              # 6   (2 + 4 Bytes)</code></pre>
+<p class="ex">In <code class="i">ls -l</code> steht die Größe im fünften Feld. Diese Auswertung ist nützlich, aber <code class="i">du</code> oder <code class="i">wc -c</code> liefern Größen auch direkt.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
