@@ -2648,6 +2648,109 @@ find notes -type f -exec grep -l 'Carla' {} +     # dasselbe mit find</code></pr
 <p class="ex"><code class="i">find</code> sucht nach Eigenschaften der Datei, <code class="i">grep -r</code> nach Text darin. <code class="i">-l</code> listet nur die Dateinamen auf.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 26 · Archiv erstellen</h3>
+<p><b>Aufgabe:</b> Erstelle im Übungsordner das komprimierte Archiv <code class="i">notes.tar.gz</code>. Es soll das Verzeichnis <code class="i">notes</code> mit allen Dateien enthalten, darunter <code class="i">greeting.txt</code>, <code class="i">commands.txt</code> und <code class="i">words.txt</code>.</p>
+<p class="ex">Geübt wird: <code class="i">tar</code> mit den Optionen <code class="i">-c</code>, <code class="i">-z</code> und <code class="i">-f</code> und die Kontrolle mit <code class="i">-t</code>. Das Archiv liegt neben dem Ordner <code class="i">notes</code>, nicht darin.</p>
+<details><summary>Vorbereitung: Dateien anlegen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes
+echo "Hallo" &gt; notes/greeting.txt                          # Übung 3
+printf 'pwd\nls\nmkdir\ngrep\n' &gt; notes/commands.txt        # Übung 8 und 9
+printf 'alpha\nbravo\ncharlie\ndelta\necho\n' &gt; notes/words.txt   # Übung 10
+ls notes</code></pre>
+<p class="ex">Diese Dateien haben Sie in früheren Übungen schon angelegt. Fehlende ergänzen Sie hiermit.</p></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+tar -czf notes.tar.gz notes
+
+tar -tzf notes.tar.gz          # Inhalt anzeigen, ohne zu entpacken
+# notes/
+# notes/greeting.txt
+# notes/commands.txt
+# notes/words.txt
+# ...</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>tar</code></td><td><b>t</b>ape <b>ar</b>chive: Fasst viele Dateien und Ordner zu <i>einer</i> Datei zusammen. Die Optionen stehen oft ohne Bindestrich oder gebündelt.</td></tr>
+<tr><td class="nw"><code>-c</code></td><td><b>c</b>reate: ein neues Archiv anlegen.</td></tr>
+<tr><td class="nw"><code>-z</code></td><td>Mit <b>gz</b>ip komprimieren. Daher die Endung <code>.tar.gz</code>.</td></tr>
+<tr><td class="nw"><code>-f notes.tar.gz</code></td><td><b>f</b>ile: der Name der Archivdatei. <code>-f</code> muss <i>direkt vor dem Namen</i> stehen.</td></tr>
+<tr><td class="nw"><code>notes</code></td><td>Was ins Archiv kommt: das Verzeichnis <code>notes</code> samt allem darin.</td></tr>
+<tr><td class="nw"><code>-t</code></td><td>list (<b>t</b>able of contents): zeigt den Inhalt, ohne etwas zu entpacken.</td></tr>
+</table></div>
+<pre><code>notes/                          notes.tar.gz
+  greeting.txt                  (eine Datei, komprimiert)
+  commands.txt     -- tar czf --&gt;   enthält: notes/
+  words.txt                                  notes/greeting.txt
+                                             notes/commands.txt ...</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Eine Datei statt vieler:</b> Ein Archiv lässt sich leicht verschicken, sichern oder herunterladen. <code class="i">tar</code> bewahrt dabei die Ordnerstruktur, Rechte und Zeitstempel.</p>
+<p><b>Zwei Schichten:</b> <code class="i">tar</code> bündelt, <code class="i">gzip</code> komprimiert. Mit <code class="i">-z</code> erledigt <code class="i">tar</code> beides in einem Schritt. Für stärkere Kompression gibt es <code class="i">-j</code> (<code class="i">.tar.bz2</code>) und <code class="i">-J</code> (<code class="i">.tar.xz</code>).</p>
+<p><b>Erst prüfen, dann vertrauen:</b> <code class="i">tar -tzf</code> zeigt den Inhalt. So sehen Sie, ob alle Dateien dabei sind und in welchem Pfad sie stehen.</p>
+<p><b>Relative Pfade:</b> Im Archiv stehen die Pfade so, wie Sie sie angeben (<code class="i">notes/greeting.txt</code>). Beim Entpacken entsteht dadurch wieder ein Ordner <code class="i">notes</code>. Bei absoluten Pfaden entfernt <code class="i">tar</code> den führenden <code class="i">/</code> und meldet das.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>tar -cfz notes.tar.gz notes</code> (<code>f</code> und <code>z</code> vertauscht)</td><td><code>-f</code> nimmt das nächste Wort als Dateinamen, also <code>z</code>. Es entsteht ein Archiv namens <code>z</code>, und <code>notes.tar.gz</code> wird als Datei gesucht (<code>Cannot stat</code>).</td></tr>
+<tr><td><code>-z</code> vergessen</td><td>Die Datei heißt <code>.tar.gz</code>, ist aber nur ein einfaches, unkomprimiertes tar. <code>file notes.tar.gz</code> zeigt <code>POSIX tar archive</code> statt <code>gzip compressed data</code>.</td></tr>
+<tr><td>Nichts zum Archivieren angegeben</td><td><code>tar: Cowardly refusing to create an empty archive</code>.</td></tr>
+<tr><td>Quelle existiert nicht</td><td><code>tar: nix: Cannot stat: No such file or directory</code>. Es entsteht trotzdem eine (leere) Archivdatei, der Befehl endet mit Fehlerstatus.</td></tr>
+<tr><td>Archiv im selben Ordner wie die Quelle erzeugt</td><td>Das Archiv soll sich selbst enthalten: <code>file changed as we read it</code>. Legen Sie es neben den Ordner, nicht hinein.</td></tr>
+<tr><td>Nur <code>notes/*.txt</code> statt <code>notes</code></td><td>Die drei Dateien sind enthalten, aber nicht der Ordner <code>notes/</code> selbst und keine Unterordner.</td></tr>
+<tr><td>Falsches Verzeichnis beim Aufruf</td><td>Die Pfade im Archiv stimmen nicht. <code>pwd</code> und <code>ls</code> vorher prüfen.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 26 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie im Übungsordner <code class="i">~/uebung</code>. Die Beispiele verändern <code class="i">notes.tar.gz</code> nicht.</p>
+<p><b>a)</b> Zeige beim Erstellen jede Datei an und prüfe den Dateityp.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>tar -czvf notes.tar.gz notes        # -v: verbose, jede Datei wird ausgegeben
+file notes.tar.gz                   # notes.tar.gz: gzip compressed data
+tar -tzvf notes.tar.gz              # Inhalt mit Rechten, Größen, Datum</code></pre>
+<p class="ex"><code class="i">-v</code> (verbose) gibt aus, was <code class="i">tar</code> gerade tut. Mit <code class="i">-tzvf</code> sehen Sie auch Besitzer, Rechte und Größe jeder Datei.</p></details>
+<p><b>b)</b> Entpacke das Archiv in einen anderen Ordner, und nur eine Datei daraus.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>mkdir ziel
+tar -xzf notes.tar.gz -C ziel                       # alles nach ziel/ entpacken
+mkdir ziel2
+tar -xzf notes.tar.gz -C ziel2 notes/greeting.txt   # nur eine Datei
+diff -r notes ziel/notes &amp;&amp; echo "identisch"</code></pre>
+<p class="ex"><code class="i">-x</code> (extract) entpackt, <code class="i">-C</code> wechselt vorher in einen Zielordner. Wer nur bestimmte Dateien braucht, nennt deren Pfad aus <code class="i">tar -tzf</code>. <code class="i">diff -r</code> vergleicht zwei Ordner vollständig.</p></details>
+<p><b>c)</b> Lies eine Datei aus dem Archiv, ohne zu entpacken.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>tar -xzOf notes.tar.gz notes/greeting.txt           # gibt den Inhalt auf dem Bildschirm aus</code></pre>
+<p class="ex"><code class="i">-O</code> schreibt den Inhalt auf die Standardausgabe, statt Dateien anzulegen. So können Sie ihn mit <code class="i">grep</code> oder <code class="i">less</code> weiterverarbeiten.</p></details>
+<p><b>d)</b> Schließe Dateien beim Archivieren aus.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>tar -czf n.tar.gz --exclude='*.tmp' notes
+tar -czf n.tar.gz --exclude='notes/archiv' notes
+tar -tzf n.tar.gz</code></pre>
+<p class="ex"><code class="i">--exclude</code> nimmt ein Muster, in Anführungszeichen, damit es nicht die Shell auswertet. Die Option steht vor den Quellen.</p></details>
+<p><b>e)</b> Archiviere ohne den Ordnernamen im Archivpfad.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>tar -czf n.tar.gz -C notes .                       # Pfade beginnen mit ./
+tar -czf n.tar.gz -C notes greeting.txt commands.txt
+tar -tzf n.tar.gz</code></pre>
+<p class="ex"><code class="i">-C notes</code> wechselt vor dem Packen in den Ordner. Beim Entpacken landen die Dateien dann direkt im Zielordner, ohne zusätzliches <code class="i">notes/</code>. Das ist praktisch, wenn man in einen vorhandenen Ordner entpackt.</p></details>
+<p><b>f)</b> Wähle andere Kompressionen und lass <code class="i">tar</code> die Art selbst erkennen.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>tar -cjf notes.tar.bz2 notes        # bzip2
+tar -cJf notes.tar.xz notes         # xz, meist am kleinsten
+tar -caf notes.tar.xz notes         # -a: Kompression nach der Endung wählen
+tar -xf notes.tar.gz -C ziel        # beim Entpacken erkennt GNU tar die Art automatisch</code></pre>
+<p class="ex">Bei kleinen Dateien spart die Kompression kaum etwas: In unserem Beispiel ist das Archiv mit knapp 300 Bytes sogar größer als die Originaldateien (zusammen etwa 60 Bytes). Der Vorteil zeigt sich bei Text in größeren Mengen.</p></details>
+<p><b>g)</b> Packe Dateien mit <code class="i">zip</code> statt <code class="i">tar</code>.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>zip -r notes.zip notes
+unzip -l notes.zip                  # Inhalt anzeigen
+unzip notes.zip -d ziel3            # in einen Ordner entpacken</code></pre>
+<p class="ex"><code class="i">zip</code> ist die übliche Wahl, wenn die Empfänger Windows nutzen. Unter Linux ist <code class="i">tar.gz</code> der Standard. Beide Programme müssen unter Umständen nachinstalliert werden.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
