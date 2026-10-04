@@ -2751,6 +2751,139 @@ unzip notes.zip -d ziel3            # in einen Ordner entpacken</code></pre>
 <p class="ex"><code class="i">zip</code> ist die übliche Wahl, wenn die Empfänger Windows nutzen. Unter Linux ist <code class="i">tar.gz</code> der Standard. Beide Programme müssen unter Umständen nachinstalliert werden.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 27 · Log mit less ansehen und Warnungen sichern</h3>
+<p><b>Aufgabe:</b> Sieh dir die Logdatei <code class="i">events.log</code> mit <code class="i">less</code> an und speichere dann nur die <code class="i">WARN</code>-Zeilen in <code class="i">projects/warnings.txt</code>, in der ursprünglichen Reihenfolge.</p>
+<p class="ex">Geübt wird: <code class="i">less</code> zum Lesen langer Dateien, danach <code class="i">grep</code> mit Umleitung. Die Datei liegt diesmal im Ordner <code class="i">projects</code> (aus Übung 4), nicht in <code class="i">notes</code>. Wir nehmen die Beispieldatei <code class="i">~/daten/events3.log</code>. Setzen Sie Ihren Pfad aus der Aufgabenstellung ein.</p>
+<details><summary>Beispieldaten anlegen</summary>
+<pre><code>mkdir -p ~/daten
+cat &gt; ~/daten/events3.log &lt;&lt;'EOF'
+2026-10-01 10:00:01 INFO start
+2026-10-01 10:00:09 WARN slow response
+2026-10-01 10:01:12 ERROR timeout
+2026-10-01 10:02:30 WARN disk 90% full
+2026-10-01 10:03:44 INFO request ok
+2026-10-01 10:04:10 INFO WARNING banner shown
+2026-10-01 10:05:02 WARN cache miss rate high
+2026-10-01 10:06:19 DEBUG heartbeat
+2026-10-01 10:07:45 ERROR connection refused
+2026-10-01 10:08:30 WARN retry 3 of 5
+EOF</code></pre>
+<p class="ex">Zehn Zeilen, davon vier mit dem Level <code class="i">WARN</code> (Zeilen 2, 4, 7 und 10). Zeile 6 enthält nur das Wort <code class="i">WARNING</code> in der Meldung, ihr Level ist <code class="i">INFO</code>.</p></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p projects
+less ~/daten/events3.log                              # ansehen (q beendet)
+
+grep ' WARN ' ~/daten/events3.log &gt; projects/warnings.txt
+
+cat projects/warnings.txt                             # 4 Zeilen
+wc -l projects/warnings.txt                           # 4</code></pre>
+<p class="ex">Das Muster <code class="i"> WARN </code> mit Leerzeichen trifft den Level und lässt die Meldung <code class="i">WARNING banner shown</code> weg.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Wichtige Tasten in less</h3>
+<p class="ex"><code class="i">less</code> ist ein Pager: Es zeigt eine Datei seitenweise und lädt sie nicht ganz in den Speicher. Es hat dieselben Suchtasten wie <code class="i">man</code>, denn <code class="i">man</code> nutzt es selbst.</p><div class="tw"><table>
+<tr><th>Taste</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>Leertaste</code> / <code>f</code></td><td>eine Seite vor</td></tr>
+<tr><td class="nw"><code>b</code></td><td>eine Seite zurück</td></tr>
+<tr><td class="nw"><code>Enter</code> / <code>j</code> / <code>↓</code></td><td>eine Zeile vor</td></tr>
+<tr><td class="nw"><code>k</code> / <code>↑</code></td><td>eine Zeile zurück</td></tr>
+<tr><td class="nw"><code>g</code> / <code>G</code></td><td>zum Anfang / zum Ende der Datei</td></tr>
+<tr><td class="nw"><code>/WARN</code> + Enter</td><td>vorwärts nach <code>WARN</code> suchen (<code>?</code> sucht rückwärts)</td></tr>
+<tr><td class="nw"><code>n</code> / <code>N</code></td><td>nächster / vorheriger Treffer</td></tr>
+<tr><td class="nw"><code>&amp;WARN</code> + Enter</td><td>nur Zeilen mit <code>WARN</code> anzeigen (Filter). <code>&amp;</code> + Enter hebt ihn auf.</td></tr>
+<tr><td class="nw"><code>-N</code> + Enter</td><td>Zeilennummern ein- oder ausschalten</td></tr>
+<tr><td class="nw"><code>-S</code> + Enter</td><td>lange Zeilen abschneiden statt umbrechen</td></tr>
+<tr><td class="nw"><code>F</code></td><td>wie <code>tail -f</code>: neue Zeilen live (Strg+C bricht ab)</td></tr>
+<tr><td class="nw"><code>h</code></td><td>Hilfe</td></tr>
+<tr><td class="nw"><code>q</code></td><td>beenden</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>less datei</code></td><td>Öffnet die Datei im Pager. Sie bleibt unverändert, Sie können nur lesen.</td></tr>
+<tr><td class="nw"><code>grep ' WARN ' datei</code></td><td>Gibt die Zeilen mit dem Level <code>WARN</code> aus, in der Reihenfolge der Datei.</td></tr>
+<tr><td class="nw"><code>&gt; projects/warnings.txt</code></td><td>Schreibt sie in die Datei im Ordner <code>projects</code>.</td></tr>
+</table></div>
+<pre><code>events3.log (10 Zeilen)      projects/warnings.txt
+INFO  start
+WARN  slow response     --&gt;   WARN  slow response
+ERROR timeout
+WARN  disk 90% full     --&gt;   WARN  disk 90% full
+INFO  request ok
+INFO  WARNING banner         (nicht: Level ist INFO)
+WARN  cache miss ...    --&gt;   WARN  cache miss rate high
+...
+WARN  retry 3 of 5      --&gt;   WARN  retry 3 of 5</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Erst ansehen, dann filtern:</b> Mit <code class="i">less</code> verschaffen Sie sich einen Überblick über Aufbau und Inhalt, bevor Sie ein Muster festlegen. Hier sehen Sie zum Beispiel, dass der Level an dritter Stelle steht und die Meldung ebenfalls <code class="i">WARNING</code> enthalten kann.</p>
+<p><b>Warum nicht <code class="i">cat</code>?</b> Bei langen Logs rauscht der Text vorbei. <code class="i">less</code> hält an, lässt blättern und suchen. Es liest nur, was Sie gerade ansehen, und öffnet daher auch sehr große Dateien sofort.</p>
+<p><b>Dann gezielt speichern:</b> Die Auswahl der Zeilen übernimmt <code class="i">grep</code>, der Rest ist wie in Übung 13 und 24. Weil <code class="i">grep</code> die Datei von oben nach unten liest, bleibt die Reihenfolge erhalten.</p>
+<p><b>Nicht interaktiv:</b> Ist die Ausgabe von <code class="i">less</code> keine Konsole (zum Beispiel in einer Pipe), verhält es sich wie <code class="i">cat</code>. Das <code class="i">less</code> in der Aufgabe ist also ein Hilfsmittel zum Ansehen, es verändert die Datei nicht.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td>Nicht wissen, wie man <code>less</code> verlässt</td><td>Mit <code>q</code> beenden. Strg+C beendet <code>less</code> nicht, es bricht nur eine laufende Aktion wie das Folgen mit <code>F</code> ab.</td></tr>
+<tr><td><code>grep WARN</code> ohne Leerzeichen</td><td>Trifft auch <code>INFO WARNING banner shown</code>: 5 statt 4 Zeilen.</td></tr>
+<tr><td>Ordner <code>projects</code> fehlt</td><td><code>bash: projects/warnings.txt: No such file or directory</code>. Erst <code>mkdir -p projects</code>.</td></tr>
+<tr><td>Datei in <code>notes</code> statt <code>projects</code> gespeichert</td><td>Die Datei liegt am falschen Ort. Die Aufgabe nennt <code>projects/warnings.txt</code>.</td></tr>
+<tr><td><code>&gt;&gt;</code> statt <code>&gt;</code></td><td>Beim zweiten Lauf stehen die Warnungen doppelt in der Datei (8 Zeilen).</td></tr>
+<tr><td>Quelle und Ziel gleich</td><td><code>grep: x.log: input file is also the output</code>, die Datei wird geleert.</td></tr>
+<tr><td>Zwei Suchläufe für <code>WARN</code> und <code>ERROR</code> nacheinander</td><td>Die Reihenfolge der Zeilen geht verloren. Besser ein Muster: <code>grep -E ' (WARN|ERROR) '</code>.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 27 · Zum Weiterüben</h3>
+<p class="ex">Die Beispiele laufen mit <code class="i">~/daten/events3.log</code>. Die Tasten für <code class="i">less</code> probieren Sie direkt in einem Terminal aus.</p>
+<p><b>a)</b> Öffne die Datei mit Zeilennummern und springe zum ersten <code class="i">ERROR</code>.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>less -N ~/daten/events3.log                  # mit Zeilennummern starten
+less +/ERROR ~/daten/events3.log             # Start direkt beim ersten ERROR
+less +G ~/daten/events3.log                  # Start am Dateiende
+less -i ~/daten/events3.log                  # Suche ohne Rücksicht auf Groß-/Kleinschreibung</code></pre>
+<p class="ex">Eine Option mit <code class="i">+</code> ist ein Befehl, der nach dem Öffnen ausgeführt wird. <code class="i">+/ERROR</code> sucht sofort, <code class="i">+G</code> springt ans Ende. <code class="i">-N</code>, <code class="i">-S</code> und <code class="i">-i</code> lassen sich auch während der Anzeige mit <code class="i">-</code> und Enter umschalten.</p></details>
+<p><b>b)</b> Zeige in <code class="i">less</code> nur die <code class="i">WARN</code>-Zeilen, ohne die Datei zu verändern.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>less ~/daten/events3.log
+# dann eingeben:  &amp;WARN  und Enter    (nur passende Zeilen)
+# zurück:         &amp;  und Enter</code></pre>
+<p class="ex">Der Filter mit <code class="i">&amp;</code> arbeitet nur in der Anzeige. Zum Speichern brauchen Sie weiterhin <code class="i">grep</code> mit <code class="i">&gt;</code>.</p></details>
+<p><b>c)</b> Lies die Ausgabe eines Befehls in <code class="i">less</code>.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>ls -lR /etc | less                           # lange Ausgabe blättern
+grep -n ' WARN ' ~/daten/events3.log | less
+journalctl -u ssh | less -R                  # -R lässt Farben zu</code></pre>
+<p class="ex">Jede lange Ausgabe lässt sich an <code class="i">less</code> weitergeben. So schützt man das Terminal vor tausenden Zeilen.</p></details>
+<p><b>d)</b> Beide Level auf einmal, mit Zeilennummern der Quelle.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>grep -nE ' (WARN|ERROR) ' ~/daten/events3.log
+# 2:... WARN  3:... ERROR  4:... WARN  7:... WARN  9:... ERROR  10:... WARN</code></pre>
+<p class="ex">Ein Muster mit <code class="i">|</code> erhält die gemeinsame Reihenfolge (Übung 24). <code class="i">-n</code> zeigt, in welcher Zeile der Quelle der Treffer steht.</p></details>
+<p><b>e)</b> Zeige die Zeilen um einen Fehler herum, und zähle die Level.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>grep -C1 ' ERROR ' ~/daten/events3.log        # je 1 Zeile davor und danach
+awk '{print $3}' ~/daten/events3.log | sort | uniq -c | sort -rn
+#   4 WARN
+#   3 INFO
+#   2 ERROR
+#   1 DEBUG</code></pre>
+<p class="ex"><code class="i">-C1</code> (context) liefert Umgebungszeilen, nützlich um die Ursache eines Fehlers zu finden. <code class="i">-B</code> zeigt nur die Zeilen davor, <code class="i">-A</code> die danach.</p></details>
+<p><b>f)</b> Betrachte komprimierte Logs ohne sie zu entpacken.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>gzip -k ~/daten/events3.log                 # -k: Original behalten, erzeugt events3.log.gz
+zcat ~/daten/events3.log.gz | wc -l         # 10
+zless ~/daten/events3.log.gz                # wie less, aber für .gz
+zgrep ' WARN ' ~/daten/events3.log.gz       # grep in der komprimierten Datei</code></pre>
+<p class="ex">Rotierte Logs liegen oft als <code class="i">.gz</code> vor. <code class="i">zcat</code>, <code class="i">zless</code> und <code class="i">zgrep</code> sind die Gegenstücke zu <code class="i">cat</code>, <code class="i">less</code> und <code class="i">grep</code>.</p></details>
+<p><b>g)</b> Verfolge eine Logdatei live und zeige das Ende.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>tail -n 2 ~/daten/events3.log               # die letzten zwei Zeilen
+tail -f ~/daten/events3.log                 # neue Zeilen live (Strg+C beendet)
+less +F ~/daten/events3.log                 # wie tail -f, aber mit Strg+C zurück zu less</code></pre>
+<p class="ex"><code class="i">less +F</code> verbindet das Mitlesen mit dem Blättern: Mit Strg+C stoppen Sie das Folgen und können suchen, mit <code class="i">F</code> geht es weiter.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
