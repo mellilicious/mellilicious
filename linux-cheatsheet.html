@@ -2028,6 +2028,86 @@ grep -nF 'u3,' ~/daten/people.csv               # 4:u3,Carla,Köln</code></pre>
 <p class="ex"><code class="i">-n</code> zeigt die Zeilennummer in der Quelldatei. Die Kopfzeile ist Zeile 1, Ihr Eintrag Zeile 4.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 19 · Eine Spalte auswählen</h3>
+<p><b>Aufgabe:</b> Lege <code class="i">notes/names.txt</code> an. Sie soll die <i>erste Spalte</i> der Datei <code class="i">notes/people.csv</code> enthalten, jeweils eine Angabe pro Zeile: den Spaltennamen aus der Kopfzeile und den Wert Ihres Eintrags.</p>
+<p class="ex">Geübt wird: <code class="i">cut</code> mit Trennzeichen (<code class="i">-d,</code>) und Feldnummer (<code class="i">-f1</code>). Die Datei <code class="i">notes/people.csv</code> stammt aus Übung 18 (Kopfzeile <code class="i">id,name,city</code> und Ihr Eintrag <code class="i">u3,Carla,Köln</code>). In der Kursaufgabe heißt die erste Spalte <code class="i">name</code>, bei uns <code class="i">id</code>. Das Vorgehen ist dasselbe.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+printf 'id,name,city\nu3,Carla,Köln\n' &gt; notes/people.csv   # nur falls Übung 18 fehlt
+
+cut -d, -f1 notes/people.csv &gt; notes/names.txt
+
+cat notes/names.txt            # id
+                               # u3
+wc -l notes/names.txt          # 2</code></pre>
+<p class="ex">Für die <i>zweite</i> Spalte nehmen Sie <code class="i">-f2</code>: <code class="i">cut -d, -f2 notes/people.csv</code> ergibt <code class="i">name</code> und <code class="i">Carla</code>.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>cut</code></td><td>Schneidet aus jeder Zeile Teile heraus. Es verarbeitet Zeile für Zeile.</td></tr>
+<tr><td class="nw"><code>-d,</code></td><td><b>d</b>elimiter: das Zeichen, an dem getrennt wird. Hier das Komma, wie in CSV-Dateien üblich.</td></tr>
+<tr><td class="nw"><code>-f1</code></td><td><b>f</b>ield: welches Feld ausgegeben wird. Gezählt wird ab <code>1</code>. Hier das erste, also alles vor dem ersten Komma.</td></tr>
+<tr><td class="nw"><code>&gt; notes/names.txt</code></td><td>Schreibt das Ergebnis in die Datei.</td></tr>
+</table></div>
+<pre><code>id,name,city      --cut -d, -f1--&gt;   id
+u3,Carla,Köln                         u3</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Spalten statt Zeilen:</b> <code class="i">grep</code> und <code class="i">head</code> wählen <i>Zeilen</i> aus, <code class="i">cut</code> wählt <i>Spalten</i> aus. Zusammen können Sie jede Stelle einer Tabelle erreichen.</p>
+<p><b>Das Trennzeichen muss stimmen:</b> <code class="i">cut</code> trennt standardmäßig an Tabulatoren. Bei Dateien mit Komma, Semikolon oder Doppelpunkt (wie <code class="i">/etc/passwd</code>) geben Sie das Zeichen mit <code class="i">-d</code> an.</p>
+<p><b>Auch die Kopfzeile wird geschnitten:</b> <code class="i">cut</code> kennt keine „Kopfzeile“, es behandelt jede Zeile gleich. Deshalb enthält <code class="i">names.txt</code> als erste Zeile den Spaltennamen.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>-d,</code> vergessen</td><td><code>cut</code> trennt an Tabulatoren. Da keine vorkommen, wird die <i>ganze Zeile</i> ausgegeben, auch bei <code>-f2</code>.</td></tr>
+<tr><td>Falsche Feldnummer</td><td><code>-f2</code> liefert <code>name</code>/<code>Carla</code>, nicht <code>id</code>/<code>u3</code>. <code>-f0</code> meldet <code>fields are numbered from 1</code>. Eine zu große Nummer liefert leere Zeilen.</td></tr>
+<tr><td>Falsches Trennzeichen (<code>-d;</code>)</td><td>Auch hier wird die ganze Zeile ausgegeben, weil das Zeichen nicht vorkommt.</td></tr>
+<tr><td>Komma im Feld (<code>"Meier, Hans"</code>)</td><td><code>cut</code> kennt keine Anführungszeichen und schneidet mitten im Feld. Für solche CSV-Dateien braucht man Spezialwerkzeuge.</td></tr>
+<tr><td>Windows-Zeilenende (<code>\r</code>)</td><td>Das letzte Feld jeder Zeile endet mit einem unsichtbaren <code>^M</code>. Mit <code>cat -A</code> prüfen.</td></tr>
+<tr><td>Ergebnis nicht gespeichert</td><td>Ohne <code>&gt;</code> erscheint es nur im Terminal.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 19 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit <code class="i">notes/people.csv</code> und der größeren Datei <code class="i">~/daten/people.csv</code> aus Übung 18 (fünf Personen).</p>
+<p><b>a)</b> Gib mehrere Spalten aus: die erste und die dritte, sowie Spalte 2 bis zum Ende.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>cut -d, -f1,3 notes/people.csv       # id,city  /  u3,Köln
+cut -d, -f2- notes/people.csv        # name,city  /  Carla,Köln
+cut -d, -f1-2 notes/people.csv       # id,name  /  u3,Carla</code></pre>
+<p class="ex">Mit Komma trennen Sie einzelne Felder, mit Bindestrich geben Sie einen Bereich an. <code class="i">2-</code> heißt „ab Feld 2 bis zum Ende“.</p></details>
+<p><b>b)</b> Gib alle Spalten <i>außer</i> der zweiten aus und ändere dabei das Trennzeichen.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>cut -d, --complement -f2 notes/people.csv                # id,city  /  u3,Köln
+cut -d, -f1,3 --output-delimiter=';' notes/people.csv    # id;city  /  u3;Köln</code></pre>
+<p class="ex"><code class="i">--complement</code> kehrt die Auswahl um. <code class="i">--output-delimiter</code> setzt das Trennzeichen der Ausgabe. Beides sind GNU-Optionen.</p></details>
+<p><b>c)</b> Liste alle Namen der größeren Datei ohne Kopfzeile alphabetisch.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>cut -d, -f2 ~/daten/people.csv | tail -n +2 | sort
+# Anna  Ben  Carla  Dino  Emil</code></pre>
+<p class="ex"><code class="i">tail -n +2</code> überspringt die Kopfzeile, <code class="i">sort</code> ordnet alphabetisch. So verbinden Sie <code class="i">cut</code> mit den Werkzeugen aus Übung 11 bis 15.</p></details>
+<p><b>d)</b> Zähle, wie oft jede Stadt vorkommt.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>cut -d, -f3 ~/daten/people.csv | tail -n +2 | sort | uniq -c
+#   2 Berlin
+#   1 Bonn
+#   1 Hamburg
+#   1 Köln</code></pre>
+<p class="ex">Spalte ausschneiden, Kopfzeile weg, sortieren, zählen (<code class="i">uniq -c</code>, Übung 12). Dasselbe Muster wertet jede Spalte einer Tabelle aus.</p></details>
+<p><b>e)</b> Wie viele Spalten hat die Datei und an welcher Stelle steht die Spalte <code class="i">name</code>?</p>
+<details><summary>Lösung e)</summary>
+<pre><code>head -n 1 ~/daten/people.csv | tr ',' '\n' | wc -l          # 3 Spalten
+head -n 1 ~/daten/people.csv | tr ',' '\n' | grep -n '^name$'   # 2:name</code></pre>
+<p class="ex">Die Kopfzeile wird mit <code class="i">tr</code> in eine Zeile pro Spaltenname verwandelt. Die Zeilennummer eines Namens ist seine Feldnummer für <code class="i">cut -f</code>.</p></details>
+<p><b>f)</b> Löse die Aufgabe mit <code class="i">awk</code> und schneide ein Stück per Zeichenposition aus.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>awk -F, '{print $1}' notes/people.csv                 # id  /  u3
+awk -F, '{print $2 " (" $3 ")"}' ~/daten/people.csv   # name (city)  Anna (Berlin) ...
+echo "abcdef" | cut -c2-4                             # bcd</code></pre>
+<p class="ex"><code class="i">awk</code> ist flexibler: Es kann Felder umstellen und mit Text verbinden. <code class="i">cut -c</code> wählt Zeichen nach Position und passt zu Dateien mit fester Spaltenbreite.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
