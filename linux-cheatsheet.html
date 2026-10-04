@@ -2884,6 +2884,109 @@ less +F ~/daten/events3.log                 # wie tail -f, aber mit Strg+C zurü
 <p class="ex"><code class="i">less +F</code> verbindet das Mitlesen mit dem Blättern: Mit Strg+C stoppen Sie das Folgen und können suchen, mit <code class="i">F</code> geht es weiter.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 28 · Verzeichnis kopieren</h3>
+<p><b>Aufgabe:</b> Kopiere das Verzeichnis <code class="i">notes</code> rekursiv nach <code class="i">notes-backup</code> im Übungsordner.</p>
+<p class="ex">Geübt wird: <code class="i">cp -r</code> kopiert einen Ordner mit allem, was darin liegt. Entscheidend ist, ob das Ziel schon existiert oder nicht. <code class="i">notes</code> ist der Ordner aus den vorigen Übungen. Wenn er leer oder unvollständig ist, legen Sie vorher ein paar Dateien an.</p>
+<details><summary>Vorbereitung: Beispielinhalt anlegen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes/archiv
+echo "Hallo" &gt; notes/greeting.txt
+printf 'pwd\nls\nmkdir\ngrep\n' &gt; notes/commands.txt
+echo "alt" &gt; notes/archiv/old.txt
+echo "versteckt" &gt; notes/.versteckt
+find notes | sort</code></pre></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+cp -r notes notes-backup
+
+diff -r notes notes-backup &amp;&amp; echo "identisch"     # Kontrolle: Inhalt gleich
+find notes-backup | sort                            # alles ist kopiert, auch Unterordner
+ls -A notes-backup                                  # auch .versteckt</code></pre>
+<p class="ex">Wichtig: <code class="i">notes-backup</code> darf vorher <i>nicht</i> existieren (siehe unten).</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>cp quelle ziel</code></td><td>Kopiert eine Datei. Die Quelle bleibt unverändert, es entsteht eine unabhängige Kopie.</td></tr>
+<tr><td class="nw"><code>-r</code> (oder <code>-R</code>)</td><td><b>r</b>ecursive: Verzeichnisse samt allen Unterordnern und Dateien kopieren. Ohne <code>-r</code> weigert sich <code>cp</code> bei Ordnern.</td></tr>
+<tr><td class="nw"><code>notes</code></td><td>Die Quelle: ein Verzeichnis.</td></tr>
+<tr><td class="nw"><code>notes-backup</code></td><td>Das Ziel. Existiert es <i>nicht</i>, wird es als Kopie von <code>notes</code> angelegt.</td></tr>
+<tr><td class="nw"><code>diff -r a b</code></td><td>Vergleicht zwei Verzeichnisse. Keine Ausgabe heißt: identisch.</td></tr>
+</table></div>
+<pre><code>notes/                       notes-backup/
+  greeting.txt                 greeting.txt
+  commands.txt   --cp -r--&gt;    commands.txt
+  archiv/old.txt               archiv/old.txt
+  .versteckt                   .versteckt</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Sicherung vor einer Änderung:</b> Eine Kopie des ganzen Ordners ist die einfachste Absicherung, bevor Sie etwas ausprobieren, das schiefgehen könnte.</p>
+<p><b>Rekursiv heißt: auch alles darunter.</b> Ein Verzeichnis ist für <code class="i">cp</code> mehr als eine Datei. Die Option <code class="i">-r</code> steigt in jeden Unterordner ab. Versteckte Dateien (Name mit Punkt) werden dabei mitkopiert.</p>
+<p><b>Das Ziel entscheidet:</b> <code class="i">cp -r notes notes-backup</code> hat zwei Bedeutungen. Existiert <code class="i">notes-backup</code> noch nicht, ist es die Kopie. Existiert es bereits, wird <code class="i">notes</code> <i>hineinkopiert</i>, und es entsteht <code class="i">notes-backup/notes</code>.</p>
+<p><b>Prüfen statt hoffen:</b> <code class="i">diff -r</code> vergleicht beide Ordner Datei für Datei. Meldungen wie <code class="i">Only in notes: …</code> zeigen, was fehlt oder abweicht.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>-r</code> vergessen</td><td><code>cp: -r not specified; omitting directory 'notes'</code>. Nichts wird kopiert.</td></tr>
+<tr><td>Ziel existiert schon</td><td>Es entsteht <code>notes-backup/notes</code> (verschachtelt) neben den bereits vorhandenen Dateien. Vorher mit <code>ls</code> prüfen oder aufräumen.</td></tr>
+<tr><td>Ordner in sich selbst kopieren (<code>cp -r notes notes/kopie</code>)</td><td><code>cannot copy a directory, 'notes', into itself</code>. Es kann ein halber Ordner übrig bleiben.</td></tr>
+<tr><td>Quelle falsch geschrieben</td><td><code>cp: cannot stat 'nix': No such file or directory</code>.</td></tr>
+<tr><td><code>mv</code> statt <code>cp</code></td><td>Der Ordner wird verschoben (oder umbenannt), das Original ist weg.</td></tr>
+<tr><td>Zeitstempel erwartet</td><td>Mit <code>-r</code> bekommen die Kopien das aktuelle Datum als Änderungszeit. Wer die Zeiten erhalten will, nimmt <code>-a</code> oder <code>-p</code>.</td></tr>
+<tr><td>Falsches Verzeichnis beim Aufruf</td><td>Die Kopie entsteht an einer anderen Stelle als <code>~/uebung/notes-backup</code>. Mit <code>pwd</code> prüfen.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 28 · Zum Weiterüben</h3>
+<p class="ex">Alle Beispiele laufen im Übungsordner <code class="i">~/uebung</code>. Löschen Sie die Test-Kopien danach wieder, zum Beispiel mit <code class="i">rm -r nb_a nb_v</code>.</p>
+<p><b>a)</b> Kopiere und erhalte dabei Rechte, Zeitstempel und Links.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>touch -d '2020-01-02 03:04' notes/greeting.txt
+cp -r notes nb_r                       # Zeitstempel = jetzt
+cp -a notes nb_a                       # Archivmodus: alles möglichst erhalten
+stat -c '%y' notes/greeting.txt nb_r/greeting.txt nb_a/greeting.txt | cut -c1-16
+# 2020-01-02 03:04 / (heutiges Datum) / 2020-01-02 03:04</code></pre>
+<p class="ex"><code class="i">-a</code> (archive) steht für <code class="i">-dR --preserve=all</code>: rekursiv, Links als Links, Besitzer, Rechte und Zeiten erhalten. Für echte Sicherungen ist es die beste Wahl. <code class="i">-p</code> allein erhält Rechte und Zeiten.</p></details>
+<p><b>b)</b> Zeige beim Kopieren jede Datei an, und frage vor dem Überschreiben nach.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>cp -rv notes nb_v                      # -v: jede kopierte Datei ausgeben
+cp -ri notes/greeting.txt nb_v/greeting.txt    # -i: vor dem Überschreiben fragen</code></pre>
+<p class="ex"><code class="i">-v</code> (verbose) listet <code class="i">'notes' -&gt; 'nb_v'</code> und jede weitere Datei auf. <code class="i">-i</code> (interactive) fragt <code class="i">overwrite …?</code>, mit <code class="i">y</code> bestätigen.</p></details>
+<p><b>c)</b> Kopiere den <i>Inhalt</i> eines Ordners in einen bereits vorhandenen.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>mkdir ziel
+cp -r notes/. ziel/                    # Punkt = Inhalt inklusive versteckter Dateien
+ls -A ziel                             # .versteckt  archiv  commands.txt  greeting.txt</code></pre>
+<p class="ex"><code class="i">notes/.</code> meint „den Inhalt von <code class="i">notes</code>“. Der Ordner selbst wird nicht mitkopiert, daher keine Verschachtelung. Die Schreibweise <code class="i">notes/*</code> lässt dagegen versteckte Dateien aus, weil <code class="i">*</code> Namen mit Punkt nicht trifft.</p></details>
+<p><b>d)</b> Aktualisiere eine vorhandene Kopie nur mit neueren Dateien.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>echo "neu" &gt; notes/greeting.txt
+cp -ru notes/. nb_v/                   # -u: nur kopieren, wenn Quelle neuer ist
+cat nb_v/greeting.txt                  # neu</code></pre>
+<p class="ex"><code class="i">-u</code> (update) überspringt Dateien, bei denen das Ziel gleich neu oder neuer ist. Für regelmäßige Abgleiche ist <code class="i">rsync</code> noch besser, falls installiert: <code class="i">rsync -a notes/ notes-backup/</code>.</p></details>
+<p><b>e)</b> Lege eine Sicherung mit Datum im Namen an und zähle die Dateien.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>cp -a notes "notes-$(date +%F)"        # z. B. notes-2026-10-04
+find notes -type f | wc -l             # Dateien im Original
+find notes-backup -type f | wc -l      # Dateien in der Kopie: gleiche Zahl</code></pre>
+<p class="ex">Das Datum im Namen verhindert, dass eine ältere Sicherung überschrieben wird.</p></details>
+<p><b>f)</b> Finde die Unterschiede, nachdem sich etwas geändert hat.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>echo extra &gt; notes-backup/extra.txt
+echo geändert &gt; notes/greeting.txt
+diff -r notes notes-backup
+# Only in notes-backup: extra.txt
+# diff -r notes/greeting.txt notes-backup/greeting.txt  (mit Zeilenunterschied)
+echo $?                                # 1 = Unterschiede, 0 = identisch</code></pre>
+<p class="ex"><code class="i">diff -r</code> nennt Dateien, die nur auf einer Seite stehen, und zeigt Unterschiede im Inhalt. Der Exit-Code eignet sich für Skripte.</p></details>
+<p><b>g)</b> Verschiebe oder benenne einen Ordner um.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>mv notes-backup notes-alt              # umbenennen
+mv notes-alt /tmp/                     # verschieben (Original verschwindet)
+rm -r /tmp/notes-alt                   # aufräumen</code></pre>
+<p class="ex"><code class="i">mv</code> kopiert nicht, es ändert nur den Namen oder Ort. Ein Ordner braucht dafür kein <code class="i">-r</code>.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
