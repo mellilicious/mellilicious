@@ -4443,6 +4443,108 @@ rm ~/uebung/verlauf.txt                         # und wieder aufräumen</code></
 <p class="ex">Das ist der Unterschied zur Aufgabe: Hier wird der Verlauf bewusst gespeichert, in der Aufgabe soll er <i>nicht</i> im Ergebnis stehen. Prüfen Sie am Ende, dass <code class="i">projects/auth-errors.txt</code> nur Logzeilen enthält.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 42 · Das System untersuchen</h3>
+<p><b>Aufgabe:</b> Lege <code class="i">projects/system.txt</code> mit zwei Zeilen an: die Ausgabe von <code class="i">uname -s</code> und der Einhängepunkt (Mount Point) Ihres Home-Verzeichnisses aus <code class="i">df --output=target ~</code>, ohne die Kopfzeile.</p>
+<p class="ex">Geübt wird: Systeminformationen mit <code class="i">uname</code> und <code class="i">df</code> auslesen, die Kopfzeile von <code class="i">df</code> mit <code class="i">grep -v</code> entfernen und zwei Befehle in einer Datei sammeln. Was in der Datei steht, hängt von Ihrem System ab. Das ist keine feste Zeichenfolge. Auf der Kursmaschine sieht es anders aus als bei Ihnen zu Hause.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p projects
+
+uname -s &gt; projects/system.txt                             # erste Zeile: Kernel-Name
+df --output=target ~ | grep -v Mounted &gt;&gt; projects/system.txt   # zweite Zeile: Einhängepunkt, ohne Kopfzeile
+
+cat projects/system.txt            # Linux  und  z. B. /
+wc -l projects/system.txt          # 2</code></pre>
+<p class="ex">Bei Ihnen steht in der zweiten Zeile der Einhängepunkt des Laufwerks, auf dem Ihr Home-Verzeichnis liegt, zum Beispiel <code class="i">/</code> oder <code class="i">/home</code>. Mit <code class="i">df --output=target ~</code> allein sehen Sie zwei Zeilen: die Kopfzeile <code class="i">Mounted on</code> und den Wert.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Teil macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>uname -s</code></td><td>Gibt den Namen des Betriebssystem-Kernels aus (<b>s</b>ystem name): <code>Linux</code>.</td></tr>
+<tr><td class="nw"><code>df</code></td><td><b>d</b>isk <b>f</b>ree: zeigt Belegung und Einhängepunkt von Dateisystemen.</td></tr>
+<tr><td class="nw"><code>--output=target</code></td><td>Beschränkt die Ausgabe auf eine Spalte: den Einhängepunkt (<code>target</code>). Dazu eine Kopfzeile <code>Mounted on</code>.</td></tr>
+<tr><td class="nw"><code>~</code></td><td>Ihr Home-Verzeichnis. <code>df</code> zeigt dann das Dateisystem, auf dem <i>dieser Pfad</i> liegt, und nicht alle Dateisysteme.</td></tr>
+<tr><td class="nw"><code>grep -v Mounted</code></td><td>Entfernt jede Zeile mit dem Wort <code>Mounted</code>, also die Kopfzeile.</td></tr>
+<tr><td class="nw"><code>&gt;</code> und <code>&gt;&gt;</code></td><td>Die erste Zeile legt die Datei neu an, die zweite hängt an.</td></tr>
+</table></div>
+<pre><code>df --output=target ~          grep -v Mounted
+Mounted on             --&gt;    (entfällt)
+/                      --&gt;    /
+
+projects/system.txt:  Linux
+                      /</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Genau die Spalte, die man braucht:</b> <code class="i">df</code> kennt viele Spalten (<code class="i">source</code>, <code class="i">size</code>, <code class="i">used</code>, <code class="i">avail</code>, <code class="i">pcent</code>, <code class="i">target</code>). Mit <code class="i">--output=</code> wählen Sie nur diese aus. Das ist besser auswertbar als die breite Standardtabelle.</p>
+<p><b>Einen Pfad prüfen:</b> <code class="i">df ~</code> zeigt das Dateisystem <i>unter diesem Pfad</i>. So erfahren Sie, auf welcher Platte oder Partition Ihre Daten liegen und wie viel Platz dort frei ist.</p>
+<p><b>Kopfzeile entfernen:</b> Die Ausgabe soll in eine Datei oder ein Skript. Dort stört <code class="i">Mounted on</code>. Mit <code class="i">grep -v</code> (Übung 40) oder <code class="i">tail</code> bleibt nur der Wert.</p>
+<p><b>Kein fester Inhalt:</b> Die Datei enthält Systemangaben, die sich von Rechner zu Rechner unterscheiden. Deshalb steht in der Aufgabe der Befehl, nicht das erwartete Ergebnis.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td>Kopfzeile vergessen</td><td>Die Datei hat drei Zeilen (<code>Linux</code>, <code>Mounted on</code>, <code>/</code>).</td></tr>
+<tr><td>Beide Male <code>&gt;</code></td><td>Die zweite Umleitung überschreibt <code>Linux</code>. Es bleibt nur der Einhängepunkt (eine Zeile).</td></tr>
+<tr><td>Systemsprache nicht Englisch</td><td>Die Kopfzeile kann übersetzt sein (auf Deutsch zum Beispiel <code>Eingehängt auf</code>). Dann findet <code>grep -v Mounted</code> sie nicht, und die Kopfzeile bleibt in der Datei. Robuster: <code>tail -n +2</code> (ab Zeile 2) oder <code>LC_ALL=C df …</code>.</td></tr>
+<tr><td><code>~</code> vergessen</td><td><code>df --output=target</code> zeigt <i>alle</i> Dateisysteme (viele Zeilen). Gefragt ist nur das von Ihrem Home-Verzeichnis.</td></tr>
+<tr><td>Falsche Option (<code>--output=nix</code>)</td><td><code>df: option --output: field 'nix' unknown</code>.</td></tr>
+<tr><td>Pfad falsch</td><td><code>df: /nix/pfad: No such file or directory</code>.</td></tr>
+<tr><td><code>uname</code> ohne <code>-s</code></td><td>Gleich (ohne Option ist <code>-s</code> der Standard), aber <code>uname -a</code> liefert eine lange Zeile mit Namen, Version und Architektur.</td></tr>
+<tr><td>Zwei Befehle ohne Datei</td><td>Die Ausgabe erscheint nur auf dem Bildschirm, <code>system.txt</code> fehlt.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 42 · Zum Weiterüben</h3>
+<p class="ex">Alle Beispiele laufen direkt im Terminal. Die Ausgaben hängen von Ihrem System ab.</p>
+<p><b>a)</b> Hole dieselbe Datei ohne <code class="i">grep</code>, und mit nur einem Umleitungszeichen.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>{ uname -s; df --output=target ~ | tail -n +2; } &gt; projects/s2.txt
+diff projects/system.txt projects/s2.txt &amp;&amp; echo "gleich"
+
+df --output=target ~ | tail -n 1                     # nur die letzte Zeile: der Wert</code></pre>
+<p class="ex"><code class="i">tail -n +2</code> beginnt bei Zeile 2 und überspringt damit die Kopfzeile, unabhängig von ihrem Text und der Sprache. Die Klammern fassen beide Befehle zu einer Ausgabe zusammen (Übung 18).</p></details>
+<p><b>b)</b> Zeige mehr über das Dateisystem deines Home-Verzeichnisses.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>df ~                                                 # Standardtabelle für diesen Pfad
+df -h ~                                              # human readable: GB und MB statt KB
+df -T ~                                              # mit Dateisystemtyp (ext4, xfs, tmpfs ...)
+df --output=source,fstype,size,used,avail,pcent,target ~
+df --output=pcent ~ | tail -n 1                      # nur die Belegung in Prozent</code></pre>
+<p class="ex"><code class="i">-h</code> rundet auf lesbare Einheiten. Die Felder bei <code class="i">--output</code> sind frei kombinierbar, durch Komma getrennt.</p></details>
+<p><b>c)</b> Frage das System auf andere Weisen nach dem Einhängepunkt.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>stat -c %m ~                                         # Einhängepunkt des Pfads
+findmnt -T ~ -no TARGET                              # dasselbe mit findmnt
+df --output=target . | tail -n 1                     # für den aktuellen Ordner</code></pre>
+<p class="ex"><code class="i">stat -c %m</code> gibt direkt den Einhängepunkt aus, ohne Kopfzeile. <code class="i">findmnt</code> gehört zum Paket <code class="i">util-linux</code> und ist nicht überall installiert.</p></details>
+<p><b>d)</b> Lies weitere Systemangaben aus.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>uname -r                         # Kernel-Version
+uname -m                         # Architektur (x86_64, aarch64)
+uname -n                         # Rechnername (wie hostname)
+uname -o                         # Betriebssystem (GNU/Linux)
+uname -a                         # alles in einer Zeile
+cat /etc/os-release              # Distribution und Version (NAME=..., VERSION_ID=...)</code></pre>
+<p class="ex"><code class="i">uname</code> beschreibt den <i>Kernel</i>, <code class="i">/etc/os-release</code> die <i>Distribution</i>. Der Befehl <code class="i">. /etc/os-release</code> lädt die Datei in die Shell und setzt Variablen wie <code class="i">$NAME</code> und <code class="i">$VERSION_ID</code>.</p></details>
+<p><b>e)</b> Lies Speicher, Prozessor und Laufzeit.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>free -h                          # Arbeitsspeicher: total, used, free, available
+lscpu | head -n 5                # Prozessor: Architektur, Kerne, Modell
+uptime -p                        # Laufzeit lesbar: up 3 days, 2 hours
+nproc                            # Anzahl der Prozessoren</code></pre>
+<p class="ex">Diese Befehle sind die Standard-Werkzeuge, um in Sekunden zu sehen, wie ein Rechner ausgestattet ist und ob er ausgelastet ist.</p></details>
+<p><b>f)</b> Schreibe einen kleinen Systembericht in eine Datei.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>{
+  echo "Rechner:  $(hostname)"
+  echo "System:   $(uname -sr)"
+  echo "Benutzer: $(whoami)"
+  echo "Home auf: $(df --output=target ~ | tail -n 1)"
+  echo "Belegung: $(df --output=pcent ~ | tail -n 1 | tr -d ' ')"
+} &gt; projects/bericht.txt
+cat projects/bericht.txt</code></pre>
+<p class="ex">Mit <code class="i">$(…)</code> setzen Sie die Ausgabe der Befehle in den Text ein. So entsteht ein lesbarer Bericht, den Sie zum Beispiel per <code class="i">cron</code> regelmäßig erzeugen lassen könnten (Übung 32).</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
