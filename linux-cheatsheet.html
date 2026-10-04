@@ -3780,6 +3780,102 @@ xz    -kc big.csv | wc -c          # 1856</code></pre>
 <p class="ex"><code class="i">gzip</code> ist am schnellsten und überall verfügbar. <code class="i">bzip2</code> und <code class="i">xz</code> komprimieren stärker, brauchen aber länger. Die Zahlen gelten für diese Testdatei mit stark wiederholtem Text. <code class="i">-k</code> behält das Original, <code class="i">-c</code> schreibt auf die Standardausgabe.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 36 · Datei entpacken</h3>
+<p><b>Aufgabe:</b> Erstelle <code class="i">projects/people-restored.csv</code> aus dem Archiv <code class="i">notes/people.csv.gz</code>.</p>
+<p class="ex">Geübt wird: <code class="i">gzip -dc</code> entpackt auf die Standardausgabe, <code class="i">&gt;</code> legt das Ergebnis unter einem <i>anderen Namen und Ort</i> ab. Das Archiv stammt aus Übung 35. Falls es fehlt, legt die Vorbereitung es an.</p>
+<details><summary>Vorbereitung: Archiv anlegen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes projects
+printf 'id,name,city\nu3,Carla,Köln\n' &gt; notes/people.csv
+gzip -c notes/people.csv &gt; notes/people.csv.gz</code></pre></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+gzip -dc notes/people.csv.gz &gt; projects/people-restored.csv
+
+cat projects/people-restored.csv                   # id,name,city / u3,Carla,Köln
+diff notes/people.csv projects/people-restored.csv &amp;&amp; echo "identisch"</code></pre>
+<p class="ex">Gleichwertig: <code class="i">gunzip -c notes/people.csv.gz &gt; projects/people-restored.csv</code> oder <code class="i">zcat notes/people.csv.gz &gt; projects/people-restored.csv</code>.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Teil macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>gzip -d</code></td><td><b>d</b>ecompress: entpackt statt zu komprimieren. Dasselbe wie <code>gunzip</code>.</td></tr>
+<tr><td class="nw"><code>-c</code></td><td>Schreibt das Ergebnis auf die Standardausgabe. Das Archiv bleibt unverändert.</td></tr>
+<tr><td class="nw"><code>-dc</code></td><td>Beide Optionen zusammen. Wirkt wie <code>zcat</code>.</td></tr>
+<tr><td class="nw"><code>&gt; projects/people-restored.csv</code></td><td>Leitet den entpackten Text in eine Datei mit neuem Namen im Ordner <code>projects</code> um.</td></tr>
+<tr><td class="nw"><code>diff a b</code></td><td>Vergleicht Original und Wiederherstellung. Keine Ausgabe heißt: identisch.</td></tr>
+</table></div>
+<pre><code>notes/people.csv.gz   --gzip -dc--&gt;   projects/people-restored.csv
+(bleibt erhalten)                      (neuer Name, anderer Ordner)</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Entpacken ohne Nebenwirkung:</b> <code class="i">gunzip datei.gz</code> entpackt <i>neben</i> das Archiv und <b>löscht</b> das Archiv. Mit <code class="i">-c</code> und <code class="i">&gt;</code> bestimmen Sie Namen und Ort selbst, das Archiv bleibt. Das ist hier verlangt: Ein anderer Ordner, ein anderer Name.</p>
+<p><b>Ein Fehler, den man vermeidet:</b> Im Ordner <code class="i">notes</code> liegt noch das Original <code class="i">people.csv</code>. <code class="i">gunzip notes/people.csv.gz</code> würde die Datei überschreiben wollen und bricht mit <code class="i">already exists; not overwritten</code> ab.</p>
+<p><b>Kontrolle statt Vertrauen:</b> Eine wiederhergestellte Datei prüft man mit <code class="i">diff</code>, <code class="i">cmp</code> oder einer Prüfsumme. Gleiche Prüfsumme heißt: Byte für Byte gleich.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>gunzip notes/people.csv.gz</code> (ohne <code>-c</code>)</td><td><code>gzip: notes/people.csv already exists; not overwritten</code> (Exit-Code 2). Selbst wenn es klappte, würde das Archiv verschwinden und die Datei läge am falschen Ort.</td></tr>
+<tr><td><code>-c</code> ohne <code>&gt;</code></td><td>Der Text erscheint nur auf dem Bildschirm, <code>people-restored.csv</code> fehlt.</td></tr>
+<tr><td>Ausgabe auf das Archiv (<code>gzip -dc x.gz &gt; x.gz</code>)</td><td>Die Shell leert <code>x.gz</code> vor dem Lesen: <code>unexpected end of file</code> und 0 Bytes. Das Archiv ist verloren.</td></tr>
+<tr><td>Kein gzip-Archiv</td><td><code>gzip: plain.txt: not in gzip format</code> (Exit-Code 1).</td></tr>
+<tr><td>Falsche Endung (<code>w.dat</code>)</td><td><code>gunzip</code> meldet <code>unknown suffix -- ignored</code>. Mit <code>gzip -dc w.dat</code> oder <code>-S .dat</code> geht es trotzdem.</td></tr>
+<tr><td>Pfad falsch</td><td><code>gzip: nix.gz: No such file or directory</code>. Die Zieldatei wird leer angelegt.</td></tr>
+<tr><td>Falscher Zielname oder -ordner</td><td>Die Datei liegt nicht in <code>projects/</code> oder heißt anders als <code>people-restored.csv</code>.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 36 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit <code class="i">notes/people.csv.gz</code> und der wiederhergestellten Datei aus der Lösung.</p>
+<p><b>a)</b> Prüfe die Wiederherstellung mit Prüfsummen.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>sha256sum notes/people.csv projects/people-restored.csv
+# beide Zeilen beginnen mit derselben Zeichenfolge
+
+sha256sum notes/people.csv &gt; sums.txt
+sed -i 's|notes/people.csv|projects/people-restored.csv|' sums.txt
+sha256sum -c sums.txt                        # projects/people-restored.csv: OK
+
+cmp notes/people.csv projects/people-restored.csv &amp;&amp; echo "Byte für Byte gleich"</code></pre>
+<p class="ex">Eine Prüfsumme ist ein „Fingerabdruck“ des Inhalts. Schon ein geändertes Zeichen ergibt eine völlig andere Summe. <code class="i">-c</code> prüft Dateien gegen eine Liste.</p></details>
+<p><b>b)</b> Entpacke an Ort und Stelle, und behalte das Archiv.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>mv notes/people.csv notes/people.bak       # Platz machen: das Original darf nicht im Weg sein
+gunzip -k notes/people.csv.gz              # -k: Archiv behalten
+ls notes                                   # people.bak  people.csv  people.csv.gz
+mv notes/people.bak notes/people.csv.orig  # zum Vergleich aufheben</code></pre>
+<p class="ex"><code class="i">gunzip</code> erzeugt <code class="i">people.csv</code> neben dem Archiv. Ohne <code class="i">-k</code> wäre das Archiv danach gelöscht. Wenn die Zieldatei schon existiert, verweigert <code class="i">gunzip</code> das Überschreiben. Mit <code class="i">-f</code> (force) erzwingen Sie es.</p></details>
+<p><b>c)</b> Lies und prüfe, ohne etwas zu schreiben.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>gzip -dc notes/people.csv.gz | head -n 1      # id,name,city
+gzip -dc notes/people.csv.gz | wc -l          # 2
+zgrep -c Carla notes/people.csv.gz            # 1
+gzip -t notes/people.csv.gz &amp;&amp; echo "Archiv ok"</code></pre>
+<p class="ex">Entpackt wird nur im Datenstrom, nichts landet auf der Platte. <code class="i">-t</code> (test) prüft die Integrität des Archivs.</p></details>
+<p><b>d)</b> Entpacke über Pipes und aus der Standardeingabe.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>gzip -dc &lt; notes/people.csv.gz | tail -n 1       # u3,Carla,Köln
+cat notes/people.csv.gz | gunzip | tail -n 1     # dasselbe über cat</code></pre>
+<p class="ex">Ohne Dateinamen liest <code class="i">gunzip</code> von der Standardeingabe und schreibt auf die Standardausgabe. So lassen sich auch Downloads direkt entpacken.</p></details>
+<p><b>e)</b> Behandle Archive ohne <code class="i">.gz</code>-Endung.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>cp notes/people.csv.gz w.dat
+gunzip w.dat                             # gzip: w.dat: unknown suffix -- ignored
+gzip -dc w.dat | head -n 1               # id,name,city  (-c ignoriert die Endung)
+gunzip -S .dat w.dat                     # -S: Endung angeben, ergibt die Datei "w"</code></pre>
+<p class="ex">Prüfen Sie mit <code class="i">file w.dat</code>, ob es wirklich ein gzip-Archiv ist (<code class="i">gzip compressed data</code>).</p></details>
+<p><b>f)</b> Entpacke ein <code class="i">.tar.gz</code> in einem Schritt, und alles im Ordner.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>tar -czf t.tgz notes                       # Archiv (Übung 26)
+gzip -dc t.tgz | tar -tf -                 # Inhalt: erst entpacken, dann tar lesen
+mkdir -p ziel
+tar -xzf t.tgz -C ziel                     # oder in einem Schritt entpacken
+
+echo a &gt; a; echo b &gt; b
+gzip a b; gunzip a.gz b.gz                 # mehrere Dateien auf einmal</code></pre>
+<p class="ex">Ein <code class="i">.tar.gz</code> ist ein <code class="i">tar</code>, das mit <code class="i">gzip</code> komprimiert wurde. <code class="i">tar -xzf</code> erledigt beide Schritte, <code class="i">gzip -dc … | tar -tf -</code> zeigt die einzelnen Stufen.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
