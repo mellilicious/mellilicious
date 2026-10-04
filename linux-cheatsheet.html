@@ -788,6 +788,84 @@ cat both.txt</code></pre>
 <p class="ex"><code class="i">cat</code> hängt mehrere Dateien hintereinander und gibt sie als einen Strom aus. <code class="i">&gt;</code> speichert ihn in <code class="i">both.txt</code>.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 3 · Dateirechte setzen</h3>
+<p><b>Aufgabe:</b> Setze in <code class="i">~/uebung</code> die Rechte von <code class="i">notes/greeting.txt</code> auf <code class="i">rw-r-----</code> (Modus <code class="i">640</code>).</p>
+<p class="ex">Geübt wird: Rechte als Zahl angeben, mit <code class="i">chmod</code> ändern und mit <code class="i">ls -l</code> kontrollieren. Die Datei <code class="i">greeting.txt</code> muss existieren. Falls nicht, legen Sie sie vorher an (siehe Lösung).</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+echo "Hallo" &gt; notes/greeting.txt          # nur nötig, falls die Datei fehlt
+
+ls -l notes/greeting.txt                   # vorher:  -rw-r--r--  (644)
+chmod 640 notes/greeting.txt               # Rechte setzen
+ls -l notes/greeting.txt                   # nachher: -rw-r-----  (640)
+stat -c '%a %A' notes/greeting.txt         # Kontrolle: 640 -rw-r-----</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Rechte als Zahl berechnen</h3>
+<p class="ex">Jede der drei Ziffern gehört zu einer Gruppe: Besitzer, Gruppe, andere. Jede Ziffer ist die Summe aus lesen = 4, schreiben = 2, ausführen = 1.</p><div class="tw"><table>
+<tr><th></th><th>Besitzer (u)</th><th>Gruppe (g)</th><th>Andere (o)</th></tr>
+<tr><td class="nw">Text</td><td><code>rw-</code></td><td><code>r--</code></td><td><code>---</code></td></tr>
+<tr><td class="nw">Rechnung</td><td>4 + 2 + 0</td><td>4 + 0 + 0</td><td>0 + 0 + 0</td></tr>
+<tr><td class="nw">Ziffer</td><td><code>6</code></td><td><code>4</code></td><td><code>0</code></td></tr>
+</table></div>
+<p>Ergebnis: <code class="i">640</code>. Der Besitzer darf lesen und schreiben, die Gruppe nur lesen, alle anderen gar nichts.</p></div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Befehl</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>chmod 640 datei</code></td><td><b>ch</b>ange <b>mod</b>e: setzt die Rechte der Datei auf genau diesen Wert. Alles, was vorher galt, wird ersetzt.</td></tr>
+<tr><td class="nw"><code>ls -l datei</code></td><td>Langes Format. Die erste Spalte zeigt Typ und Rechte, danach Besitzer, Gruppe, Größe, Datum und Name.</td></tr>
+<tr><td class="nw"><code>stat -c '%a %A' datei</code></td><td>Gibt die Rechte in beiden Schreibweisen aus: als Zahl (<code>640</code>) und als Text (<code>-rw-r-----</code>).</td></tr>
+</table></div>
+<pre><code>-rw-r-----  1 anna dev  6 Okt  4 10:00 greeting.txt
+│└┬┘└┬┘└┬┘
+│ │  │  └ andere:   ---  (keine Rechte)
+│ │  └ Gruppe:      r--  (lesen)
+│ └ Besitzer:       rw-  (lesen + schreiben)
+└ Typ: - Datei, d Verzeichnis</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Rechte schützen Dateien:</b> Linux ist ein Mehrbenutzersystem. Mit <code class="i">640</code> kann nur der Besitzer die Datei ändern, die Gruppe darf sie lesen und alle anderen Benutzer sehen den Inhalt nicht.</p>
+<p><b>Zahl statt Text:</b> Die Zahlenschreibweise legt alle neun Rechte in einem Schritt fest und ist kurz. Alternativ geht auch der symbolische Weg, der gleichwertig ist: <code class="i">chmod u=rw,g=r,o= notes/greeting.txt</code>. Dabei bedeutet <code class="i">o=</code>, dass für „andere“ nichts gesetzt wird.</p>
+<p><b>Kontrolle nach der Änderung:</b> <code class="i">chmod</code> gibt bei Erfolg nichts aus. Erst <code class="i">ls -l</code> zeigt, ob wirklich <code class="i">-rw-r-----</code> herauskam.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>chmod 460</code> statt <code>640</code></td><td>Ziffern vertauscht: Der Besitzer bekäme nur lesen, die Gruppe lesen und schreiben (<code>r--rw----</code>).</td></tr>
+<tr><td>Falscher Pfad oder falsches Verzeichnis</td><td><code>chmod: cannot access 'greeting.txt': No such file or directory</code>. Mit <code>pwd</code> und <code>ls notes</code> prüfen.</td></tr>
+<tr><td><code>chmod +w</code> oder <code>chmod +x</code></td><td>Das <i>fügt</i> Rechte hinzu, setzt aber nicht den gewünschten Zielwert. Für einen exakten Wert Zahl oder <code>u=…,g=…,o=…</code> nehmen.</td></tr>
+<tr><td><code>chmod 777</code></td><td>Gibt allen alle Rechte. Das ist fast nie nötig und unsicher.</td></tr>
+<tr><td>Rechte mit Besitzer verwechseln</td><td><code>chmod</code> ändert nur die Rechte. Den Besitzer ändert man mit <code>chown</code>.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 3 · Zum Weiterüben</h3>
+<p class="ex">Prüfen Sie nach jedem Schritt mit <code class="i">ls -l</code> oder <code class="i">stat -c '%a %A' datei</code>.</p>
+<p><b>a)</b> Setze <code class="i">notes/greeting.txt</code> so, dass nur der Besitzer lesen und schreiben darf (<code class="i">rw-------</code>).</p>
+<details><summary>Lösung a)</summary>
+<pre><code>chmod 600 notes/greeting.txt</code></pre>
+<p class="ex">6 für den Besitzer (lesen + schreiben), 0 für Gruppe und andere. Das ist die übliche Einstellung für private Dateien wie SSH-Schlüssel.</p></details>
+<p><b>b)</b> Lege ein Skript <code class="i">skript.sh</code> an und mache es für alle ausführbar.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>touch skript.sh
+chmod +x skript.sh
+ls -l skript.sh</code></pre>
+<p class="ex"><code class="i">+x</code> fügt das Ausführungsrecht für Besitzer, Gruppe und andere hinzu, ohne die übrigen Rechte zu verändern. Das ist der Normalfall bei Skripten.</p></details>
+<p><b>c)</b> Setze <code class="i">skript.sh</code> auf <code class="i">rwxr-x---</code>, einmal als Zahl und einmal symbolisch.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>chmod 750 skript.sh
+chmod u=rwx,g=rx,o= skript.sh     # gleichwertig</code></pre>
+<p class="ex">Besitzer 4+2+1 = 7, Gruppe 4+0+1 = 5, andere 0.</p></details>
+<p><b>d)</b> Rechne selbst: Welche Zahl gehört zu <code class="i">rw-r--r--</code> und welche zu <code class="i">rwxr-xr-x</code>?</p>
+<details><summary>Lösung d)</summary>
+<p><code class="i">rw-r--r--</code> = 6 4 4 = <b>644</b> (normale Datei). <code class="i">rwxr-xr-x</code> = 7 5 5 = <b>755</b> (Programm oder Ordner).</p></details>
+<p><b>e)</b> Erzeuge eine neue leere Datei und schau nach, welche Rechte sie von selbst bekommt.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>touch neu.txt
+ls -l neu.txt          # meist -rw-r--r--  (644)
+umask                  # zeigt die Maske, meist 0022</code></pre>
+<p class="ex">Neue Dateien starten mit 666 minus der <code class="i">umask</code>. Bei <code class="i">0022</code> ergibt das 644. Neue Verzeichnisse starten mit 777 minus <code class="i">umask</code>, also 755.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
