@@ -1634,6 +1634,84 @@ grep -i error t.log | wc -l               # 4  (Groß/Klein egal)</code></pre>
 <p class="ex">Je nach Frage gibt es verschiedene richtige Antworten. <code class="i">-w</code> findet nur ganze Wörter, <code class="i">awk</code> prüft das Feld, in dem das Level steht, und ist am genauesten. Für die Kursaufgabe genügt <code class="i">grep ERROR</code>, weil dort nur der Level das Wort enthält.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 14 · Den ersten Treffer finden</h3>
+<p><b>Aufgabe:</b> Finde in der Liste <code class="i">words.list</code> den <i>ersten</i> Wert mit dem Präfix <code class="i">lab:</code> und speichere ihn ohne das Präfix in <code class="i">notes/first.txt</code>.</p>
+<p class="ex">Geübt wird: <code class="i">grep</code>, <code class="i">head -n 1</code> und <code class="i">cut</code> in einer Pipe. Die Ordnung der Datei ist wichtig, denn „erster“ heißt hier: erster in der Datei, nicht alphabetisch. Wie bei Übung 10 nehmen wir Beispieldaten. Diesmal stehen die Zeilen in einer anderen Reihenfolge in <code class="i">~/daten/words2.list</code>. Setzen Sie für Ihre Aufgabe den Pfad aus der Aufgabenstellung ein.</p>
+<details><summary>Beispieldaten anlegen</summary>
+<pre><code>mkdir -p ~/daten
+printf 'note:start\ncollab:fake\ntodo:x\nlab:bravo\nlab:alpha\nlab:charlie\n' &gt; ~/daten/words2.list
+cat -n ~/daten/words2.list</code></pre>
+<p class="ex">Der erste <code class="i">lab:</code>-Wert ist <code class="i">bravo</code> (Zeile 4). Er steht nicht an erster Stelle der Datei und ist auch nicht alphabetisch der erste. <code class="i">collab:fake</code> in Zeile 2 enthält <code class="i">lab:</code> ebenfalls, beginnt aber anders.</p></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes
+grep '^lab:' ~/daten/words2.list | head -n 1 | cut -d: -f2 &gt; notes/first.txt
+
+cat notes/first.txt            # bravo</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>grep '^lab:' datei</code></td><td>Gibt alle Zeilen aus, die mit <code>lab:</code> beginnen, in der Reihenfolge der Datei.</td></tr>
+<tr><td class="nw"><code>head -n 1</code></td><td>Behält nur die <i>erste</i> Zeile der Eingabe und verwirft den Rest.</td></tr>
+<tr><td class="nw"><code>cut -d: -f2</code></td><td>Teilt am Doppelpunkt <code>:</code> und gibt das zweite Feld aus, hier den Wert ohne Präfix.</td></tr>
+<tr><td class="nw"><code>&gt; notes/first.txt</code></td><td>Schreibt das Ergebnis in die Datei.</td></tr>
+</table></div>
+<pre><code>lab:bravo   --head -n 1--&gt;   lab:bravo   --cut--&gt;   bravo
+lab:alpha   (verworfen)
+lab:charlie (verworfen)</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Erst filtern, dann begrenzen:</b> <code class="i">head</code> kennt den Inhalt nicht. Es nimmt einfach die erste Zeile seiner Eingabe. Damit das die erste <i>passende</i> Zeile ist, muss <code class="i">grep</code> davor stehen.</p>
+<p><b>Reihenfolge im Strom:</b> Auch <code class="i">grep | cut | head</code> würde dasselbe Ergebnis liefern. Üblich ist es, erst alles Unwichtige loszuwerden und zuletzt umzuformen.</p>
+<p><b>Dieselbe Pipe, andere Zeile:</b> Mit <code class="i">tail -n 1</code> statt <code class="i">head</code> erhalten Sie den <i>letzten</i> Treffer, mit <code class="i">sed -n 2p</code> den zweiten.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>head -n 1</code> direkt auf der Datei, ohne <code>grep</code></td><td>Liefert die erste Zeile der Datei überhaupt, hier <code>start</code> statt <code>bravo</code>.</td></tr>
+<tr><td><code>cut</code> vergessen</td><td>In der Datei steht <code>lab:bravo</code> mit Präfix.</td></tr>
+<tr><td><code>^</code> vergessen (<code>grep 'lab:'</code>)</td><td>Trifft auch <code>collab:fake</code>. Es steht davor, der „erste Treffer“ ist dann <code>fake</code>.</td></tr>
+<tr><td><code>tail</code> statt <code>head</code></td><td>Liefert den letzten Treffer (<code>charlie</code>).</td></tr>
+<tr><td>Alphabetisch sortiert</td><td>Nach <code>sort</code> wäre <code>alpha</code> der erste. Die Aufgabe meint aber die Reihenfolge in der Datei, also nicht sortieren.</td></tr>
+<tr><td><code>head -n 2</code> statt <code>-n 1</code></td><td>Es stehen zwei Werte in der Datei statt einem.</td></tr>
+<tr><td>Kein Treffer</td><td>Die Pipe liefert nichts, <code>first.txt</code> bleibt leer. Pfad und Muster prüfen.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 14 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit <code class="i">~/daten/words2.list</code> aus den Beispieldaten.</p>
+<p><b>a)</b> Löse es mit <code class="i">grep -m1</code> statt <code class="i">head</code>.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>grep -m1 '^lab:' ~/daten/words2.list | cut -d: -f2       # bravo</code></pre>
+<p class="ex"><code class="i">-m1</code> (max count) beendet <code class="i">grep</code> nach dem ersten Treffer. Bei großen Dateien ist das schneller, weil nicht weitergesucht wird.</p></details>
+<p><b>b)</b> In welcher Zeile steht der erste Treffer?</p>
+<details><summary>Lösung b)</summary>
+<pre><code>grep -n -m1 '^lab:' ~/daten/words2.list         # 4:lab:bravo</code></pre>
+<p class="ex"><code class="i">-n</code> stellt die Zeilennummer voran, hier <code class="i">4</code>.</p></details>
+<p><b>c)</b> Gib den <i>letzten</i> und den <i>zweiten</i> Wert aus.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>grep '^lab:' ~/daten/words2.list | tail -n 1 | cut -d: -f2           # charlie
+grep '^lab:' ~/daten/words2.list | head -n 2 | tail -n 1 | cut -d: -f2   # alpha</code></pre>
+<p class="ex">Für die zweite Zeile nimmt man erst die ersten zwei (<code class="i">head -n 2</code>) und davon die letzte (<code class="i">tail -n 1</code>). Ein Alternativweg ist <code class="i">sed -n '2p'</code>.</p></details>
+<p><b>d)</b> Löse es mit <code class="i">sed</code> in einem Befehl.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>sed -n '/^lab:/{s/^lab://p;q}' ~/daten/words2.list       # bravo</code></pre>
+<p class="ex">Bei der ersten Zeile, die zu <code class="i">^lab:</code> passt, wird das Präfix entfernt und die Zeile ausgegeben (<code class="i">p</code>). Danach beendet <code class="i">q</code> das Programm.</p></details>
+<p><b>e)</b> Löse es mit <code class="i">awk</code>.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>awk -F: '$1=="lab" {print $2; exit}' ~/daten/words2.list     # bravo</code></pre>
+<p class="ex">Ist das erste Feld genau <code class="i">lab</code>, wird das zweite ausgegeben und <code class="i">exit</code> beendet das Programm. <code class="i">collab</code> fällt wegen des exakten Vergleichs heraus.</p></details>
+<p><b>f)</b> Zeige die ersten zwei Werte auf einmal.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>grep -m2 '^lab:' ~/daten/words2.list | cut -d: -f2       # bravo, alpha
+grep '^lab:' ~/daten/words2.list | head -n 2 | cut -d: -f2</code></pre>
+<p class="ex"><code class="i">-m2</code> und <code class="i">head -n 2</code> ergeben dasselbe.</p></details>
+<p><b>g)</b> Welcher Wert ist alphabetisch der erste?</p>
+<details><summary>Lösung g)</summary>
+<pre><code>grep '^lab:' ~/daten/words2.list | cut -d: -f2 | sort | head -n 1    # alpha</code></pre>
+<p class="ex">Hier wird zuerst geschnitten und sortiert, dann die erste Zeile genommen. Merken Sie sich den Unterschied: <i>erster in der Datei</i> (<code class="i">bravo</code>) oder <i>erster nach Sortierung</i> (<code class="i">alpha</code>).</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
