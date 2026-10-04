@@ -85,6 +85,10 @@ td code{font-family:var(--f-mono);font-size:12px}
 td.nw{white-space:nowrap}
 .note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:8px 12px;border-radius:0 4px 4px 0;font-size:13.5px;margin:0 0 8px}
 .warn{border-left-color:#c2410c}
+details{margin:8px 0 12px}
+summary{cursor:pointer;font-weight:600;color:var(--accent);padding:4px 0}
+summary:hover{text-decoration:underline}
+details[open] summary{margin-bottom:8px}
 .empty{color:var(--muted);padding:24px 0}
 .hide{display:none!important}
 footer{grid-column:1/-1;color:var(--muted);font-size:13px}
@@ -647,6 +651,69 @@ trap 'rm -f "$tmp"' EXIT         # beim Beenden ausführen</code></pre></div>
 • Skripte mit <code class="i">set -euo pipefail</code> beginnen und Variablen in Anführungszeichen setzen<br>
 • Bei Unklarheit: <code class="i">man befehl</code> oder <code class="i">befehl --help</code> lesen<br>
 • Wiederkehrendes als <code class="i">alias</code> oder Skript ablegen</p></div>
+</div></section>
+
+<section id="uebungen" data-grp="Übungen"><h2>Übungen <small>mit Lösung</small></h2><div class="grid">
+
+<div class="blk wide"><h3>Übung 1 · Verzeichnis anlegen und auflisten</h3>
+<p><b>Aufgabe:</b> Lege im Arbeitsverzeichnis <code class="i">~/teachme-linux-00fbe14e</code> das Verzeichnis <code class="i">notes</code> an und speichere die Ausgabe von <code class="i">ls -d notes</code> in der Datei <code class="i">notes/listing.txt</code>.</p>
+<p class="ex">Geübt wird: Verzeichnis anlegen, relative Pfade, die Option <code class="i">-d</code> und die Umleitung der Ausgabe in eine Datei. Versuchen Sie es zuerst selbst, die Lösung ist eingeklappt.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/teachme-linux-00fbe14e       # ins Arbeitsverzeichnis wechseln
+mkdir notes                       # Verzeichnis "notes" anlegen
+ls -d notes &gt; notes/listing.txt   # Ausgabe von ls -d in die Datei schreiben
+cat notes/listing.txt             # Kontrolle: zeigt  notes</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Befehl</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>cd ~/teachme-linux-…</code></td><td><b>c</b>hange <b>d</b>irectory: Die Shell wechselt in dieses Verzeichnis. <code>~</code> steht für Ihr Home-Verzeichnis.</td></tr>
+<tr><td class="nw"><code>mkdir notes</code></td><td><b>m</b>a<b>k</b>e <b>dir</b>ectory: legt einen neuen, leeren Ordner <code>notes</code> im aktuellen Verzeichnis an.</td></tr>
+<tr><td class="nw"><code>ls</code></td><td><b>l</b>i<b>s</b>t: zeigt den <i>Inhalt</i> eines Verzeichnisses.</td></tr>
+<tr><td class="nw"><code>ls -d notes</code></td><td>Option <code>-d</code> (<b>d</b>irectory): zeigt den <i>Eintrag selbst</i> statt seines Inhalts. Die Ausgabe ist einfach der Name <code>notes</code>.</td></tr>
+<tr><td class="nw"><code>&gt;</code></td><td>Umleitung: Statt auf den Bildschirm geht die Ausgabe in eine Datei. Die Datei wird angelegt oder, falls vorhanden, überschrieben.</td></tr>
+<tr><td class="nw"><code>cat notes/listing.txt</code></td><td>Gibt den Dateiinhalt aus. Damit prüfen Sie, ob wirklich <code>notes</code> darin steht.</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Reihenfolge:</b> <code class="i">mkdir</code> muss zuerst kommen. Die Umleitung <code class="i">&gt;</code> legt zwar die Datei an, aber nie fehlende Verzeichnisse. Ohne <code class="i">notes</code> bricht die Shell mit <code class="i">No such file or directory</code> ab.</p>
+<p><b>Warum <code class="i">-d</code>?</b> Ohne die Option würde <code class="i">ls notes</code> den Inhalt des Ordners zeigen, und der ist leer. Mit <code class="i">-d</code> erhalten Sie den Namen des Ordners selbst. So prüft man zum Beispiel, ob ein Verzeichnis existiert, oder listet mit <code class="i">ls -d */</code> nur die Unterverzeichnisse.</p>
+<p><b>Warum umleiten?</b> Ein Befehl schreibt normalerweise in das Terminal (Standardausgabe). Mit <code class="i">&gt;</code> können Sie das Ergebnis speichern, weiterverarbeiten oder, wie hier, automatisch prüfen lassen. Die Prüfung liest die Datei auf dem Server, deshalb muss sie am richtigen Pfad liegen.</p>
+<p><b>Relative Pfade:</b> <code class="i">notes/listing.txt</code> gilt vom aktuellen Verzeichnis aus. Deshalb zuerst <code class="i">cd</code> und im Zweifel <code class="i">pwd</code> zur Kontrolle.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>mkdir</code> vergessen</td><td><code>bash: notes/listing.txt: No such file or directory</code></td></tr>
+<tr><td><code>ls notes</code> ohne <code>-d</code></td><td>Die Shell legt <code>listing.txt</code> an, <i>bevor</i> <code>ls</code> läuft. <code>ls</code> findet dann genau diese Datei, und in der Datei steht <code>listing.txt</code> statt <code>notes</code>.</td></tr>
+<tr><td><code>&gt;&gt;</code> statt <code>&gt;</code></td><td>Die Ausgabe wird angehängt. Bei jedem erneuten Ausführen kommt eine Zeile dazu.</td></tr>
+<tr><td>falsches Verzeichnis</td><td>Die Datei landet woanders. Mit <code>pwd</code> prüfen, in welchem Ordner Sie sind.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Zum Weiterüben</h3>
+<p class="ex">Variationen der gleichen Technik. Probieren Sie sie im Übungsordner aus und schauen Sie mit <code class="i">cat</code> nach, was in der Datei steht.</p>
+<p><b>a)</b> Speichere die Namen aller Unterverzeichnisse des aktuellen Ordners in <code class="i">notes/ordner.txt</code>.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>ls -d */ &gt; notes/ordner.txt     # Muster */ trifft nur Verzeichnisse
+cat notes/ordner.txt</code></pre>
+<p class="ex">Die Shell ersetzt <code class="i">*/</code> durch alle Namen, die auf einen Schrägstrich enden, also nur durch Verzeichnisse. <code class="i">-d</code> sorgt dafür, dass <code class="i">ls</code> deren Namen ausgibt statt ihren Inhalt.</p></details>
+<p><b>b)</b> Hänge der Datei <code class="i">notes/listing.txt</code> eine zweite Zeile mit dem Text <code class="i">fertig</code> an.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>echo "fertig" &gt;&gt; notes/listing.txt
+cat notes/listing.txt</code></pre>
+<p class="ex"><code class="i">echo</code> gibt Text aus, <code class="i">&gt;&gt;</code> hängt ihn ans Dateiende an, ohne den bisherigen Inhalt zu löschen.</p></details>
+<p><b>c)</b> Versuche, ein nicht vorhandenes Verzeichnis aufzulisten, und speichere nur die Fehlermeldung in <code class="i">notes/fehler.txt</code>.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>ls -d gibtesnicht 2&gt; notes/fehler.txt
+cat notes/fehler.txt</code></pre>
+<p class="ex">Fehlermeldungen laufen über einen eigenen Kanal (Standardfehler, Nummer 2). <code class="i">2&gt;</code> leitet nur diesen Kanal um, normale Ausgabe bliebe im Terminal.</p></details>
+<p><b>d)</b> Lege <code class="i">projekt/src/tests</code> in einem Schritt an und zähle danach die Einträge in <code class="i">projekt</code>.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>mkdir -p projekt/src/tests      # -p legt auch fehlende Elternordner an
+ls projekt | wc -l              # wc -l zählt Zeilen, hier: 1 (src)</code></pre>
+<p class="ex">Ohne <code class="i">-p</code> meldet <code class="i">mkdir</code> einen Fehler, weil <code class="i">projekt</code> und <code class="i">src</code> noch nicht existieren.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
