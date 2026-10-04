@@ -1940,6 +1940,94 @@ echo "Hello" | grep -i hello                  # findet ohne Rücksicht auf die S
 <p class="ex">Oft muss man gar nicht umwandeln: Viele Werkzeuge haben eine Option, die Schreibweise zu ignorieren (<code class="i">grep -i</code>, <code class="i">sort -f</code>, <code class="i">uniq -i</code>).</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 18 · Den eigenen CSV-Eintrag herausziehen</h3>
+<p><b>Aufgabe:</b> Aus der Datei <code class="i">people.csv</code> soll eine neue Datei <code class="i">notes/people.csv</code> entstehen. Sie enthält nur die Kopfzeile und Ihren eigenen Eintrag, in dieser Reihenfolge.</p>
+<p class="ex">Geübt wird: <code class="i">head</code> für die Kopfzeile, <code class="i">grep -F</code> für eine feste Zeichenfolge und das Zusammensetzen einer Datei aus zwei Befehlen mit <code class="i">&gt;</code> und <code class="i">&gt;&gt;</code>. In der Kursaufgabe erkennen Sie Ihren Eintrag an einem persönlichen Wert. Hier nehmen wir die Beispieldatei <code class="i">~/daten/people.csv</code>, in der Ihr Eintrag die ID <code class="i">u3</code> hat. Setzen Sie Ihren Wert und Ihren Pfad aus der Aufgabenstellung ein.</p>
+<details><summary>Beispieldaten anlegen</summary>
+<pre><code>mkdir -p ~/daten
+printf 'id,name,city\nu1,Anna,Berlin\nu2,Ben,Hamburg\nu3,Carla,Köln\nu31,Dino,Berlin\nu13,Emil,Bonn\n' &gt; ~/daten/people.csv
+cat -n ~/daten/people.csv</code></pre>
+<p class="ex">CSV heißt „comma-separated values“: eine Zeile je Datensatz, die Felder sind durch Kommas getrennt. Die erste Zeile ist die Kopfzeile mit den Spaltennamen. Beachten Sie <code class="i">u31</code>: Diese ID enthält ebenfalls die Zeichen <code class="i">u3</code>.</p></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes
+head -n 1 ~/daten/people.csv &gt; notes/people.csv         # Kopfzeile, überschreibt
+grep -F 'u3,' ~/daten/people.csv &gt;&gt; notes/people.csv     # eigener Eintrag, hängt an
+
+cat notes/people.csv
+# id,name,city
+# u3,Carla,Köln
+wc -l notes/people.csv                                   # 2</code></pre>
+<p class="ex">Ihr Suchwert ist <code class="i">u3,</code> mit dem Komma dahinter. Ohne das Komma würde auch <code class="i">u31,Dino,Berlin</code> passen.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>head -n 1 datei</code></td><td>Gibt nur die erste Zeile aus, hier die Kopfzeile mit den Spaltennamen.</td></tr>
+<tr><td class="nw"><code>&gt; notes/people.csv</code></td><td>Legt die Zieldatei an und schreibt die Kopfzeile hinein. Eine vorhandene Datei wird dabei geleert.</td></tr>
+<tr><td class="nw"><code>grep -F 'u3,' datei</code></td><td>Gibt die Zeilen aus, die die Zeichenfolge <code>u3,</code> <i>wörtlich</i> enthalten. <code>-F</code> steht für „fixed string“: Zeichen wie <code>.</code> oder <code>[</code> haben keine Sonderbedeutung.</td></tr>
+<tr><td class="nw"><code>&gt;&gt; notes/people.csv</code></td><td>Hängt diese Zeile an die Datei an, ohne die Kopfzeile zu löschen.</td></tr>
+</table></div>
+<pre><code>people.csv                          notes/people.csv
+id,name,city      --head -n 1--&gt;    id,name,city
+u1,Anna,Berlin
+u2,Ben,Hamburg
+u3,Carla,Köln     --grep -F u3,--&gt;  u3,Carla,Köln
+u31,Dino,Berlin
+u13,Emil,Bonn</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Zwei Teile, zwei Befehle:</b> Die Kopfzeile erkennt man an ihrer Position (die erste Zeile), den Datensatz an seinem Inhalt. Deshalb braucht es zwei verschiedene Befehle, <code class="i">head</code> und <code class="i">grep</code>.</p>
+<p><b><code class="i">&gt;</code> zuerst, dann <code class="i">&gt;&gt;</code>:</b> Der erste Befehl legt die Datei neu an. Der zweite hängt an. In dieser Reihenfolge steht die Kopfzeile oben, wie die Aufgabe es verlangt.</p>
+<p><b>Warum <code class="i">-F</code>?</b> Ohne <code class="i">-F</code> ist das Muster ein regulärer Ausdruck. Ein <code class="i">.</code> in einer E-Mail-Adresse passt dann auf jedes Zeichen. Mit <code class="i">-F</code> wird genau das gesucht, was Sie tippen. Für feste Texte ist das sicherer und schneller.</p>
+<p><b>Genau genug suchen:</b> Ein zu kurzes Muster trifft mehr als gewünscht. <code class="i">u3</code> findet auch <code class="i">u31</code>. Das Komma dahinter macht den Treffer eindeutig.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td>Beide Male <code>&gt;</code></td><td>Der zweite Befehl überschreibt die Kopfzeile. In der Datei steht nur der Eintrag.</td></tr>
+<tr><td>Falsche Reihenfolge (erst <code>grep</code>, dann <code>head &gt;&gt;</code>)</td><td>Der Eintrag steht oben, die Kopfzeile unten.</td></tr>
+<tr><td>Muster zu kurz (<code>u3</code>)</td><td>Es kommt auch <code>u31,Dino,Berlin</code> mit, die Datei hat 3 Zeilen.</td></tr>
+<tr><td>Nur den zweiten Befehl wiederholt</td><td><code>&gt;&gt;</code> hängt jedes Mal an, der Eintrag steht dann mehrfach in der Datei. Immer beide Befehle zusammen ausführen, beginnend mit <code>&gt;</code>.</td></tr>
+<tr><td>Kopfzeile enthält das Muster</td><td>Dann würde <code>grep</code> sie ein zweites Mal ausgeben. Beispiel: Wer nach <code>id</code> sucht, trifft die Kopfzeile.</td></tr>
+<tr><td>Datei kommt aus Windows (<code>\r</code> am Zeilenende)</td><td>Unsichtbares Zeichen <code>^M</code> am Ende. Mit <code>cat -A</code> prüfen. Es stört bei exakter Suche nach dem Zeilenende.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 18 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit <code class="i">~/daten/people.csv</code> aus den Beispieldaten.</p>
+<p><b>a)</b> Erzeuge dieselbe Datei mit einem einzigen Umleitungszeichen.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>{ head -n 1 ~/daten/people.csv; grep -F 'u3,' ~/daten/people.csv; } &gt; notes/p2.csv
+(head -n 1 ~/daten/people.csv; grep -F 'u3,' ~/daten/people.csv) &gt; notes/p3.csv</code></pre>
+<p class="ex">Die Klammern fassen mehrere Befehle zu einer Gruppe zusammen, deren gesamte Ausgabe umgeleitet wird. Bei <code class="i">{ … }</code> braucht es Leerzeichen innen und ein Semikolon vor <code class="i">}</code>. Der Vorteil: Die Datei wird nur einmal geschrieben, ein versehentliches <code class="i">&gt;</code> beim zweiten Befehl ist ausgeschlossen.</p></details>
+<p><b>b)</b> Suche den Eintrag mit anderen Mitteln, genauer als mit <code class="i">grep -F</code>.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>grep -Fw 'u3' ~/daten/people.csv          # -w: nur ganze Wörter, u31 fällt weg
+grep '^u3,' ~/daten/people.csv            # Regex: Zeile beginnt mit u3,
+grep -Fx 'u3,Carla,Köln' ~/daten/people.csv   # -x: ganze Zeile exakt
+awk -F, '$1=="u3"' ~/daten/people.csv     # erstes Feld ist genau u3</code></pre>
+<p class="ex">Je genauer das Muster, desto weniger unerwünschte Treffer. <code class="i">awk</code> prüft ein Feld und ist am robustesten, wenn die ID in einer bestimmten Spalte steht.</p></details>
+<p><b>c)</b> Kopfzeile und Eintrag in einem <code class="i">awk</code>- oder <code class="i">sed</code>-Aufruf.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>awk -F, 'NR==1 || $1=="u3"' ~/daten/people.csv
+sed -n '1p;/^u3,/p' ~/daten/people.csv</code></pre>
+<p class="ex"><code class="i">NR==1</code> ist die erste Zeile (Kopfzeile), <code class="i">||</code> heißt „oder“. Bei <code class="i">sed</code> gibt <code class="i">-n</code> mit <code class="i">1p</code> die erste Zeile aus und <code class="i">/^u3,/p</code> die passenden.</p></details>
+<p><b>d)</b> Zeige alle Zeilen aus Berlin, aber ohne die Kopfzeile.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>tail -n +2 ~/daten/people.csv | grep -F 'Berlin'      # u1 Anna, u31 Dino</code></pre>
+<p class="ex"><code class="i">tail -n +2</code> beginnt ab Zeile 2 und überspringt damit die Kopfzeile. So kann sie nicht versehentlich mitgefunden werden.</p></details>
+<p><b>e)</b> Zeige, warum <code class="i">-F</code> bei Sonderzeichen wichtig ist.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>printf 'a.b\naxb\n' | grep 'a.b'         # a.b  und  axb  (. = beliebiges Zeichen)
+printf 'a.b\naxb\n' | grep -F 'a.b'       # nur a.b</code></pre>
+<p class="ex">Im regulären Ausdruck steht der Punkt für jedes beliebige Zeichen. Mit <code class="i">-F</code> bleibt er ein Punkt. Das ist wichtig bei E-Mail-Adressen, IP-Adressen oder Dateinamen.</p></details>
+<p><b>f)</b> Zähle die Datensätze (ohne Kopfzeile) und zeige die Zeilennummer Ihres Eintrags.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>tail -n +2 ~/daten/people.csv | wc -l           # 5 Datensätze
+grep -nF 'u3,' ~/daten/people.csv               # 4:u3,Carla,Köln</code></pre>
+<p class="ex"><code class="i">-n</code> zeigt die Zeilennummer in der Quelldatei. Die Kopfzeile ist Zeile 1, Ihr Eintrag Zeile 4.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
