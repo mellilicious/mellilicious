@@ -1013,6 +1013,76 @@ echo $?            # 0 = Erfolg</code></pre>
 <p class="ex">Keine Meldung und Exit-Code <code class="i">0</code>: Alles war schon vorhanden, <code class="i">-p</code> hat nichts geändert. Ohne <code class="i">-p</code> käme <code class="i">File exists</code>.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 6 · Versteckte Datei anlegen</h3>
+<p><b>Aufgabe:</b> Lege mit <code class="i">echo</code> die Datei <code class="i">~/uebung/.profile-note</code> an, die den Text <code class="i">hidden</code> enthält. Finde sie danach mit <code class="i">ls -a</code>.</p>
+<p class="ex">Geübt wird: Text mit <code class="i">echo</code> in eine Datei schreiben, versteckte Dateien (Name beginnt mit einem Punkt) und die Option <code class="i">-a</code> von <code class="i">ls</code>.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+echo hidden &gt; .profile-note       # Datei mit dem Inhalt "hidden" anlegen
+
+ls                                # die Datei fehlt in der Liste
+ls -a                             # jetzt ist .profile-note zu sehen
+cat .profile-note                 # Kontrolle: gibt  hidden  aus</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Befehl</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>echo hidden</code></td><td>Gibt den Text <code>hidden</code> gefolgt von einem Zeilenumbruch aus.</td></tr>
+<tr><td class="nw"><code>&gt; .profile-note</code></td><td>Leitet die Ausgabe in die Datei um. Existiert sie nicht, wird sie angelegt, sonst überschrieben.</td></tr>
+<tr><td class="nw"><code>ls</code></td><td>Zeigt nur normale Dateien, versteckte werden übersprungen.</td></tr>
+<tr><td class="nw"><code>ls -a</code></td><td><b>a</b>ll: zeigt auch versteckte Einträge, dazu <code>.</code> (aktueller Ordner) und <code>..</code> (der Ordner darüber).</td></tr>
+<tr><td class="nw"><code>ls -A</code></td><td>Wie <code>-a</code>, aber ohne <code>.</code> und <code>..</code>.</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Versteckt heißt nur: Name beginnt mit einem Punkt.</b> Es gibt kein Versteck-Attribut. <code class="i">ls</code> und Dateimanager blenden solche Einträge standardmäßig aus, damit Konfigurationsdateien wie <code class="i">.bashrc</code> oder <code class="i">.ssh</code> den Alltag nicht überladen.</p>
+<p><b>Kein Schutz:</b> Jeder, der <code class="i">ls -a</code> kennt, sieht die Datei. Verstecken ist Ordnung, keine Sicherheit. Zugriff regeln Dateirechte (Übung 3).</p>
+<p><b><code class="i">echo</code> statt Editor:</b> Mit <code class="i">echo text &gt; datei</code> legen Sie in einem Schritt eine kleine Datei an, ohne einen Editor zu öffnen. Das ist üblich in Skripten und bei Tests.</p>
+<p><b>Genau der Pfad zählt:</b> <code class="i">~</code> allein ist Ihr Home-Verzeichnis, <code class="i">~/uebung</code> der Übungsordner. Die Datei muss dort liegen, wo die Aufgabe sie verlangt.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td>Punkt vergessen (<code>profile-note</code>)</td><td>Die Datei ist normal sichtbar, aber hat den falschen Namen.</td></tr>
+<tr><td><code>ls</code> statt <code>ls -a</code></td><td>Die Datei scheint zu fehlen, obwohl sie da ist.</td></tr>
+<tr><td>Falscher Ordner (<code>~/.profile-note</code>)</td><td>Die Datei liegt im Home-Verzeichnis statt in <code>~/uebung</code>. Mit <code>pwd</code> vor dem Anlegen prüfen.</td></tr>
+<tr><td>Text mit Leerzeichen ohne Anführungszeichen</td><td>Funktioniert bei <code>echo</code>, aber mehrere Leerzeichen werden zu einem. Besser <code>echo "text  mit  Abstand"</code>.</td></tr>
+<tr><td><code>&gt;</code> auf bestehende Datei</td><td>Der alte Inhalt ist weg. Zum Anhängen <code>&gt;&gt;</code> benutzen.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 6 · Zum Weiterüben</h3>
+<p class="ex">Alle Befehle im Übungsordner <code class="i">~/uebung</code> ausführen.</p>
+<p><b>a)</b> Zeige alle Einträge, aber ohne <code class="i">.</code> und <code class="i">..</code>.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>ls -A</code></pre>
+<p class="ex"><code class="i">-A</code> (großes A) steht für „almost all“. Es zeigt versteckte Einträge, lässt aber die beiden Sonderverweise <code class="i">.</code> und <code class="i">..</code> weg.</p></details>
+<p><b>b)</b> Prüfe, ob in <code class="i">.profile-note</code> wirklich nur <code class="i">hidden</code> mit Zeilenumbruch steht.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>cat -A .profile-note
+# hidden$          ($ markiert das Zeilenende)
+
+echo -n hidden &gt; .ohne-umbruch    # -n: ohne Zeilenumbruch
+cat -A .ohne-umbruch
+# hidden           (kein $)</code></pre>
+<p class="ex"><code class="i">cat -A</code> macht unsichtbare Zeichen sichtbar. <code class="i">echo</code> hängt normalerweise einen Zeilenumbruch an, <code class="i">-n</code> unterdrückt ihn.</p></details>
+<p><b>c)</b> Hänge der Datei eine zweite Zeile <code class="i">mehr</code> an.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>echo mehr &gt;&gt; .profile-note
+cat .profile-note</code></pre>
+<p class="ex"><code class="i">&gt;&gt;</code> hängt an, <code class="i">&gt;</code> würde die Datei überschreiben.</p></details>
+<p><b>d)</b> Lege einen versteckten Ordner <code class="i">.config-test</code> an und liste nur die versteckten Einträge im aktuellen Ordner.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>mkdir .config-test
+find . -maxdepth 1 -name ".*"      # nur Einträge, deren Name mit . beginnt
+ls -d .*                           # alternativ mit Platzhalter</code></pre>
+<p class="ex">Auch Ordner werden mit einem Punkt versteckt. <code class="i">-maxdepth 1</code> beschränkt <code class="i">find</code> auf den aktuellen Ordner. Das Ergebnis von <code class="i">find</code> enthält zusätzlich <code class="i">.</code> selbst.</p></details>
+<p><b>e)</b> Warum zeigt <code class="i">ls *</code> die versteckte Datei nicht?</p>
+<details><summary>Lösung e)</summary>
+<pre><code>echo *             # sichtbare Namen, ohne versteckte
+echo .*            # Namen, die mit . beginnen</code></pre>
+<p class="ex">Der Platzhalter <code class="i">*</code> trifft Namen mit führendem Punkt nicht. Deshalb löscht <code class="i">rm *</code> versteckte Dateien nicht mit. Je nach Bash-Version enthält <code class="i">.*</code> auch <code class="i">.</code> und <code class="i">..</code>. Mit <code class="i">rm -r .*</code> kann man dann den Ordner darüber erwischen, daher solche Muster vermeiden.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
