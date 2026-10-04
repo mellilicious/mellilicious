@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linux CheatSheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Fira+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: sticky Themen-Navigation links, Befehls-Karten in mehrspaltigem Fluss rechts; Palette: Schiefergrau mit Tux-Gelb */
+:root{
+  --bg:#eceff0; --surface:#fafbfb; --fg:#1b1f23; --muted:#59636b; --line:#cfd5d9;
+  --accent:#8f5f00; --accent-soft:#f5e9c8; --code-bg:#14171a; --code-fg:#d6dbde; --tbl:#e3e7e9;
+  --k:#f2b73f; --s:#9bd16b; --c:#79838b; --a:#6fc1df; --n:#e0a96d; --v:#c9a0e8;
+  --f-display:'Fira Code',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;
+  --f-body:'Fira Sans','Segoe UI',system-ui,sans-serif;
+  --f-mono:'Fira Code',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16191c; --surface:#1f2428; --fg:#e4e8ea; --muted:#98a2aa; --line:#333b41;
+    --accent:#f2b73f; --accent-soft:#3a3118; --code-bg:#0e1012; --code-fg:#d6dbde; --tbl:#292f34;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16191c; --surface:#1f2428; --fg:#e4e8ea; --muted:#98a2aa; --line:#333b41;
+  --accent:#f2b73f; --accent-soft:#3a3118; --code-bg:#0e1012; --code-fg:#d6dbde; --tbl:#292f34;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1320px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+@media(min-width:960px){.wrap{grid-template-columns:210px minmax(0,1fr);gap:32px}}
+header.top{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(1.7rem,4.6vw,2.6rem);line-height:1.1;margin:0;letter-spacing:-.03em;text-wrap:balance}
+h1 .pr{color:var(--accent);margin-right:.35em}
+h1 .cur{display:inline-block;width:.5em;height:.9em;background:var(--accent);vertical-align:-.1em;margin-left:.15em}
+.sub{color:var(--muted);margin:8px 0 0;max-width:62ch}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+input[type=search]{font:inherit;padding:9px 12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:4px;width:min(100%,270px)}
+button{font:inherit;cursor:pointer}
+.btn{padding:9px 12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:4px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+nav{min-width:0}
+nav ul{list-style:none;margin:0;padding:0;display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
+nav a{display:block;white-space:nowrap;padding:5px 10px;border:1px solid var(--line);border-radius:4px;color:var(--fg);text-decoration:none;font-size:13px;background:var(--surface)}
+nav a:hover{border-color:var(--accent);color:var(--accent)}
+nav .grp{display:none}
+@media(min-width:960px){
+  nav{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);overflow-y:auto}
+  nav ul{flex-direction:column;gap:0;overflow:visible}
+  nav a{border:0;border-left:2px solid var(--line);border-radius:0 4px 4px 0;background:transparent;padding:5px 10px}
+  nav a:hover{border-left-color:var(--accent);background:var(--accent-soft)}
+  nav .grp{display:block;margin:14px 0 4px;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+}
+main{min-width:0}
+section{margin-bottom:40px;scroll-margin-top:16px}
+h2{font-family:var(--f-display);font-weight:700;font-size:1.4rem;margin:0 0 14px;letter-spacing:-.02em;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h2::before{content:"#";color:var(--accent)}
+h2 small{font-family:var(--f-body);font-size:12px;font-weight:500;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:3px;letter-spacing:.04em;text-transform:uppercase}
+.grid{columns:2 380px;column-gap:16px}
+.blk{break-inside:avoid;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px;margin:0 0 16px;min-width:0}
+.blk.wide{column-span:all}
+.blk h3{margin:0 0 8px;font-family:var(--f-mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.blk p{margin:0 0 8px}
+.blk p:last-child{margin-bottom:0}
+.blk p.ex{color:var(--muted);font-size:13.5px}
+.code{position:relative;margin:0 0 8px}
+.code:last-child{margin-bottom:0}
+pre{margin:0;background:var(--code-bg);color:var(--code-fg);border-radius:4px;padding:12px 14px;overflow-x:auto;font-family:var(--f-mono);font-size:12.5px;line-height:1.65;tab-size:4}
+pre code{font:inherit}
+.cp{position:absolute;top:6px;right:6px;font-size:11px;padding:2px 8px;border-radius:3px;border:1px solid #444d54;background:#232a2f;color:#d6dbde;opacity:0}
+.code:hover .cp,.cp:focus-visible{opacity:1}
+@media(hover:none){.cp{opacity:.85}}
+.k{color:var(--k)}.s{color:var(--s)}.c{color:var(--c);font-style:italic}.a{color:var(--a)}.n{color:var(--n)}.v{color:var(--v)}
+code.i{font-family:var(--f-mono);font-size:.84em;background:var(--tbl);padding:1px 5px;border-radius:3px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--tbl);font-weight:600;white-space:nowrap}
+td code{font-family:var(--f-mono);font-size:12px}
+td.nw{white-space:nowrap}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:8px 12px;border-radius:0 4px 4px 0;font-size:13.5px;margin:0 0 8px}
+.warn{border-left-color:#c2410c}
+.empty{color:var(--muted);padding:24px 0}
+.hide{display:none!important}
+footer{grid-column:1/-1;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div>
+    <h1><span class="pr">$</span>Linux CheatSheet<span class="cur" aria-hidden="true"></span></h1>
+    <p class="sub">Die wichtigsten Befehle für die Shell: Navigation, Dateien, Text, Rechte, Prozesse, Netzwerk, Pakete und Shell-Skripte. Code-Blöcke lassen sich per Klick kopieren.</p>
+  </div>
+  <div class="tools">
+    <input type="search" id="q" placeholder="Suchen, z. B. grep, chmod, tar" aria-label="Cheatsheet durchsuchen">
+    <button class="btn" id="theme" type="button" aria-label="Farbschema wechseln">Hell / Dunkel</button>
+  </div>
+</header>
+<nav aria-label="Themen"><ul id="nav"></ul></nav>
+<main id="main">
+
+<section id="navigation" data-grp="Grundlagen"><h2>Navigation</h2><div class="grid">
+<div class="blk"><h3>Wo bin ich, was liegt hier?</h3>
+<p class="ex">Die Shell arbeitet immer in einem aktuellen Verzeichnis. Mit diesen Befehlen sehen Sie es und wechseln dorthin, wo Sie arbeiten wollen.</p>
+<pre><code>pwd                  # aktuelles Verzeichnis anzeigen
+ls                   # Inhalt auflisten
+ls -la               # Details inkl. versteckter Dateien (.name)
+ls -lh               # Größen lesbar (KB, MB)
+cd /var/log          # absoluter Pfad
+cd ..                # eine Ebene hoch
+cd ~                 # Home-Verzeichnis (auch nur: cd)
+cd -                 # zurück zum letzten Verzeichnis</code></pre></div>
+
+<div class="blk"><h3>Hilfe finden</h3>
+<p class="ex">Fast jeder Befehl dokumentiert sich selbst. <code class="i">man</code> öffnet die Handbuchseite, <code class="i">--help</code> gibt eine Kurzfassung aus.</p>
+<pre><code>man ls               # Handbuch (q beendet, / sucht)
+ls --help            # Kurzhilfe
+man -k kopieren      # Handbücher nach Stichwort durchsuchen
+type cd              # Art des Befehls (builtin, alias, Datei)
+which python3        # Pfad des Programms
+history              # Befehlsverlauf
+!!                   # letzten Befehl wiederholen
+sudo !!              # ... diesmal mit sudo</code></pre></div>
+
+<div class="blk"><h3>Tastenkürzel im Terminal</h3>
+<p class="ex">Sie sparen viel Tipparbeit, vor allem Tab und Strg+R.</p><div class="tw"><table>
+<tr><th>Taste</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>Tab</code></td><td>Befehl/Pfad vervollständigen (zweimal: Vorschläge)</td></tr>
+<tr><td class="nw"><code>Strg+C</code></td><td>laufenden Befehl abbrechen</td></tr>
+<tr><td class="nw"><code>Strg+D</code></td><td>Eingabe beenden / Shell verlassen</td></tr>
+<tr><td class="nw"><code>Strg+Z</code></td><td>Prozess anhalten (weiter mit <code>fg</code>/<code>bg</code>)</td></tr>
+<tr><td class="nw"><code>Strg+R</code></td><td>im Verlauf rückwärts suchen</td></tr>
+<tr><td class="nw"><code>Strg+A / Strg+E</code></td><td>Zeilenanfang / Zeilenende</td></tr>
+<tr><td class="nw"><code>Strg+U / Strg+K</code></td><td>bis Anfang / bis Ende der Zeile löschen</td></tr>
+<tr><td class="nw"><code>Strg+W</code></td><td>letztes Wort löschen</td></tr>
+<tr><td class="nw"><code>Strg+L</code></td><td>Bildschirm leeren (wie <code>clear</code>)</td></tr>
+<tr><td class="nw"><code>↑ / ↓</code></td><td>durch frühere Befehle blättern</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Wichtige Verzeichnisse</h3>
+<p class="ex">Unter Linux gibt es nur einen Verzeichnisbaum, der bei <code class="i">/</code> beginnt. Laufwerke werden irgendwo in diesen Baum eingehängt.</p><div class="tw"><table>
+<tr><th>Pfad</th><th>Inhalt</th></tr>
+<tr><td class="nw"><code>/</code></td><td>Wurzel des gesamten Dateisystems</td></tr>
+<tr><td class="nw"><code>/home/name</code></td><td>Persönliche Dateien der Benutzer (<code>~</code>)</td></tr>
+<tr><td class="nw"><code>/root</code></td><td>Home-Verzeichnis des Administrators</td></tr>
+<tr><td class="nw"><code>/etc</code></td><td>Konfigurationsdateien</td></tr>
+<tr><td class="nw"><code>/var/log</code></td><td>Logdateien</td></tr>
+<tr><td class="nw"><code>/usr/bin</code>, <code>/bin</code></td><td>Programme</td></tr>
+<tr><td class="nw"><code>/tmp</code></td><td>Temporäre Dateien (wird beim Neustart geleert)</td></tr>
+<tr><td class="nw"><code>/dev</code></td><td>Geräte als Dateien (z. B. <code>/dev/sda</code>)</td></tr>
+<tr><td class="nw"><code>/proc</code>, <code>/sys</code></td><td>Systeminformationen des Kernels</td></tr>
+<tr><td class="nw"><code>/mnt</code>, <code>/media</code></td><td>Eingehängte Laufwerke</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Umgebung &amp; Konfiguration</h3>
+<p class="ex">Umgebungsvariablen steuern Programme. Dauerhafte Einstellungen gehören in die Konfiguration Ihrer Shell, bei Bash ist das <code class="i">~/.bashrc</code>.</p>
+<pre><code>echo $HOME $USER $PATH   # Variablen ausgeben
+env                      # alle Umgebungsvariablen
+export EDITOR=nano       # Variable für Kindprozesse setzen
+export PATH="$PATH:$HOME/bin"
+
+alias ll='ls -lah'       # Abkürzung definieren
+unalias ll
+
+source ~/.bashrc         # Konfiguration neu laden</code></pre></div>
+</div></section>
+
+<section id="dateien" data-grp="Dateien &amp; Text"><h2>Dateien &amp; Verzeichnisse</h2><div class="grid">
+<div class="blk"><h3>Anlegen, kopieren, verschieben, löschen</h3>
+<p class="ex">Verschieben und Umbenennen ist derselbe Befehl (<code class="i">mv</code>). Gelöscht wird endgültig, es gibt keinen Papierkorb.</p>
+<pre><code>mkdir projekt            # Verzeichnis anlegen
+mkdir -p a/b/c           # inkl. fehlender Elternverzeichnisse
+touch datei.txt          # leere Datei anlegen / Zeitstempel setzen
+
+cp a.txt b.txt           # Datei kopieren
+cp -r ordner/ kopie/     # Verzeichnis rekursiv kopieren
+mv alt.txt neu.txt       # umbenennen
+mv datei.txt ~/Dokumente/  # verschieben
+
+rm datei.txt             # Datei löschen
+rm -r ordner/            # Verzeichnis löschen
+rmdir leer/              # nur leeres Verzeichnis löschen</code></pre>
+<p class="note warn"><b>Vorsicht:</b> <code class="i">rm -rf</code> fragt nicht nach und löscht alles darunter. Pfad vorher mit <code class="i">ls</code> prüfen, vor allem mit <code class="i">sudo</code>.</p></div>
+
+<div class="blk"><h3>Dateien ansehen</h3>
+<p class="ex">Für kurze Dateien reicht <code class="i">cat</code>, für lange nimmt man <code class="i">less</code>. Mit <code class="i">tail -f</code> verfolgen Sie Logdateien live.</p>
+<pre><code>cat datei.txt            # ganze Datei ausgeben
+less datei.txt           # blättern (q beenden, / suchen)
+head -n 20 datei.txt     # erste 20 Zeilen
+tail -n 20 datei.txt     # letzte 20 Zeilen
+tail -f /var/log/syslog  # neue Zeilen live mitlesen
+wc -l datei.txt          # Zeilen zählen
+file bild.png            # Dateityp erkennen</code></pre></div>
+
+<div class="blk"><h3>Links &amp; Datei-Infos</h3>
+<p class="ex">Ein symbolischer Link ist eine Verknüpfung auf eine andere Datei oder einen Ordner.</p>
+<pre><code>ln -s /pfad/ziel linkname   # symbolischer Link
+ls -l                       # Links erscheinen als  name -&gt; ziel
+stat datei.txt              # Größe, Rechte, Zeitstempel
+du -sh ordner/              # Größe eines Ordners
+tree -L 2                   # Verzeichnisbaum (2 Ebenen)</code></pre></div>
+
+<div class="blk"><h3>Dateien suchen</h3>
+<p class="ex"><code class="i">find</code> durchsucht das Dateisystem live nach Name, Typ, Größe oder Alter. <code class="i">locate</code> nutzt eine Datenbank und ist schneller.</p>
+<pre><code>find . -name "*.log"            # nach Name
+find . -iname "*.jpg"           # Groß-/Kleinschreibung egal
+find /var -type d -name cache   # nur Verzeichnisse (-type f: Dateien)
+find . -size +100M              # größer als 100 MB
+find . -mtime -7                # in den letzten 7 Tagen geändert
+find . -name "*.tmp" -delete    # gefundene Dateien löschen
+find . -name "*.sh" -exec chmod +x {} \;
+
+locate datei.txt                # (vorher: sudo updatedb)</code></pre></div>
+
+<div class="blk"><h3>Editoren im Terminal</h3>
+<p class="ex"><code class="i">nano</code> ist einfach, <code class="i">vim</code> ist mächtig, aber gewöhnungsbedürftig: Es hat Modi, und man kommt nur mit den richtigen Tasten wieder heraus.</p>
+<pre><code>nano datei.txt     # Strg+O speichern, Strg+X beenden
+
+vim datei.txt
+#   i          Einfügemodus      Esc  zurück in den Normalmodus
+#   :w         speichern         :q   beenden
+#   :wq        speichern + beenden
+#   :q!        beenden ohne speichern
+#   /text      suchen            dd   Zeile löschen</code></pre></div>
+</div></section>
+
+<section id="text" data-grp="Dateien &amp; Text"><h2>Text &amp; Pipes</h2><div class="grid">
+<div class="blk"><h3>grep: Text suchen</h3>
+<p class="ex"><code class="i">grep</code> filtert Zeilen, die ein Muster enthalten. Es ist das Werkzeug, das Sie am häufigsten brauchen werden.</p>
+<pre><code>grep "fehler" datei.log        # Zeilen mit "fehler"
+grep -i "fehler" datei.log     # Groß-/Kleinschreibung egal
+grep -n "fehler" datei.log     # mit Zeilennummern
+grep -v "debug" datei.log      # Zeilen OHNE "debug"
+grep -c "fehler" datei.log     # Treffer zählen
+grep -r "TODO" src/            # rekursiv in Ordner
+grep -E "err|warn" datei.log   # erweiterter Regex (oder)
+grep -C 2 "fehler" datei.log   # 2 Zeilen Kontext</code></pre></div>
+
+<div class="blk"><h3>Pipes &amp; Umleitung</h3>
+<p class="ex">Die Pipe <code class="i">|</code> reicht die Ausgabe eines Befehls als Eingabe an den nächsten weiter. Mit <code class="i">&gt;</code> landet die Ausgabe stattdessen in einer Datei.</p><div class="tw"><table>
+<tr><th>Zeichen</th><th>Bedeutung</th></tr>
+<tr><td class="nw"><code>cmd &gt; datei</code></td><td>Ausgabe in Datei schreiben (überschreibt)</td></tr>
+<tr><td class="nw"><code>cmd &gt;&gt; datei</code></td><td>Ausgabe anhängen</td></tr>
+<tr><td class="nw"><code>cmd &lt; datei</code></td><td>Datei als Eingabe verwenden</td></tr>
+<tr><td class="nw"><code>cmd 2&gt; fehler.txt</code></td><td>nur Fehlermeldungen umleiten</td></tr>
+<tr><td class="nw"><code>cmd &amp;&gt; alles.txt</code></td><td>Ausgabe und Fehler in eine Datei</td></tr>
+<tr><td class="nw"><code>cmd 2&gt;/dev/null</code></td><td>Fehlermeldungen verwerfen</td></tr>
+<tr><td class="nw"><code>a | b</code></td><td>Ausgabe von a wird Eingabe von b</td></tr>
+<tr><td class="nw"><code>a &amp;&amp; b</code></td><td>b nur, wenn a erfolgreich war</td></tr>
+<tr><td class="nw"><code>a || b</code></td><td>b nur, wenn a fehlgeschlagen ist</td></tr>
+<tr><td class="nw"><code>a ; b</code></td><td>nacheinander, unabhängig vom Ergebnis</td></tr>
+</table></div>
+<pre><code>ls -l | grep ".txt" | wc -l        # .txt-Dateien zählen
+cmd | tee ausgabe.txt              # anzeigen UND speichern
+find . -name "*.log" | xargs rm    # Treffer als Argumente weitergeben</code></pre></div>
+
+<div class="blk"><h3>Text bearbeiten</h3>
+<p class="ex">Kleine Werkzeuge, die sich per Pipe kombinieren lassen: Spalten ausschneiden, sortieren, Duplikate zählen, ersetzen.</p>
+<pre><code>sort datei.txt              # alphabetisch sortieren
+sort -n zahlen.txt          # numerisch
+sort -r datei.txt           # umgekehrt
+sort datei.txt | uniq       # Duplikate entfernen
+sort datei.txt | uniq -c    # Duplikate zählen
+cut -d',' -f1,3 daten.csv   # Spalten 1 und 3 (Trenner Komma)
+tr 'a-z' 'A-Z' &lt; datei.txt   # in Großbuchstaben umwandeln
+diff alt.txt neu.txt        # Unterschiede anzeigen</code></pre></div>
+
+<div class="blk"><h3>sed &amp; awk</h3>
+<p class="ex"><code class="i">sed</code> ersetzt Text Zeile für Zeile, <code class="i">awk</code> verarbeitet Spalten (Felder). Beide sind kleine Programmiersprachen, hier nur die häufigsten Fälle.</p>
+<pre><code>sed 's/alt/neu/' datei.txt        # erstes "alt" pro Zeile ersetzen
+sed 's/alt/neu/g' datei.txt       # alle ersetzen
+sed -i 's/alt/neu/g' datei.txt    # direkt in der Datei ändern
+sed -n '5,10p' datei.txt          # Zeilen 5 bis 10 ausgeben
+sed '/^#/d' datei.txt             # Kommentarzeilen entfernen
+
+awk '{print $1}' datei.txt        # erste Spalte
+awk -F: '{print $1, $3}' /etc/passwd   # Trenner ":" , Spalte 1 und 3
+awk '$3 &gt; 100' daten.txt          # Zeilen mit Spalte 3 &gt; 100
+awk '{s+=$1} END {print s}' zahlen.txt  # Summe der ersten Spalte</code></pre></div>
+
+<div class="blk"><h3>Archive &amp; Kompression</h3>
+<p class="ex">Mit <code class="i">tar</code> packt man viele Dateien in ein Archiv, mit <code class="i">gzip</code> (Option <code class="i">z</code>) wird es zusätzlich komprimiert.</p>
+<pre><code>tar -czvf backup.tar.gz ordner/   # packen + komprimieren
+tar -xzvf backup.tar.gz           # entpacken
+tar -xzvf backup.tar.gz -C /ziel  # in anderes Verzeichnis entpacken
+tar -tzvf backup.tar.gz           # Inhalt anzeigen
+
+zip -r archiv.zip ordner/
+unzip archiv.zip
+gzip datei.txt                    # -&gt; datei.txt.gz
+gunzip datei.txt.gz</code></pre>
+<p>Merkhilfe: <b>c</b>reate, e<b>x</b>tract, <b>z</b> = gzip, <b>v</b>erbose, <b>f</b>ile.</p></div>
+</div></section>
+
+<section id="rechte" data-grp="System"><h2>Rechte &amp; Benutzer</h2><div class="grid">
+<div class="blk"><h3>Dateirechte lesen</h3>
+<p class="ex">Jede Datei hat Rechte für den Besitzer (<b>u</b>), die Gruppe (<b>g</b>) und alle anderen (<b>o</b>). Pro Gruppe gibt es lesen (r), schreiben (w) und ausführen (x).</p>
+<pre><code>-rwxr-xr--  1 anna dev  4096 Mar  3 10:00 skript.sh
+│└┬┘└┬┘└┬┘     │    │
+│ │  │  └ andere: nur lesen (r--)
+│ │  └ Gruppe: lesen + ausführen (r-x)
+│ └ Besitzer: alles (rwx)
+└ Typ: - Datei, d Verzeichnis, l Link</code></pre>
+<div class="tw"><table>
+<tr><th>Zahl</th><th>Recht</th><th>Zahl</th><th>Recht</th></tr>
+<tr><td><code>4</code></td><td>r (lesen)</td><td><code>6</code></td><td>rw-</td></tr>
+<tr><td><code>2</code></td><td>w (schreiben)</td><td><code>5</code></td><td>r-x</td></tr>
+<tr><td><code>1</code></td><td>x (ausführen)</td><td><code>7</code></td><td>rwx</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>chmod &amp; chown</h3>
+<p class="ex"><code class="i">chmod</code> ändert die Rechte, <code class="i">chown</code> den Besitzer. Zahlen: eine Ziffer pro Gruppe (Besitzer, Gruppe, andere).</p>
+<pre><code>chmod 755 skript.sh        # rwxr-xr-x  (Programme, Ordner)
+chmod 644 datei.txt        # rw-r--r--  (normale Dateien)
+chmod 600 id_rsa           # rw-------  (nur Besitzer, z. B. SSH-Schlüssel)
+chmod +x skript.sh         # ausführbar machen
+chmod u+w,g-w datei.txt    # Besitzer +schreiben, Gruppe -schreiben
+chmod -R 755 ordner/       # rekursiv
+
+chown anna datei.txt       # Besitzer ändern
+chown anna:dev datei.txt   # Besitzer und Gruppe
+sudo chown -R www-data: /var/www</code></pre>
+<p class="note warn"><code class="i">chmod 777</code> erlaubt jedem alles. Vermeiden, es löst selten ein Problem sauber.</p></div>
+
+<div class="blk"><h3>sudo &amp; Benutzer</h3>
+<p class="ex"><code class="i">sudo</code> führt einen einzelnen Befehl mit Administratorrechten aus. Dauerhaft als root zu arbeiten ist nicht empfehlenswert.</p>
+<pre><code>whoami                     # aktueller Benutzer
+id                         # UID, GID, Gruppen
+sudo befehl                # als root ausführen
+sudo -i                    # Root-Shell (mit exit verlassen)
+su - anna                  # zu anderem Benutzer wechseln
+
+sudo useradd -m -s /bin/bash neu   # Benutzer mit Home anlegen
+sudo passwd neu                    # Passwort setzen
+sudo usermod -aG sudo neu          # zur Gruppe sudo hinzufügen
+sudo userdel -r neu                # Benutzer samt Home löschen
+groups anna                        # Gruppen anzeigen</code></pre></div>
+</div></section>
+
+<section id="prozesse" data-grp="System"><h2>Prozesse &amp; Dienste</h2><div class="grid">
+<div class="blk"><h3>Prozesse ansehen &amp; beenden</h3>
+<p class="ex">Jedes laufende Programm ist ein Prozess mit einer Nummer (PID). Mit der PID kann man ihn beenden.</p>
+<pre><code>ps aux                     # alle Prozesse
+ps aux | grep nginx        # bestimmten Prozess suchen
+top                        # Live-Übersicht (q beendet)
+htop                       # komfortablere Variante
+pgrep nginx                # PID nach Name
+
+kill 1234                  # Prozess höflich beenden (SIGTERM)
+kill -9 1234               # hart beenden (SIGKILL), nur im Notfall
+pkill nginx                # nach Name beenden
+killall firefox</code></pre></div>
+
+<div class="blk"><h3>Hintergrund &amp; Jobs</h3>
+<p class="ex">Ein <code class="i">&amp;</code> am Ende startet einen Befehl im Hintergrund, die Shell bleibt benutzbar.</p>
+<pre><code>langerbefehl &amp;            # im Hintergrund starten
+jobs                      # laufende Jobs der Shell
+fg %1                     # Job 1 in den Vordergrund
+bg %1                     # angehaltenen Job im Hintergrund fortsetzen
+nohup befehl &amp;            # läuft weiter, auch nach dem Abmelden
+nice -n 10 befehl         # mit niedrigerer Priorität starten</code></pre></div>
+
+<div class="blk"><h3>systemd: Dienste steuern</h3>
+<p class="ex">Fast alle modernen Distributionen verwalten Hintergrunddienste mit <code class="i">systemctl</code>. <code class="i">enable</code> startet einen Dienst beim Booten, <code class="i">start</code> sofort.</p>
+<pre><code>systemctl status nginx          # Zustand und letzte Logzeilen
+sudo systemctl start nginx
+sudo systemctl stop nginx
+sudo systemctl restart nginx    # stoppen + starten
+sudo systemctl reload nginx     # Konfiguration neu laden, ohne Neustart
+sudo systemctl enable nginx     # beim Booten starten
+sudo systemctl enable --now nginx   # aktivieren und sofort starten
+sudo systemctl disable nginx
+systemctl list-units --type=service --state=running
+systemctl --failed              # fehlgeschlagene Dienste</code></pre></div>
+
+<div class="blk"><h3>Logs mit journalctl</h3>
+<p class="ex">Das systemd-Journal sammelt die Logs aller Dienste an einer Stelle.</p>
+<pre><code>journalctl -u nginx             # Logs eines Dienstes
+journalctl -u nginx -f          # live mitlesen
+journalctl -b                   # seit dem letzten Boot
+journalctl -p err               # nur Fehler und schlimmer
+journalctl --since "1 hour ago"
+journalctl --disk-usage</code></pre></div>
+
+<div class="blk"><h3>Eigener Dienst (Unit-Datei)</h3>
+<p class="ex">Legen Sie die Datei unter <code class="i">/etc/systemd/system/meindienst.service</code> an und laden Sie systemd danach neu.</p>
+<pre data-lang="plain"><code>[Unit]
+Description=Mein Dienst
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/meindienst
+Restart=on-failure
+User=dienst
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+<pre><code>sudo systemctl daemon-reload
+sudo systemctl enable --now meindienst</code></pre></div>
+
+<div class="blk"><h3>Zeitgesteuerte Aufgaben (cron)</h3>
+<p class="ex">Cron führt Befehle zu festen Zeiten aus. Die Aufgaben stehen in der Crontab, bearbeitet wird sie mit <code class="i">crontab -e</code>.</p>
+<pre><code>crontab -e     # eigene Crontab bearbeiten
+crontab -l     # anzeigen</code></pre>
+<pre data-lang="plain"><code># Min  Std  Tag  Monat  Wochentag   Befehl
+# 0-59 0-23 1-31 1-12   0-7 (0 und 7 = Sonntag)
+*/5   *    *    *      *           /pfad/check.sh     # alle 5 Minuten
+0     3    *    *      *           /pfad/backup.sh    # täglich um 03:00
+30    8    *    *      1-5         /pfad/job.sh       # Mo-Fr um 08:30
+@reboot                            /pfad/start.sh     # bei jedem Start</code></pre></div>
+</div></section>
+
+<section id="system" data-grp="System"><h2>Systeminfo &amp; Speicher</h2><div class="grid">
+<div class="blk"><h3>System &amp; Hardware</h3>
+<p class="ex">Schnelle Antworten auf: Welche Distribution, welcher Kernel, wie viel RAM, was für Hardware?</p>
+<pre><code>uname -a               # Kernel und Architektur
+cat /etc/os-release    # Distribution und Version
+hostnamectl            # Hostname, OS, Kernel auf einen Blick
+uptime                 # Laufzeit und Last
+date                   # Datum und Uhrzeit
+lscpu                  # Prozessor
+free -h                # Arbeitsspeicher
+lspci                  # PCI-Geräte (Grafik, Netzwerk)
+lsusb                  # USB-Geräte
+dmesg | tail           # letzte Kernel-Meldungen</code></pre></div>
+
+<div class="blk"><h3>Festplatten &amp; Speicherplatz</h3>
+<p class="ex"><code class="i">df</code> zeigt, wie voll die Laufwerke sind, <code class="i">du</code> wie groß einzelne Ordner sind. Das ist der erste Weg, wenn „kein Platz mehr“ gemeldet wird.</p>
+<pre><code>df -h                      # Belegung der Laufwerke
+du -sh *                   # Größe jedes Eintrags im Ordner
+du -h --max-depth=1 /var | sort -h   # größte Ordner zuerst
+lsblk                      # Laufwerke und Partitionen als Baum
+sudo fdisk -l              # Partitionstabellen</code></pre></div>
+
+<div class="blk"><h3>Laufwerke einhängen</h3>
+<p class="ex">Ein Datenträger muss in den Verzeichnisbaum eingehängt werden (mount), bevor man auf ihn zugreift. Dauerhaft geschieht das über <code class="i">/etc/fstab</code>.</p>
+<pre><code>sudo mount /dev/sdb1 /mnt     # einhängen
+sudo umount /mnt              # aushängen
+mount | grep sdb              # was ist eingehängt?
+lsblk -f                      # Dateisysteme und UUIDs</code></pre>
+<pre data-lang="plain"><code># /etc/fstab
+# Gerät                     Ziel   Typ   Optionen   dump pass
+UUID=1234-ABCD              /data  ext4  defaults   0    2</code></pre>
+<p class="note warn">Ein Fehler in der <code class="i">fstab</code> kann das Booten verhindern. Vor dem Neustart mit <code class="i">sudo mount -a</code> testen.</p></div>
+</div></section>
+
+<section id="pakete" data-grp="Netzwerk &amp; Pakete"><h2>Paketverwaltung</h2><div class="grid">
+<div class="blk wide"><h3>Pakete installieren je Distribution</h3>
+<p class="ex">Software kommt unter Linux aus Paketquellen. Der Befehl hängt von der Distribution ab, die Aufgaben sind überall gleich.</p><div class="tw"><table>
+<tr><th>Aufgabe</th><th>Debian / Ubuntu / Mint</th><th>Fedora / RHEL</th><th>Arch / Manjaro</th><th>openSUSE</th></tr>
+<tr><td>Paketliste aktualisieren</td><td><code>apt update</code></td><td><code>dnf check-update</code></td><td><code>pacman -Sy</code> (besser gleich <code>-Syu</code>)</td><td><code>zypper refresh</code></td></tr>
+<tr><td>System aktualisieren</td><td><code>apt upgrade</code></td><td><code>dnf upgrade</code></td><td><code>pacman -Syu</code></td><td><code>zypper update</code></td></tr>
+<tr><td>Installieren</td><td><code>apt install paket</code></td><td><code>dnf install paket</code></td><td><code>pacman -S paket</code></td><td><code>zypper install paket</code></td></tr>
+<tr><td>Entfernen</td><td><code>apt remove paket</code></td><td><code>dnf remove paket</code></td><td><code>pacman -R paket</code></td><td><code>zypper remove paket</code></td></tr>
+<tr><td>Suchen</td><td><code>apt search begriff</code></td><td><code>dnf search begriff</code></td><td><code>pacman -Ss begriff</code></td><td><code>zypper search begriff</code></td></tr>
+<tr><td>Infos anzeigen</td><td><code>apt show paket</code></td><td><code>dnf info paket</code></td><td><code>pacman -Si paket</code></td><td><code>zypper info paket</code></td></tr>
+</table></div>
+<p>Alle Befehle brauchen Administratorrechte, also <code class="i">sudo</code> davor. Beispiel: <code class="i">sudo apt update &amp;&amp; sudo apt upgrade</code>.</p></div>
+
+<div class="blk"><h3>Debian/Ubuntu im Alltag</h3>
+<p class="ex">Aufräumen und ein einzelnes Paket genauer ansehen.</p>
+<pre><code>sudo apt update &amp;&amp; sudo apt upgrade -y
+sudo apt autoremove            # nicht mehr benötigte Pakete
+sudo apt purge paket           # inkl. Konfigurationsdateien
+dpkg -l | grep paket           # installierte Pakete filtern
+dpkg -i datei.deb              # lokale .deb-Datei installieren
+apt list --installed</code></pre></div>
+</div></section>
+
+<section id="netzwerk" data-grp="Netzwerk &amp; Pakete"><h2>Netzwerk</h2><div class="grid">
+<div class="blk"><h3>Verbindung prüfen</h3>
+<p class="ex">Bei Netzwerkproblemen von innen nach außen prüfen: eigene Adresse, Router, Internet, Namensauflösung.</p>
+<pre><code>ip a                      # IP-Adressen der Schnittstellen
+ip route                  # Routing-Tabelle (Gateway)
+ping -c 4 8.8.8.8         # Erreichbarkeit testen (4 Pakete)
+ping -c 4 example.org     # ... inkl. DNS-Auflösung
+traceroute example.org    # Weg der Pakete
+dig example.org           # DNS-Abfrage
+dig +short example.org
+hostname -I               # eigene IP-Adressen</code></pre></div>
+
+<div class="blk"><h3>Ports &amp; Verbindungen</h3>
+<p class="ex">Wer lauscht auf welchem Port? <code class="i">ss</code> ersetzt das ältere <code class="i">netstat</code>.</p>
+<pre><code>ss -tulpn                 # lauschende TCP/UDP-Ports + Programm
+ss -tn                    # aktive TCP-Verbindungen
+sudo lsof -i :80          # wer nutzt Port 80?
+nc -zv host 22            # Port erreichbar? (netcat)</code></pre></div>
+
+<div class="blk"><h3>Download &amp; HTTP</h3>
+<p class="ex"><code class="i">curl</code> ruft URLs auf und zeigt die Antwort an, <code class="i">wget</code> lädt vor allem Dateien herunter.</p>
+<pre><code>curl https://example.org                    # Seite ausgeben
+curl -I https://example.org                 # nur Header
+curl -o datei.zip https://example.org/a.zip # in Datei speichern
+curl -L https://example.org                 # Weiterleitungen folgen
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"name":"anna"}' https://api.example.org/users
+wget https://example.org/datei.zip
+wget -c https://example.org/gross.iso       # Download fortsetzen</code></pre></div>
+
+<div class="blk"><h3>SSH &amp; Dateien übertragen</h3>
+<p class="ex">Mit SSH melden Sie sich verschlüsselt auf anderen Rechnern an. Schlüsselpaare sind sicherer und bequemer als Passwörter.</p>
+<pre><code>ssh anna@server.example.org
+ssh -p 2222 anna@server          # anderer Port
+ssh-keygen -t ed25519            # Schlüsselpaar erzeugen
+ssh-copy-id anna@server          # öffentlichen Schlüssel hinterlegen
+
+scp datei.txt anna@server:/tmp/        # Datei hochladen
+scp anna@server:/tmp/datei.txt .       # herunterladen
+rsync -avz ordner/ anna@server:/backup/  # nur Änderungen synchronisieren
+rsync -avz --delete quelle/ ziel/      # Ziel spiegeln (löscht überzählige)</code></pre></div>
+
+<div class="blk"><h3>Firewall (ufw)</h3>
+<p class="ex">Unter Ubuntu und Debian ist <code class="i">ufw</code> eine einfache Oberfläche für die Firewall. Erlauben Sie SSH, bevor Sie sie aktivieren.</p>
+<pre><code>sudo ufw allow 22/tcp          # SSH erlauben
+sudo ufw allow 80,443/tcp      # Web erlauben
+sudo ufw enable
+sudo ufw status verbose
+sudo ufw delete allow 80/tcp</code></pre>
+<p class="note warn">Wer per SSH verbunden ist und Port 22 nicht freigibt, sperrt sich beim Aktivieren selbst aus.</p></div>
+</div></section>
+
+<section id="scripting" data-grp="Scripting"><h2>Shell-Skripte <small>Bash</small></h2><div class="grid">
+<div class="blk"><h3>Erstes Skript</h3>
+<p class="ex">Ein Skript ist eine Textdatei mit Befehlen. Die erste Zeile (Shebang) legt fest, welches Programm sie ausführt. Danach muss die Datei ausführbar sein.</p>
+<pre><code>#!/usr/bin/env bash
+set -euo pipefail    # bei Fehler abbrechen, undefinierte Variablen verbieten
+
+echo "Hallo $USER"</code></pre>
+<pre><code>chmod +x hallo.sh
+./hallo.sh              # ausführen
+bash hallo.sh           # alternativ, ohne x-Recht</code></pre></div>
+
+<div class="blk"><h3>Variablen &amp; Argumente</h3>
+<p class="ex">Bei Zuweisungen steht kein Leerzeichen um das <code class="i">=</code>. Variablen immer in Anführungszeichen verwenden, sonst brechen Leerzeichen im Wert den Befehl auf.</p>
+<pre><code>name="Anna"
+echo "Hallo $name"
+echo "Pfad: ${name}_alt"            # Klammern, wenn Text folgt
+heute=$(date +%F)                   # Ausgabe eines Befehls speichern
+read -p "Dein Name: " eingabe       # Eingabe lesen
+
+# Argumente beim Aufruf:  ./skript.sh eins zwei
+echo "$0"       # Skriptname
+echo "$1 $2"    # erstes und zweites Argument
+echo "$#"       # Anzahl der Argumente
+echo "$@"       # alle Argumente
+echo "$?"       # Exit-Code des letzten Befehls</code></pre></div>
+
+<div class="blk"><h3>Bedingungen</h3>
+<p class="ex">Ein Befehl gilt als erfolgreich, wenn sein Exit-Code <code class="i">0</code> ist. <code class="i">[[ ]]</code> prüft Bedingungen, vor und nach den Klammern gehört ein Leerzeichen.</p>
+<pre><code>if [[ -f "$datei" ]]; then
+    echo "Datei existiert"
+elif [[ -d "$datei" ]]; then
+    echo "Ist ein Verzeichnis"
+else
+    echo "Nicht gefunden"
+fi
+
+[[ $n -gt 5 ]] &amp;&amp; echo "größer als 5"
+
+case "$1" in
+    start)  echo "starte" ;;
+    stop)   echo "stoppe" ;;
+    *)      echo "Aufruf: $0 start|stop" ;;
+esac</code></pre></div>
+
+<div class="blk"><h3>Vergleiche &amp; Tests</h3><div class="tw"><table>
+<tr><th>Test</th><th>Wahr, wenn ...</th></tr>
+<tr><td class="nw"><code>-eq -ne -lt -gt -le -ge</code></td><td>Zahlen: gleich, ungleich, kleiner, größer, ...</td></tr>
+<tr><td class="nw"><code>== !=</code></td><td>Strings gleich / ungleich</td></tr>
+<tr><td class="nw"><code>-z "$s"</code></td><td>String ist leer</td></tr>
+<tr><td class="nw"><code>-n "$s"</code></td><td>String ist nicht leer</td></tr>
+<tr><td class="nw"><code>-e pfad</code></td><td>Pfad existiert</td></tr>
+<tr><td class="nw"><code>-f pfad</code></td><td>reguläre Datei</td></tr>
+<tr><td class="nw"><code>-d pfad</code></td><td>Verzeichnis</td></tr>
+<tr><td class="nw"><code>-r -w -x pfad</code></td><td>lesbar, schreibbar, ausführbar</td></tr>
+<tr><td class="nw"><code>&amp;&amp;  ||  !</code></td><td>und, oder, nicht</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Schleifen</h3>
+<p class="ex"><code class="i">for</code> läuft über eine Liste oder Dateien, <code class="i">while</code> solange eine Bedingung zutrifft.</p>
+<pre><code>for i in 1 2 3; do echo "$i"; done
+
+for i in {1..5}; do echo "Nr. $i"; done
+
+for datei in *.txt; do
+    echo "Bearbeite $datei"
+done
+
+zaehler=0
+while [[ $zaehler -lt 3 ]]; do
+    echo "$zaehler"
+    ((zaehler++))
+done
+
+while read -r zeile; do          # Datei zeilenweise lesen
+    echo "$zeile"
+done &lt; datei.txt</code></pre></div>
+
+<div class="blk"><h3>Funktionen &amp; Arrays</h3>
+<p class="ex">Funktionen bündeln wiederkehrende Schritte. Ihre Argumente heißen wie beim Skript <code class="i">$1</code>, <code class="i">$2</code>, ...</p>
+<pre><code>gruss() {
+    local name="$1"
+    echo "Hallo $name"
+}
+gruss "Anna"
+
+farben=("rot" "grün" "blau")
+echo "${farben[0]}"        # erstes Element
+echo "${farben[@]}"        # alle
+echo "${#farben[@]}"       # Anzahl
+for f in "${farben[@]}"; do echo "$f"; done</code></pre></div>
+
+<div class="blk"><h3>Exit-Codes &amp; Aufräumen</h3>
+<p class="ex">Skripte melden Erfolg oder Fehler über ihren Exit-Code. Mit <code class="i">trap</code> räumen Sie auch bei Abbruch auf.</p>
+<pre><code>exit 0                   # Erfolg
+exit 1                   # Fehler
+
+if ! grep -q "x" datei; then
+    echo "nicht gefunden" &gt;&amp;2     # Meldung auf stderr
+    exit 1
+fi
+
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT         # beim Beenden ausführen</code></pre></div>
+</div></section>
+
+<section id="best" data-grp="Scripting"><h2>Best Practices</h2><div class="grid">
+<div class="blk"><h3>Sicher arbeiten</h3>
+<p>• Vor <code class="i">rm -r</code> den Pfad mit <code class="i">ls</code> prüfen, nie blind <code class="i">rm -rf</code> mit Variablen (<code class="i">rm -rf "$x/"</code> wird bei leerem <code class="i">$x</code> zu <code class="i">/</code>)<br>
+• Nur einzelne Befehle mit <code class="i">sudo</code> ausführen, nicht dauerhaft als root arbeiten<br>
+• Befehle aus dem Internet nicht blind einfügen, vor allem nicht <code class="i">curl ... | sudo bash</code><br>
+• Vor größeren Änderungen eine Kopie der Konfiguration anlegen: <code class="i">sudo cp datei datei.bak</code><br>
+• SSH mit Schlüsseln statt Passwörtern, Schlüsseldatei mit <code class="i">chmod 600</code></p></div>
+<div class="blk"><h3>Effizient arbeiten</h3>
+<p>• <code class="i">Tab</code> und <code class="i">Strg+R</code> konsequent nutzen<br>
+• Kleine Befehle per Pipe kombinieren statt große Programme zu schreiben<br>
+• Dateinamen ohne Leerzeichen wählen, sonst Pfade in Anführungszeichen setzen<br>
+• Skripte mit <code class="i">set -euo pipefail</code> beginnen und Variablen in Anführungszeichen setzen<br>
+• Bei Unklarheit: <code class="i">man befehl</code> oder <code class="i">befehl --help</code> lesen<br>
+• Wiederkehrendes als <code class="i">alias</code> oder Skript ablegen</p></div>
+</div></section>
+
+<div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
+</main>
+<footer>Bash-Syntax. Pakete und Dienste beziehen sich auf gängige Distributionen mit systemd.</footer>
+</div>
+<script>
+(function(){
+  var SH = new RegExp([
+    '(?<=^|\\s)(#[^\\n]*)',
+    '("(?:\\\\.|[^"\\\\\\n])*"|\'[^\'\\n]*\')',
+    '(\\$\\{[^}\\n]*\\}|\\$[A-Za-z_]\\w*|\\$[0-9@#?*!$])',
+    '((?<=\\s)--?[A-Za-z][\\w-]*)',
+    '(\\b(?:if|then|else|elif|fi|for|while|do|done|case|esac|in|function|return|exit|local|export|set)\\b)',
+    '((?<=^[ \\t]*|[|;&]\\s*|\\$\\(\\s*)(?:sudo\\s+)?(?:\\.{1,2}\\/)?[a-z][\\w.\\/-]*(?![\\w.\\/-]*=))'
+  ].join('|'), 'gm');
+  var PL = /(?<=^|\s)(#[^\n]*)/gm;
+  function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function hl(code, lang){
+    var src = code.textContent, out = '', last = 0, m, re = lang === 'plain' ? PL : SH;
+    re.lastIndex = 0;
+    while ((m = re.exec(src))) {
+      if (m[0] === '') { re.lastIndex++; continue; }
+      out += esc(src.slice(last, m.index));
+      var cls = m[1] ? 'c' : m[2] ? 's' : m[3] ? 'v' : m[4] ? 'a' : m[5] ? 'n' : 'k';
+      if (lang === 'plain') cls = 'c';
+      out += '<span class="' + cls + '">' + esc(m[0]) + '</span>';
+      last = m.index + m[0].length;
+    }
+    code.innerHTML = out + esc(src.slice(last));
+  }
+
+  document.querySelectorAll('pre').forEach(function(pre){
+    var code = pre.querySelector('code');
+    var raw = code.textContent;
+    try { hl(code, pre.getAttribute('data-lang') || 'sh'); } catch (e) { }
+    var wrap = document.createElement('div'); wrap.className = 'code';
+    pre.parentNode.insertBefore(wrap, pre); wrap.appendChild(pre);
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'cp'; b.textContent = 'Kopieren';
+    b.addEventListener('click', function(){
+      function done(){ b.textContent = 'Kopiert'; setTimeout(function(){ b.textContent = 'Kopieren'; }, 1200); }
+      function fallback(){
+        var r = document.createRange(); r.selectNodeContents(code);
+        var s = getSelection(); s.removeAllRanges(); s.addRange(r);
+        b.textContent = 'Markiert';
+        setTimeout(function(){ b.textContent = 'Kopieren'; }, 1200);
+      }
+      try { navigator.clipboard.writeText(raw).then(done, fallback); } catch (e) { fallback(); }
+    });
+    wrap.appendChild(b);
+  });
+
+  var nav = document.getElementById('nav'), lastGrp = '';
+  document.querySelectorAll('main > section').forEach(function(sec){
+    var g = sec.getAttribute('data-grp');
+    if (g !== lastGrp) {
+      lastGrp = g;
+      var gi = document.createElement('li'); gi.className = 'grp'; gi.textContent = g; nav.appendChild(gi);
+    }
+    var li = document.createElement('li'), a = document.createElement('a');
+    a.href = '#' + sec.id;
+    a.textContent = sec.querySelector('h2').childNodes[0].textContent.trim();
+    li.appendChild(a); nav.appendChild(li);
+  });
+
+  var q = document.getElementById('q'), empty = document.getElementById('empty');
+  var blocks = Array.prototype.slice.call(document.querySelectorAll('.blk'));
+  var texts = blocks.map(function(b){ return b.textContent.toLowerCase(); });
+  function filter(){
+    var term = q.value.trim().toLowerCase(), any = false;
+    document.querySelectorAll('main > section').forEach(function(sec){
+      var shown = 0;
+      sec.querySelectorAll('.blk').forEach(function(b){
+        var hit = !term || texts[blocks.indexOf(b)].indexOf(term) !== -1;
+        b.classList.toggle('hide', !hit);
+        if (hit) shown++;
+      });
+      sec.classList.toggle('hide', shown === 0);
+      if (shown) any = true;
+    });
+    empty.classList.toggle('hide', any);
+  }
+  q.addEventListener('input', filter);
+
+  var root = document.documentElement;
+  document.getElementById('theme').addEventListener('click', function(){
+    var dark = root.getAttribute('data-theme') === 'dark' ||
+      (!root.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+    root.setAttribute('data-theme', dark ? 'light' : 'dark');
+  });
+})();
+</script>
+
+</body>
+</html>
