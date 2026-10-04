@@ -1787,6 +1787,83 @@ tail -f /var/log/syslog            # neue Zeilen live mitlesen (Strg+C beendet)<
 <p class="ex"><code class="i">tail -n +3</code> beginnt <i>bei</i> Zeile 3 statt die letzten drei zu zeigen. <code class="i">-f</code> (follow) hält die Datei offen und gibt neue Zeilen sofort aus. So verfolgt man Logdateien beim Testen.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 16 · Text umwandeln</h3>
+<p><b>Aufgabe:</b> Lege <code class="i">notes/upper.txt</code> an. Sie soll den Text <code class="i">HELLO</code> gefolgt von einem Code in Großbuchstaben enthalten (in der Kursaufgabe ein persönlicher Code, hier <code class="i">WORLD</code>). Der Text soll mit <code class="i">tr</code> in Großbuchstaben umgewandelt werden.</p>
+<p class="ex">Geübt wird: <code class="i">tr</code> wandelt Zeichen um. Es liest die Standardeingabe, deshalb steht davor ein <code class="i">echo</code> und eine Pipe. Aus <code class="i">hello world</code> soll <code class="i">HELLO WORLD</code> werden. Setzen Sie Ihren Text oder Code aus der Aufgabenstellung ein.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes
+echo "hello world" | tr 'a-z' 'A-Z' &gt; notes/upper.txt
+
+cat notes/upper.txt            # HELLO WORLD</code></pre>
+<p class="ex">Mit einem Code wie in der Kursaufgabe: <code class="i">echo "hello c2610475054" | tr 'a-z' 'A-Z' &gt; notes/upper.txt</code> ergibt <code class="i">HELLO C2610475054</code>. Ziffern bleiben unverändert.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>echo "hello world"</code></td><td>Gibt den Text mit Zeilenumbruch aus.</td></tr>
+<tr><td class="nw"><code>tr 'a-z' 'A-Z'</code></td><td><b>tr</b>anslate: Jedes Zeichen der ersten Menge wird durch das Zeichen an derselben Stelle der zweiten Menge ersetzt. <code>a-z</code> steht für alle Kleinbuchstaben, <code>A-Z</code> für alle Großbuchstaben, <code>a</code> wird also zu <code>A</code>, <code>b</code> zu <code>B</code> usw.</td></tr>
+<tr><td class="nw"><code>&gt; notes/upper.txt</code></td><td>Schreibt das Ergebnis in die Datei.</td></tr>
+</table></div>
+<pre><code>hello world   --tr 'a-z' 'A-Z'--&gt;   HELLO WORLD
+Leerzeichen und Ziffern bleiben unverändert.</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b><code class="i">tr</code> arbeitet nur mit Datenströmen:</b> Es nimmt keinen Dateinamen. Die Eingabe kommt aus einer Pipe oder per <code class="i">&lt;</code> aus einer Datei: <code class="i">tr 'a-z' 'A-Z' &lt; datei.txt</code>.</p>
+<p><b>Zeichen für Zeichen:</b> <code class="i">tr</code> ersetzt einzelne Zeichen, keine Wörter. Dafür ist es sehr schnell und eignet sich zum Umwandeln von Groß/Klein, zum Löschen und zum Ersetzen von Trennzeichen.</p>
+<p><b>Auch hier Original unverändert:</b> Was Sie umwandeln, bleibt an der Quelle bestehen. Das Ergebnis wandert in die neue Datei.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>tr 'a-z' 'A-Z' datei.txt</code></td><td><code>tr: extra operand 'datei.txt'</code>. <code>tr</code> liest keine Dateinamen. Richtig: <code>tr 'a-z' 'A-Z' &lt; datei.txt</code> oder <code>cat datei.txt | tr …</code>.</td></tr>
+<tr><td>Mengen vertauscht (<code>'A-Z' 'a-z'</code>)</td><td>Das Ergebnis ist klein statt groß geschrieben.</td></tr>
+<tr><td>Mengen ungleich lang (<code>'a-z' 'A-C'</code>)</td><td>Das letzte Zeichen der zweiten Menge wird wiederholt, aus <code>hello</code> wird <code>CCCCC</code>.</td></tr>
+<tr><td>Anführungszeichen vergessen</td><td>Die Shell kann Muster wie <code>a-z</code> oder <code>[a-z]</code> als Dateimuster deuten. Immer in einfache Anführungszeichen setzen.</td></tr>
+<tr><td>Umlaute (<code>ä</code>, <code>ö</code>, <code>ü</code>)</td><td>Werden von <code>tr</code> mit <code>a-z</code> nicht umgewandelt: aus <code>häuser</code> wird <code>HäUSER</code>.</td></tr>
+<tr><td>Ergebnis nicht gespeichert</td><td>Ohne <code>&gt;</code> erscheint der Text nur im Terminal, die Datei fehlt.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 16 · Zum Weiterüben</h3>
+<p class="ex">Alle Beispiele laufen direkt im Terminal. Die Ausgabe sehen Sie sofort.</p>
+<p><b>a)</b> Wandle <code class="i">HELLO</code> zurück in Kleinbuchstaben und nutze dazu die Zeichenklassen.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>echo "HELLO" | tr 'A-Z' 'a-z'                       # hello
+echo "hello world 42" | tr '[:lower:]' '[:upper:]'   # HELLO WORLD 42</code></pre>
+<p class="ex"><code class="i">[:lower:]</code> und <code class="i">[:upper:]</code> sind Zeichenklassen. Sie sind besser lesbar und je nach Spracheinstellung zuverlässiger als <code class="i">a-z</code>.</p></details>
+<p><b>b)</b> Wandle eine ganze Datei um.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>echo "hello world" &gt; in.txt
+tr 'a-z' 'A-Z' &lt; in.txt                # Datei als Eingabe
+cat in.txt | tr 'a-z' 'A-Z'            # gleichwertig mit Pipe
+tr 'a-z' 'A-Z' &lt; in.txt &gt; out.txt</code></pre>
+<p class="ex">Mit <code class="i">&lt;</code> wird die Datei zur Standardeingabe von <code class="i">tr</code>. Schreiben Sie nie in dieselbe Datei, aus der gelesen wird (siehe Übung 11).</p></details>
+<p><b>c)</b> Lösche alle Bindestriche und alle Ziffern aus einem Text.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>echo "h-e-l-l-o" | tr -d '-'                  # hello
+echo "hello 42" | tr -d '0-9'                  # hello  (mit Leerzeichen am Ende)</code></pre>
+<p class="ex"><code class="i">-d</code> (delete) löscht alle Zeichen aus der angegebenen Menge. Es wird nur eine Menge angegeben.</p></details>
+<p><b>d)</b> Fasse mehrfache Leerzeichen zu einem zusammen.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>echo "a    b   c" | tr -s ' '                 # a b c</code></pre>
+<p class="ex"><code class="i">-s</code> (squeeze) ersetzt aufeinanderfolgende gleiche Zeichen der Menge durch ein einziges.</p></details>
+<p><b>e)</b> Ersetze Kommas durch Semikolons und wandle ein Leerzeichen in einen Zeilenumbruch um.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>echo "a,b,c" | tr ',' ';'              # a;b;c
+echo "a b c" | tr ' ' '\n'             # drei Zeilen: a, b, c</code></pre>
+<p class="ex"><code class="i">\n</code> steht für den Zeilenumbruch. So macht man aus einem Satz eine Wortliste, die sich mit <code class="i">sort</code> und <code class="i">uniq</code> weiterverarbeiten lässt.</p></details>
+<p><b>f)</b> Behalte nur die Buchstaben und werfe alles andere weg.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>echo "Hello, World! 42" | tr -cd '[:alpha:]'      # HelloWorld</code></pre>
+<p class="ex"><code class="i">-c</code> (complement) kehrt die Menge um: alles außer Buchstaben. Mit <code class="i">-d</code> kombiniert, wird genau das gelöscht.</p></details>
+<p><b>g)</b> Wandle in Großbuchstaben ohne <code class="i">tr</code>: mit <code class="i">awk</code>, <code class="i">sed</code> und Bash.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>echo "hello world" | awk '{print toupper($0)}'      # HELLO WORLD
+echo "hello world" | sed 's/.*/\U&amp;/'                 # HELLO WORLD (GNU sed)
+s="hello world"; echo "${s^^}"                       # HELLO WORLD (Bash 4+)</code></pre>
+<p class="ex"><code class="i">awk</code> hat <code class="i">toupper</code>, GNU-<code class="i">sed</code> <code class="i">\U</code> und Bash 4 die Ersetzung <code class="i">${var^^}</code>. <code class="i">tr</code> bleibt die kürzeste Variante.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
