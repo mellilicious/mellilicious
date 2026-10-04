@@ -3210,6 +3210,114 @@ ls -A notes-backup</code></pre>
 <p class="ex">Wer ein Archiv hat, kann Gelöschtes zurückholen. So wird aus dem endgültigen Löschen ein umkehrbarer Schritt. Archiv am Ende mit <code class="i">rm notes-backup.tar.gz</code> aufräumen.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 31 · Datei mit nano bearbeiten</h3>
+<p><b>Aufgabe:</b> Lege mit <code class="i">nano</code> die Datei <code class="i">projects/runbook.txt</code> an, mit genau drei Zeilen. In der Kursaufgabe: <code class="i">student:</code> und Ihr persönlicher Code, <code class="i">server:studentos</code> und <code class="i">command:grep</code>. Hier nehmen wir <code class="i">student:anna</code>, <code class="i">server:server01</code> und <code class="i">command:grep</code>.</p>
+<p class="ex">Geübt wird: Ein Texteditor im Terminal. Mit <code class="i">nano</code> schreiben, speichern, beenden und das Ergebnis mit <code class="i">cat</code> prüfen. Der Ordner <code class="i">projects</code> stammt aus Übung 4. Setzen Sie Ihre eigenen Werte aus der Aufgabenstellung ein.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p projects
+nano projects/runbook.txt</code></pre>
+<p>Im Editor nacheinander eintippen (nach den ersten beiden Zeilen jeweils <b>Enter</b>, nach der dritten <b>nicht</b>):</p>
+<pre data-lang="plain"><code>student:anna
+server:server01
+command:grep</code></pre>
+<p>Dann speichern und beenden:</p>
+<pre data-lang="plain"><code>Strg+O        # Write Out: Dateiname bestätigen mit Enter
+Strg+X        # Exit: nano verlassen</code></pre>
+<p>Zurück in der Shell prüfen:</p>
+<pre><code>cat -A projects/runbook.txt     # drei Zeilen, jede endet mit $
+wc -l projects/runbook.txt      # 3</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Wichtige Tasten in nano</h3>
+<p class="ex">Am unteren Rand zeigt <code class="i">nano</code> die wichtigsten Befehle. <code class="i">^</code> bedeutet die <b>Strg</b>-Taste, <code class="i">M-</code> die <b>Alt</b>-Taste. Anders als in <code class="i">vim</code> können Sie sofort tippen, es gibt keine Modi.</p><div class="tw"><table>
+<tr><th>Taste</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>Strg+O</code></td><td>Speichern („Write Out“). Der Dateiname wird angezeigt, Enter bestätigt ihn.</td></tr>
+<tr><td class="nw"><code>Strg+X</code></td><td>Beenden. Bei ungespeicherten Änderungen fragt <code>nano</code>: <code>Y</code> speichern, <code>N</code> verwerfen, Strg+C abbrechen.</td></tr>
+<tr><td class="nw"><code>Strg+K</code> / <code>Strg+U</code></td><td>Zeile ausschneiden / einfügen (mehrfach möglich)</td></tr>
+<tr><td class="nw"><code>Alt+6</code></td><td>Zeile kopieren (danach mit <code>Strg+U</code> einfügen)</td></tr>
+<tr><td class="nw"><code>Strg+W</code></td><td>Suchen („Where is“)</td></tr>
+<tr><td class="nw"><code>Strg+\</code></td><td>Suchen und ersetzen (<code>A</code> ersetzt alle Treffer)</td></tr>
+<tr><td class="nw"><code>Alt+U</code> / <code>Alt+E</code></td><td>Rückgängig / Wiederholen</td></tr>
+<tr><td class="nw"><code>Strg+_</code> oder <code>Alt+G</code></td><td>Zu einer Zeilennummer springen</td></tr>
+<tr><td class="nw"><code>Strg+A</code> / <code>Strg+E</code></td><td>Zeilenanfang / Zeilenende</td></tr>
+<tr><td class="nw"><code>Alt+/</code></td><td>Zum Dateiende springen</td></tr>
+<tr><td class="nw"><code>Strg+C</code></td><td>Zeigt die Cursorposition (Zeile und Spalte)</td></tr>
+<tr><td class="nw"><code>Strg+G</code></td><td>Hilfe mit allen Tasten</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Was jeder Schritt macht</h3><div class="tw"><table>
+<tr><th>Schritt</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>nano projects/runbook.txt</code></td><td>Öffnet die Datei. Gibt es sie noch nicht, startet <code>nano</code> mit einer leeren Seite und legt die Datei beim Speichern an.</td></tr>
+<tr><td class="nw">Tippen und <b>Enter</b></td><td>Jeder Druck auf Enter beendet eine Zeile mit einem Zeilenumbruch.</td></tr>
+<tr><td class="nw"><code>Strg+O</code> + Enter</td><td>Schreibt den Text auf die Platte.</td></tr>
+<tr><td class="nw"><code>Strg+X</code></td><td>Verlässt den Editor und bringt Sie zur Shell zurück.</td></tr>
+<tr><td class="nw"><code>cat -A datei</code></td><td>Zeigt die Datei mit sichtbaren Zeilenenden (<code>$</code>), um Leerzeilen und Leerzeichen zu erkennen.</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Ein Editor für Dateien, die sich in der Shell nicht gut schreiben lassen:</b> Konfigurationsdateien, Notizen oder längere Skripte lassen sich mit <code class="i">nano</code> bequemer pflegen als mit <code class="i">echo</code> und <code class="i">printf</code>. Auf vielen Servern ist <code class="i">nano</code> der einfachste Einstieg.</p>
+<p><b>Nach dem Speichern prüfen:</b> Mit <code class="i">cat</code> sehen Sie den Inhalt, mit <code class="i">wc -l</code> die Zeilenzahl. Die Aufgabe verlangt genau drei Zeilen, also keine vierte, leere.</p>
+<p><b>Zeilenende:</b> <code class="i">nano</code> beendet beim Speichern die letzte Zeile mit einem Zeilenumbruch. Sie müssen nach der letzten Zeile also <i>kein</i> Enter drücken. Tun Sie es doch, entsteht eine leere vierte Zeile.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td>Enter nach der letzten Zeile</td><td>In der Datei steht eine zusätzliche Leerzeile: vier Zeilen statt drei (<code>wc -l</code> meldet 4).</td></tr>
+<tr><td>Nicht gespeichert (nur Strg+X, dann <code>N</code>)</td><td>Die Datei wird nicht angelegt oder bleibt unverändert.</td></tr>
+<tr><td>Leerzeichen nach dem Doppelpunkt (<code>student: anna</code>)</td><td>Der Text weicht von der Vorgabe ab. Genau abtippen, mit <code>cat -A</code> prüfen.</td></tr>
+<tr><td>Ordner <code>projects</code> fehlt</td><td><code>nano</code> öffnet sich, speichern schlägt fehl (die Datei wird nicht angelegt, in diesem Test mit nano 7.2). Erst <code>mkdir -p projects</code>.</td></tr>
+<tr><td>Tippfehler in Wort oder Reihenfolge</td><td>Die Datei stimmt nicht mit der Vorgabe. Prüfen Sie jede Zeile.</td></tr>
+<tr><td>Nicht wissen, wie man <code>nano</code> verlässt</td><td>Strg+X. Strg+C und Strg+Z führen nicht zum Ziel.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 31 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit <code class="i">projects/runbook.txt</code>. Die meisten Tasten sehen Sie am unteren Rand von <code class="i">nano</code>. Alle Tasten sind in nano 7.2 getestet, andere Versionen können abweichen.</p>
+<p><b>a)</b> Ersetze in der Datei <code class="i">server01</code> überall durch <code class="i">server02</code>.</p>
+<details><summary>Lösung a)</summary>
+<pre data-lang="plain"><code>nano projects/runbook.txt
+Strg+\        # Suchen und ersetzen
+server01      # Suchtext, Enter
+server02      # Ersatztext, Enter
+A             # "All": alle Treffer ersetzen (Y = einzeln fragen)
+Strg+O, Enter, Strg+X</code></pre>
+<p class="ex">Dasselbe ohne Editor: <code class="i">sed -i 's/server01/server02/' projects/runbook.txt</code> (Übung 20).</p></details>
+<p><b>b)</b> Verschiebe die letzte Zeile nach oben und dupliziere eine Zeile.</p>
+<details><summary>Lösung b)</summary>
+<pre data-lang="plain"><code>Strg+K        # Zeile ausschneiden (Cursor steht in der Zeile)
+Strg+U        # an der Cursorposition wieder einfügen
+Alt+6         # Zeile kopieren, ohne sie zu entfernen
+Strg+U        # und einfügen = Zeile verdoppelt</code></pre>
+<p class="ex">Zum Verschieben: Zeile mit <code class="i">Strg+K</code> ausschneiden, mit den Pfeiltasten an die Zielstelle gehen und <code class="i">Strg+U</code> einfügen. Wer mehrmals <code class="i">Strg+U</code> drückt, fügt dieselbe Zeile mehrfach ein.</p></details>
+<p><b>c)</b> Mache eine Eingabe rückgängig und stelle sie wieder her.</p>
+<details><summary>Lösung c)</summary>
+<pre data-lang="plain"><code>Alt+U         # letzte Änderung rückgängig
+Alt+E         # wiederholen</code></pre>
+<p class="ex">Mit <code class="i">Alt+U</code> können Sie mehrere Schritte zurückgehen. Das ist praktisch, wenn Sie versehentlich etwas ausgeschnitten haben.</p></details>
+<p><b>d)</b> Springe zu einer Zeile und zum Dateiende, und öffne die Datei direkt dort.</p>
+<details><summary>Lösung d)</summary>
+<pre data-lang="plain"><code>Strg+_  oder  Alt+G    # Zeilennummer eingeben, Enter
+Alt+/                  # Dateiende</code></pre>
+<pre><code>nano +2 projects/runbook.txt        # nano startet in Zeile 2
+nano -l projects/runbook.txt        # mit Zeilennummern am Rand</code></pre>
+<p class="ex">Zeilennummern helfen bei Fehlermeldungen, die eine Zeile nennen (zum Beispiel von Skripten oder Konfigurationsdateien).</p></details>
+<p><b>e)</b> Speichere zwischendurch, ohne den Editor zu verlassen.</p>
+<details><summary>Lösung e)</summary>
+<pre data-lang="plain"><code>Strg+O, Enter          # speichern und weiterarbeiten
+Strg+S                 # in neueren nano-Versionen: speichern ohne Rückfrage</code></pre>
+<p class="ex">Mit <code class="i">Strg+O</code> können Sie im Dateinamen-Feld auch einen anderen Namen eingeben und so eine Kopie speichern. Wer Änderungen nicht verlieren will, speichert öfter.</p></details>
+<p><b>f)</b> Beende <code class="i">nano</code> ohne zu speichern.</p>
+<details><summary>Lösung f)</summary>
+<pre data-lang="plain"><code>Strg+X        # Beenden
+N             # "No": Änderungen verwerfen</code></pre>
+<p class="ex">Ohne Änderungen beendet <code class="i">Strg+X</code> sofort und ohne Rückfrage. Bei Änderungen entscheiden Sie mit <code class="i">Y</code> (speichern), <code class="i">N</code> (verwerfen) oder Strg+C (zurück in den Editor).</p></details>
+<p><b>g)</b> Erzeuge dieselbe Datei ohne Editor, zum Vergleich.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>printf 'student:anna\nserver:server01\ncommand:grep\n' &gt; projects/runbook2.txt
+diff projects/runbook.txt projects/runbook2.txt &amp;&amp; echo "identisch"</code></pre>
+<p class="ex">Das Ergebnis ist dasselbe wie in <code class="i">nano</code>. Der Editor lohnt sich bei Änderungen an bestehenden Dateien, <code class="i">printf</code> bei festem Text in Skripten.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
