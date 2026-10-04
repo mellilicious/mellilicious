@@ -1712,6 +1712,81 @@ grep '^lab:' ~/daten/words2.list | head -n 2 | cut -d: -f2</code></pre>
 <p class="ex">Hier wird zuerst geschnitten und sortiert, dann die erste Zeile genommen. Merken Sie sich den Unterschied: <i>erster in der Datei</i> (<code class="i">bravo</code>) oder <i>erster nach Sortierung</i> (<code class="i">alpha</code>).</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 15 · Den letzten Treffer finden</h3>
+<p><b>Aufgabe:</b> Finde in der Liste <code class="i">words.list</code> den <i>letzten</i> Wert mit dem Präfix <code class="i">lab:</code> und speichere ihn ohne das Präfix in <code class="i">notes/last.txt</code>.</p>
+<p class="ex">Geübt wird: <code class="i">tail -n 1</code> als Gegenstück zu <code class="i">head -n 1</code> aus Übung 14. Wir nehmen die Beispieldaten aus Übung 10 (<code class="i">~/daten/words.list</code>). Dort steht der letzte <code class="i">lab:</code>-Wert nicht am Ende der Datei, denn die letzte Zeile ist <code class="i">todo:x</code>. Genau das ist die Falle. Setzen Sie für Ihre Aufgabe den Pfad aus der Aufgabenstellung ein.</p>
+<details><summary>Beispieldaten anlegen</summary>
+<pre><code>mkdir -p ~/daten
+printf 'lab:alpha\nnote:eins\nlab:bravo\ncollab:fake\nlab:charlie\nnote:zwei\nlab:delta\nlab:echo\ntodo:x\n' &gt; ~/daten/words.list
+cat -n ~/daten/words.list</code></pre>
+<p class="ex">Identisch mit den Daten aus Übung 10. Es gibt fünf <code class="i">lab:</code>-Zeilen, die letzte ist <code class="i">lab:echo</code> in Zeile 8.</p></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes
+grep '^lab:' ~/daten/words.list | tail -n 1 | cut -d: -f2 &gt; notes/last.txt
+
+cat notes/last.txt             # echo</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>grep '^lab:' datei</code></td><td>Wählt alle Zeilen aus, die mit <code>lab:</code> beginnen.</td></tr>
+<tr><td class="nw"><code>tail -n 1</code></td><td>Behält nur die <i>letzte</i> Zeile der Eingabe (tail = Schwanz). Gegenstück zu <code>head</code>.</td></tr>
+<tr><td class="nw"><code>cut -d: -f2</code></td><td>Schneidet das zweite Feld (nach dem Doppelpunkt) aus, also den Wert.</td></tr>
+<tr><td class="nw"><code>&gt; notes/last.txt</code></td><td>Schreibt das Ergebnis in die Datei.</td></tr>
+</table></div>
+<pre><code>lab:alpha
+lab:bravo
+lab:charlie    (verworfen)
+lab:delta
+lab:echo   --tail -n 1--&gt;  lab:echo  --cut--&gt;  echo</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Reihenfolge entscheidet:</b> Erst <code class="i">grep</code>, dann <code class="i">tail</code>. So ist die „letzte Zeile“ die letzte <i>passende</i> Zeile. Würde <code class="i">tail</code> zuerst auf die ganze Datei angewendet, bekäme es <code class="i">todo:x</code>.</p>
+<p><b>Dieselbe Idee wie bei <code class="i">head</code>:</b> Ein Befehl filtert, einer begrenzt, einer formt um. Mit <code class="i">head -n 1</code> bekommen Sie den ersten, mit <code class="i">tail -n 1</code> den letzten Treffer.</p>
+<p><b>Praxis:</b> Der letzte passende Eintrag ist oft der aktuellste, zum Beispiel der letzte Login oder der letzte Fehler in einer Logdatei.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>tail -n 1</code> direkt auf der Datei</td><td>Liefert die letzte Zeile überhaupt, hier <code>todo:x</code>, nach <code>cut</code> also <code>x</code>.</td></tr>
+<tr><td>Erst <code>tail</code>, dann <code>grep</code></td><td>Die letzte Zeile (<code>todo:x</code>) passt nicht auf <code>^lab:</code>. Die Pipe ist leer, <code>last.txt</code> bleibt leer.</td></tr>
+<tr><td><code>head</code> statt <code>tail</code></td><td>Liefert den ersten Treffer (<code>alpha</code>).</td></tr>
+<tr><td><code>cut</code> vergessen</td><td>In der Datei steht <code>lab:echo</code> mit Präfix.</td></tr>
+<tr><td><code>^</code> vergessen</td><td>Würde ein <code>collab:…</code> am Dateiende miterfassen.</td></tr>
+<tr><td>Leerzeile am Dateiende</td><td>Vor <code>grep</code> schadet sie nicht. Nach <code>tail -n 1</code> auf der Rohdatei wäre die letzte Zeile leer.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 15 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit <code class="i">~/daten/words.list</code> aus den Beispieldaten.</p>
+<p><b>a)</b> Gib die letzten zwei Werte aus, und den vorletzten allein.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>grep '^lab:' ~/daten/words.list | tail -n 2 | cut -d: -f2                  # delta echo
+grep '^lab:' ~/daten/words.list | tail -n 2 | head -n 1 | cut -d: -f2       # delta</code></pre>
+<p class="ex">Mit <code class="i">tail -n 2</code> bleiben die letzten zwei Zeilen. Davon ist <code class="i">head -n 1</code> die vorletzte der Treffer.</p></details>
+<p><b>b)</b> In welcher Zeile der Datei steht der letzte Treffer?</p>
+<details><summary>Lösung b)</summary>
+<pre><code>grep -n '^lab:' ~/daten/words.list | tail -n 1       # 8:lab:echo</code></pre>
+<p class="ex"><code class="i">-n</code> stellt die Zeilennummer in der Quelldatei voran.</p></details>
+<p><b>c)</b> Lies die Datei von hinten und nimm den ersten Treffer.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>tac ~/daten/words.list | grep -m1 '^lab:' | cut -d: -f2       # echo</code></pre>
+<p class="ex"><code class="i">tac</code> (cat rückwärts) gibt die Zeilen in umgekehrter Reihenfolge aus. Dann ist der letzte Treffer der erste, und <code class="i">grep -m1</code> kann nach dem ersten aufhören. Bei sehr großen Dateien spart das Arbeit.</p></details>
+<p><b>d)</b> Löse es mit <code class="i">awk</code>.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>awk -F: '$1=="lab" {w=$2} END {print w}' ~/daten/words.list     # echo</code></pre>
+<p class="ex">Bei jeder <code class="i">lab</code>-Zeile wird der Wert in die Variable <code class="i">w</code> geschrieben und überschrieben. Am Ende (<code class="i">END</code>) steht dort der letzte. Die Datei wird in einem Durchgang gelesen.</p></details>
+<p><b>e)</b> Löse es mit <code class="i">sed</code>.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>sed -n 's/^lab://p' ~/daten/words.list | sed -n '$p'       # echo</code></pre>
+<p class="ex">Der erste <code class="i">sed</code> entfernt das Präfix und gibt nur die passenden Zeilen aus. Der zweite gibt mit <code class="i">$p</code> die letzte Zeile aus (wie <code class="i">tail -n 1</code>).</p></details>
+<p><b>f)</b> Zeige alle Zeilen ab der dritten und überlege, wofür <code class="i">tail -f</code> gut ist.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>tail -n +3 ~/daten/words.list      # ab Zeile 3 bis zum Ende
+tail -f /var/log/syslog            # neue Zeilen live mitlesen (Strg+C beendet)</code></pre>
+<p class="ex"><code class="i">tail -n +3</code> beginnt <i>bei</i> Zeile 3 statt die letzten drei zu zeigen. <code class="i">-f</code> (follow) hält die Datei offen und gibt neue Zeilen sofort aus. So verfolgt man Logdateien beim Testen.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
