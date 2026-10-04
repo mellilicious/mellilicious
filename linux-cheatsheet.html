@@ -2195,6 +2195,94 @@ echo "world" | sed 's/world/[&amp;]/'                       # [world]</code></pr
 <p class="ex">Mit <code class="i">-E</code> (erweiterte Ausdrücke) bilden Klammern Gruppen, <code class="i">\1</code> und <code class="i">\2</code> setzen sie wieder ein. Ein <code class="i">&amp;</code> im Ersatz steht für den gefundenen Text. Wörtlich schreibt man <code class="i">\&amp;</code>.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 21 · Zahlen aus einer Liste herausziehen</h3>
+<p><b>Aufgabe:</b> Aus der Datei <code class="i">metrics.list</code> sollen die drei Zahlen mit dem Präfix <code class="i">lab:</code> in <code class="i">notes/numbers.txt</code> landen, eine pro Zeile und ohne das Präfix.</p>
+<p class="ex">Geübt wird: dasselbe Muster wie in Übung 10 (<code class="i">grep</code> filtert Zeilen, <code class="i">cut</code> schneidet das Feld aus), diesmal mit Zahlen. Danach lassen sich die Zahlen sortieren und berechnen. Hier nehmen wir die Beispieldatei <code class="i">~/daten/metrics.list</code>. Setzen Sie den Pfad aus Ihrer Aufgabenstellung ein.</p>
+<details><summary>Beispieldaten anlegen</summary>
+<pre><code>mkdir -p ~/daten
+printf 'cpu:12\nlab:42\nmem:78\nlab:7\ndisk:95\nlab:105\nnet:3\n' &gt; ~/daten/metrics.list
+cat -n ~/daten/metrics.list</code></pre>
+<p class="ex">Sieben Zeilen der Form <code class="i">name:wert</code>. Drei davon beginnen mit <code class="i">lab:</code> und enthalten die Zahlen 42, 7 und 105.</p></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes
+grep '^lab:' ~/daten/metrics.list | cut -d: -f2 &gt; notes/numbers.txt
+
+cat notes/numbers.txt          # 42  7  105  (je eine Zeile)
+wc -l notes/numbers.txt        # 3</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>grep '^lab:' datei</code></td><td>Wählt nur Zeilen aus, die mit <code>lab:</code> beginnen. Die anderen (<code>cpu:</code>, <code>mem:</code>, ...) fallen weg.</td></tr>
+<tr><td class="nw"><code>cut -d: -f2</code></td><td>Trennt am Doppelpunkt und gibt das zweite Feld aus, hier die Zahl.</td></tr>
+<tr><td class="nw"><code>&gt; notes/numbers.txt</code></td><td>Schreibt die Zahlen in die Datei.</td></tr>
+</table></div>
+<pre><code>cpu:12
+lab:42   --grep--&gt;  lab:42   --cut--&gt;  42
+mem:78
+lab:7    --grep--&gt;  lab:7    --cut--&gt;  7
+disk:95
+lab:105  --grep--&gt;  lab:105  --cut--&gt;  105
+net:3</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Für <code class="i">cut</code> ist eine Zahl nur Text:</b> Die Werkzeuge erkennen den Unterschied erst bei der Weiterverarbeitung. Deshalb ist das Herausziehen derselbe Schritt wie bei Wörtern. Beim Sortieren und Rechnen kommt es dann auf Zahlen an.</p>
+<p><b>Ein Wert pro Zeile:</b> Das ist das Format, das <code class="i">sort</code>, <code class="i">awk</code>, <code class="i">uniq</code> oder <code class="i">paste</code> erwarten. Aus einer gemischten Liste wird so eine saubere Zahlenliste.</p>
+<p><b>Sauber trennen:</b> <code class="i">^lab:</code> verhindert Treffer wie <code class="i">elab:2</code>, und das Präfix wird komplett entfernt, damit nur die Zahl bleibt.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>cut -d: -f1</code></td><td>Liefert dreimal <code>lab</code> statt der Zahlen.</td></tr>
+<tr><td><code>^</code> vergessen</td><td>Auch Zeilen wie <code>elab:2</code> werden erfasst, falls es sie gibt.</td></tr>
+<tr><td>Falscher Pfad</td><td><code>grep: …: No such file or directory</code>, in <code>numbers.txt</code> steht nichts.</td></tr>
+<tr><td><code>&gt;&gt;</code> statt <code>&gt;</code></td><td>Beim zweiten Lauf stehen die Zahlen doppelt in der Datei (6 Zeilen).</td></tr>
+<tr><td>Leerzeichen nach dem Doppelpunkt (<code>lab: 7</code>)</td><td><code>cut</code> liefert <code> 7</code> mit führendem Leerzeichen. Mit <code>tr -d ' '</code> oder <code>awk</code> entfernen.</td></tr>
+<tr><td>Zeilen, die keine Zahl enthalten</td><td><code>lab:abc</code> wird mitgenommen. Wenn nur Zahlen erlaubt sind, die Zeilen prüfen (siehe unten).</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 21 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit <code class="i">notes/numbers.txt</code> (42, 7, 105) und <code class="i">~/daten/metrics.list</code>.</p>
+<p><b>a)</b> Sortiere die Zahlen. Warum ist <code class="i">sort</code> allein falsch?</p>
+<details><summary>Lösung a)</summary>
+<pre><code>sort notes/numbers.txt          # 105  42  7   (als Text)
+sort -n notes/numbers.txt       # 7  42  105   (als Zahl)
+sort -nr notes/numbers.txt      # 105  42  7   (absteigend)</code></pre>
+<p class="ex">Ohne <code class="i">-n</code> vergleicht <code class="i">sort</code> Zeichen: <code class="i">105</code> kommt vor <code class="i">42</code>, weil <code class="i">1</code> kleiner als <code class="i">4</code> ist. Mit <code class="i">-n</code> zählt der Wert. Auch Dezimalzahlen sortiert <code class="i">-n</code> richtig (<code class="i">2  3.5  10</code>).</p></details>
+<p><b>b)</b> Finde die größte und die kleinste Zahl.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>sort -n notes/numbers.txt | tail -n 1      # 105  (Maximum)
+sort -n notes/numbers.txt | head -n 1      # 7    (Minimum)</code></pre>
+<p class="ex">Numerisch sortieren, dann die letzte oder erste Zeile nehmen (Übung 14 und 15).</p></details>
+<p><b>c)</b> Berechne Summe und Durchschnitt.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>awk '{s+=$1} END {print s}' notes/numbers.txt              # 154
+awk '{s+=$1; n++} END {print s/n}' notes/numbers.txt       # 51.3333
+paste -sd+ notes/numbers.txt | bc                           # 154</code></pre>
+<p class="ex">Bei jeder Zeile wird <code class="i">$1</code> zur Summe <code class="i">s</code> addiert, am Ende (<code class="i">END</code>) wird sie ausgegeben. <code class="i">paste -sd+</code> macht aus den Zeilen <code class="i">42+7+105</code>, und <code class="i">bc</code> rechnet das aus (falls installiert).</p></details>
+<p><b>d)</b> Gib nur Zahlen größer als 10 aus.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>awk '$1 &gt; 10' notes/numbers.txt          # 42  105</code></pre>
+<p class="ex">Ein Vergleich vor der Aktion filtert Zeilen. <code class="i">awk</code> vergleicht hier als Zahl.</p></details>
+<p><b>e)</b> Nimm nur Zeilen mit einer ganzen Zahl nach <code class="i">lab:</code>.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>printf 'lab:42\nlab:abc\nlab:3.5\nlab:\nlab: 7\nlab:-4\n' &gt; t.list
+
+grep -E '^lab:[0-9]+$' t.list | cut -d: -f2                      # 42
+awk -F: '$1=="lab" &amp;&amp; $2 ~ /^[0-9]+$/ {print $2}' t.list         # 42
+sed -n 's/^lab:\([0-9][0-9]*\)$/\1/p' t.list                      # 42</code></pre>
+<p class="ex"><code class="i">-E</code> aktiviert erweiterte Ausdrücke. <code class="i">[0-9]+$</code> bedeutet: eine oder mehr Ziffern bis zum Zeilenende, und sonst nichts. Damit fallen <code class="i">abc</code>, <code class="i">3.5</code>, die leere Angabe, das Leerzeichen und das Minus heraus.</p></details>
+<p><b>f)</b> Hole die Zahlen mit einem einzigen <code class="i">grep</code>, ohne <code class="i">cut</code>.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>grep -oP '(?&lt;=^lab:)[0-9]+' ~/daten/metrics.list       # 42  7  105</code></pre>
+<p class="ex"><code class="i">-o</code> gibt nur den passenden Teil aus, <code class="i">-P</code> erlaubt Perl-Ausdrücke. <code class="i">(?&lt;=^lab:)</code> bedeutet: „davor steht <code class="i">lab:</code> am Zeilenanfang“, gehört aber nicht zum Treffer. Das ist GNU-spezifisch. Portabler ist <code class="i">cut</code>.</p></details>
+<p><b>g)</b> Sortiere <i>alle</i> Werte der Datei, unabhängig vom Präfix.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>cut -d: -f2 ~/daten/metrics.list | sort -n      # 3  7  12  42  78  95  105</code></pre>
+<p class="ex">Ohne <code class="i">grep</code> werden alle Zeilen ausgewertet. Hier steht das Präfix für die Art der Messung, der Wert dahinter ist immer die Zahl.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
