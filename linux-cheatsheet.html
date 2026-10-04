@@ -4089,6 +4089,107 @@ chmod 750 projects/linux                 # wieder öffnen</code></pre>
 <p class="ex">Der Besitzer darf die Rechte seines Ordners jederzeit ändern, auch wenn er ihn gerade nicht betreten darf. Der Administrator ignoriert die Sperren und kann trotzdem zugreifen.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 39 · Wer bin ich? Eine private Datei anlegen</h3>
+<p><b>Aufgabe:</b> Speichere die Ausgabe von <code class="i">whoami</code> in <code class="i">projects/private.txt</code> und setze die Datei auf den Modus <code class="i">600</code>.</p>
+<p class="ex">Geübt wird: den eigenen Benutzernamen ermitteln, die Ausgabe in eine Datei umleiten und die Datei nur für sich selbst lesbar machen. Der Inhalt hängt davon ab, unter welchem Benutzer Sie angemeldet sind. Die Datei enthält also <i>Ihren</i> Namen, nicht ein festes Wort.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p projects
+whoami &gt; projects/private.txt
+chmod 600 projects/private.txt
+
+cat projects/private.txt                  # Ihr Benutzername
+ls -l projects/private.txt                # -rw------- 1 &lt;name&gt; &lt;gruppe&gt; ...
+stat -c '%a %A %U' projects/private.txt   # 600 -rw------- &lt;name&gt;</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Befehl</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>whoami</code></td><td>Gibt den Namen des Benutzers aus, unter dem der Befehl <i>gerade</i> läuft (who am I).</td></tr>
+<tr><td class="nw"><code>&gt; projects/private.txt</code></td><td>Schreibt diesen Namen in die Datei.</td></tr>
+<tr><td class="nw"><code>chmod 600 datei</code></td><td>Setzt die Rechte auf <code>rw-------</code>: Der Besitzer darf lesen und schreiben, die Gruppe und alle anderen dürfen gar nichts.</td></tr>
+<tr><td class="nw"><code>ls -l</code>, <code>stat</code></td><td>Kontrolle der Rechte als Text und als Zahl.</td></tr>
+</table></div>
+<pre><code>6 = rw-   (Besitzer: lesen + schreiben)
+0 = ---   (Gruppe: nichts)
+0 = ---   (andere: nichts)</code></pre></div>
+
+<div class="blk"><h3>Wer bin ich? Verschiedene Befehle</h3><div class="tw"><table>
+<tr><th>Befehl</th><th>Ausgabe</th></tr>
+<tr><td class="nw"><code>whoami</code></td><td>Name des <i>aktuellen</i> Benutzers</td></tr>
+<tr><td class="nw"><code>id</code></td><td>Benutzer-ID (UID), Gruppen-ID (GID) und alle Gruppen</td></tr>
+<tr><td class="nw"><code>id -un</code> / <code>id -u</code> / <code>id -gn</code></td><td>nur Benutzername / nur UID / nur Gruppenname</td></tr>
+<tr><td class="nw"><code>echo $USER</code></td><td>Umgebungsvariable mit dem Benutzernamen (kann fehlen oder veraltet sein)</td></tr>
+<tr><td class="nw"><code>groups</code></td><td>Alle Gruppen, in denen Sie Mitglied sind</td></tr>
+<tr><td class="nw"><code>hostname</code></td><td>Name des Rechners</td></tr>
+<tr><td class="nw"><code>who</code>, <code>w</code></td><td>Wer ist gerade angemeldet?</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Privates gehört nur dem Besitzer:</b> Mit <code class="i">600</code> kann kein anderer Benutzer die Datei lesen oder ändern. Das ist der richtige Modus für Passwörter, Schlüssel (zum Beispiel <code class="i">~/.ssh/id_ed25519</code>) und persönliche Notizen. Ihr Besitzer ist der, der sie angelegt hat.</p>
+<p><b>Aktuell vs. angemeldet:</b> <code class="i">whoami</code> meldet den Benutzer, unter dem der Prozess läuft. Wer mit <code class="i">sudo</code> arbeitet, sieht dort <code class="i">root</code>. <code class="i">who am i</code> und <code class="i">logname</code> zeigen den Namen der ursprünglichen Anmeldung, aber nur in einer Login-Sitzung (in Containern oder Skripten bleiben sie leer).</p>
+<p><b>Neue Dateien sind zunächst für alle lesbar:</b> Mit <code class="i">umask 022</code> bekommt eine neue Datei <code class="i">644</code>. Zwischen dem Anlegen mit <code class="i">&gt;</code> und dem <code class="i">chmod</code> ist sie also kurz für andere lesbar. Bei sensiblen Daten setzt man die Rechte <i>vor</i> dem Schreiben (siehe Weiterüben).</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>echo whoami &gt; datei</code></td><td>In der Datei steht das <i>Wort</i> <code>whoami</code>, nicht Ihr Name. Der Befehl muss ausgeführt werden: <code>whoami &gt; datei</code> oder <code>echo "$(whoami)"</code>.</td></tr>
+<tr><td><code>chmod</code> vergessen</td><td>Die Datei hat <code>644</code> und ist für alle lesbar. Das ist bei neuen Dateien der Normalfall.</td></tr>
+<tr><td>Zu kurze Zahl (<code>chmod 60 datei</code>)</td><td>Wird als <code>060</code> gelesen: Der Besitzer verliert alle Rechte (<code>---rw----</code>). Immer drei Ziffern.</td></tr>
+<tr><td><code>chmod 6000</code></td><td>Vier Ziffern setzen Sonderrechte (setuid, setgid). Nicht gemeint.</td></tr>
+<tr><td><code>chmod 640</code> oder <code>644</code> statt <code>600</code></td><td>Gruppe oder alle anderen können die Datei lesen. Die Aufgabe verlangt genau <code>600</code>.</td></tr>
+<tr><td><code>chmod 400</code> statt <code>600</code></td><td>Auch der Besitzer darf nicht mehr schreiben (<code>Permission denied</code> beim Schreiben). Für SSH-Schlüssel üblich, aber nicht verlangt.</td></tr>
+<tr><td>Falscher Pfad</td><td><code>chmod: cannot access 'projects/nix.txt': No such file or directory</code>.</td></tr>
+<tr><td><code>$USER</code> statt <code>whoami</code></td><td>Kann leer oder veraltet sein (zum Beispiel nach <code>sudo</code> oder <code>su</code>). <code>whoami</code> fragt das System.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 39 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie im Übungsordner <code class="i">~/uebung</code>. Wo Beispiele einen zweiten Benutzer erwähnen, stammen die Ergebnisse aus einem Test mit einem fremden Benutzerkonto.</p>
+<p><b>a)</b> Lege die Datei von Anfang an privat an, ohne Zeitfenster.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>(umask 077; whoami &gt; projects/p3.txt)             # neue Dateien in diesem Block: 600
+stat -c '%a' projects/p3.txt                      # 600
+
+touch projects/p4.txt; chmod 600 projects/p4.txt  # erst Datei, dann Rechte, dann schreiben
+whoami &gt; projects/p4.txt                          # &gt; behält den Modus 600
+
+install -m 600 /dev/null projects/p5.txt          # leere Datei mit Modus anlegen
+whoami &gt; projects/p5.txt</code></pre>
+<p class="ex">Mit <code class="i">umask 077</code> in Klammern gilt die Maske nur für diesen Block. Das Umleiten mit <code class="i">&gt;</code> auf eine vorhandene Datei ändert ihren Modus nicht. So ist sie nie für andere lesbar.</p></details>
+<p><b>b)</b> Zeige alle Angaben über dich.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>id                  # uid=…(name) gid=…(gruppe) groups=…
+id -un; id -u; id -gn; id -g
+groups
+hostname
+who</code></pre>
+<p class="ex">Die UID identifiziert den Benutzer für das System, der Name ist nur das Etikett dazu. <code class="i">0</code> ist immer der Administrator (<code class="i">root</code>).</p></details>
+<p><b>c)</b> Schreibe Benutzer, Rechner und Datum in einen Satz.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>echo "$(whoami)@$(hostname) am $(date +%F)"      # z. B.  anna@server01 am 2026-10-04
+echo "$(whoami)@$(hostname)" &gt; projects/ident.txt</code></pre>
+<p class="ex">Mit <code class="i">$(…)</code> setzen Sie die Ausgabe der Befehle in den Text ein (Übung 25).</p></details>
+<p><b>d)</b> Was kann ein anderer Benutzer mit der Datei machen?</p>
+<details><summary>Lösung d)</summary>
+<pre><code>chmod 600 projects/private.txt     # Besitzer: rw-, Gruppe: ---, andere: ---
+chmod 640 projects/private.txt     # Gruppe darf lesen
+chmod 644 projects/private.txt     # alle dürfen lesen</code></pre>
+<p class="ex">Im Test: Ein fremder Benutzer bekam bei <code class="i">600</code> <code class="i">Permission denied</code> und konnte bei <code class="i">644</code> lesen. Bei <code class="i">640</code> konnte ein Mitglied der Gruppe lesen, ein Nichtmitglied nicht. Die Gruppe steht im <code class="i">ls -l</code> neben dem Besitzer.</p></details>
+<p><b>e)</b> Prüfe die Rechte aus Sicht des Programms.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>[ -r projects/private.txt ] &amp;&amp; echo "ich darf lesen"
+[ -w projects/private.txt ] &amp;&amp; echo "ich darf schreiben"
+[ -O projects/private.txt ] &amp;&amp; echo "die Datei gehört mir"
+stat -c '%U %G' projects/private.txt     # Besitzer und Gruppe</code></pre>
+<p class="ex"><code class="i">-O</code> prüft, ob die Datei dem aktuellen Benutzer gehört. So erkennt ein Skript, ob es die Rechte ändern darf.</p></details>
+<p><b>f)</b> Wer darf die Rechte ändern?</p>
+<details><summary>Lösung f)</summary>
+<pre><code>chmod 600 projects/private.txt            # als Besitzer: geht
+sudo chown root projects/private.txt      # Besitzer wechseln (Administrator nötig)
+ls -l projects/private.txt                # -rw------- 1 root ...</code></pre>
+<p class="ex">Nur der Besitzer (und der Administrator) darf <code class="i">chmod</code> anwenden. Den Besitzer wechselt nur der Administrator mit <code class="i">chown</code>. Nach <code class="i">sudo chown root</code> können Sie die Datei selbst nicht mehr lesen. Zum Zurückgeben: <code class="i">sudo chown $(whoami) projects/private.txt</code>.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
