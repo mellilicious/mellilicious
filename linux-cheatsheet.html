@@ -2283,6 +2283,95 @@ sed -n 's/^lab:\([0-9][0-9]*\)$/\1/p' t.list                      # 42</code></p
 <p class="ex">Ohne <code class="i">grep</code> werden alle Zeilen ausgewertet. Hier steht das Präfix für die Art der Messung, der Wert dahinter ist immer die Zahl.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 22 · Zahlen sortieren</h3>
+<p><b>Aufgabe:</b> Lege <code class="i">notes/numbers-sorted.txt</code> mit den Zahlen <code class="i">4</code>, <code class="i">17</code> und <code class="i">44</code> an, jede in einer eigenen Zeile und aufsteigend nach Wert.</p>
+<p class="ex">Geübt wird: <code class="i">sort -n</code>. Der Unterschied zwischen alphabetischem und numerischem Sortieren ist die Falle dieser Aufgabe. Wir nehmen die Beispieldatei <code class="i">~/daten/zahlen.txt</code> mit den Zahlen in der Reihenfolge 44, 4, 17. Falls Ihre Kursaufgabe die Zahlen direkt nennt, geht auch der <code class="i">printf</code>-Weg aus Übung 8.</p>
+<details><summary>Beispieldaten anlegen</summary>
+<pre><code>mkdir -p ~/daten
+printf '44\n4\n17\n' &gt; ~/daten/zahlen.txt
+cat ~/daten/zahlen.txt        # 44  4  17</code></pre></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes
+sort -n ~/daten/zahlen.txt &gt; notes/numbers-sorted.txt
+
+cat notes/numbers-sorted.txt   # 4  17  44
+wc -l notes/numbers-sorted.txt # 3</code></pre>
+<p class="ex">Ohne <code class="i">-n</code> würde <code class="i">sort</code> <code class="i">17</code>, <code class="i">4</code>, <code class="i">44</code> liefern.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>sort</code></td><td>Sortiert die Zeilen. Ohne Option vergleicht es Zeichen für Zeichen, also alphabetisch.</td></tr>
+<tr><td class="nw"><code>-n</code></td><td><b>n</b>umeric: Liest den Anfang jeder Zeile als Zahl und vergleicht den <i>Wert</i>.</td></tr>
+<tr><td class="nw"><code>&gt; notes/numbers-sorted.txt</code></td><td>Schreibt das Ergebnis in die Datei.</td></tr>
+</table></div>
+<pre><code>alphabetisch (sort)    numerisch (sort -n)
+17                     4
+4                      17
+44                     44
+
+Text: "17" kommt vor "4", weil '1' vor '4' steht.</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Zeichen sind keine Zahlen:</b> Für <code class="i">sort</code> ist <code class="i">17</code> zunächst die Folge der Zeichen <code class="i">1</code> und <code class="i">7</code>. Verglichen wird das erste Zeichen: <code class="i">1</code> ist kleiner als <code class="i">4</code>, also steht <code class="i">17</code> vor <code class="i">4</code>. Erst <code class="i">-n</code> macht daraus einen Wertvergleich.</p>
+<p><b>Immer <code class="i">-n</code>, wenn Zahlen gemeint sind:</b> Das gilt für Dateigrößen, Zähler, Ports, IDs. Sonst wirken Ergebnisse zufällig falsch.</p>
+<p><b>Praxis:</b> <code class="i">du -s * | sort -n</code> zeigt die größten Ordner zuletzt, <code class="i">sort | uniq -c | sort -nr</code> liefert die Häufigkeitsliste (Übung 12).</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>-n</code> vergessen</td><td><code>17  4  44</code> statt <code>4  17  44</code>. Die Datei hat die richtigen Zahlen, aber die falsche Reihenfolge.</td></tr>
+<tr><td><code>sort -nr</code></td><td>Absteigend (<code>44  17  4</code>). Die Aufgabe verlangt aufsteigend.</td></tr>
+<tr><td><code>sort -n datei &gt; datei</code></td><td>Die Datei wird geleert, bevor <code>sort</code> liest (0 Bytes). Besser <code>sort -n -o datei datei</code>.</td></tr>
+<tr><td><code>sort -nu</code></td><td>Entfernt zugleich doppelte Zeilen. Gewollt nur, wenn die Aufgabe das verlangt.</td></tr>
+<tr><td>Zahlen mit Text gemischt</td><td>Zeilen ohne führende Zahl zählen als <code>0</code> und stehen vorn.</td></tr>
+<tr><td>Zahlen in der Quelle nicht eine pro Zeile</td><td>Erst mit <code>tr ' ' '\n'</code> in eine Zeile je Zahl bringen.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 22 · Zum Weiterüben</h3>
+<p class="ex">Die Beispiele laufen direkt im Terminal. Die Zahlen stehen mit <code class="i">printf</code> in der Pipe.</p>
+<p><b>a)</b> Sortiere absteigend und entferne dabei Duplikate.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>sort -nr ~/daten/zahlen.txt                          # 44  17  4
+printf '4\n17\n4\n44\n17\n' | sort -n                # 4 4 17 17 44
+printf '4\n17\n4\n44\n17\n' | sort -nu               # 4 17 44</code></pre>
+<p class="ex"><code class="i">-r</code> kehrt die Reihenfolge um, <code class="i">-u</code> behält pro Zahlenwert nur eine Zeile.</p></details>
+<p><b>b)</b> Sortiere negative Zahlen und Dezimalzahlen.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>printf '3.5\n-2\n10\n0.25\n-10\n' | sort -n          # -10  -2  0.25  3.5  10</code></pre>
+<p class="ex"><code class="i">-n</code> versteht das Minuszeichen und den Dezimalpunkt. Wie ein Komma als Dezimaltrenner behandelt wird, hängt von der Spracheinstellung ab. Sicherer ist <code class="i">LC_ALL=C</code> mit Punkt.</p></details>
+<p><b>c)</b> Was passiert bei führenden Nullen und Leerzeichen?</p>
+<details><summary>Lösung c)</summary>
+<pre><code>printf '007\n10\n9\n' | sort                        # 007  10  9    (als Text)
+printf '007\n10\n9\n' | sort -n                     # 007  9  10    (007 = 7)
+printf ' 17\n4\n 44\n' | sort -n                    # 4   17   44    (Leerzeichen stört nicht)</code></pre>
+<p class="ex">Bei <code class="i">-n</code> zählt der Wert: <code class="i">007</code> ist <code class="i">7</code>. Führende Leerzeichen werden übersprungen.</p></details>
+<p><b>d)</b> Sortiere Größenangaben und Versionsnummern.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>printf '2K\n1M\n512\n3G\n' | sort -h                 # 512  2K  1M  3G
+printf 'v1.10\nv1.9\nv1.2\n' | sort                 # v1.10  v1.2  v1.9   (als Text)
+printf 'v1.10\nv1.9\nv1.2\n' | sort -V              # v1.2  v1.9  v1.10</code></pre>
+<p class="ex"><code class="i">-h</code> (human numeric) versteht <code class="i">K</code>, <code class="i">M</code>, <code class="i">G</code> wie in <code class="i">du -h</code>. <code class="i">-V</code> (version sort) sortiert Versionsnummern natürlich. Beides sind GNU-Optionen.</p></details>
+<p><b>e)</b> Sortiere Zeilen nach einer Spalte.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>printf 'anna 44\nben 4\ncarla 17\n' | sort -k2 -n         # ben 4 / carla 17 / anna 44
+printf 'x,44\ny,4\nz,17\n' | sort -t, -k2n               # y,4 / z,17 / x,44</code></pre>
+<p class="ex"><code class="i">-k2</code> sortiert nach dem zweiten Feld, <code class="i">-t,</code> setzt das Komma als Trenner. Ohne <code class="i">-t</code> gelten Leerzeichen als Trenner.</p></details>
+<p><b>f)</b> Was macht <code class="i">sort -n</code> mit Text, und was ist der Unterschied zu <code class="i">-g</code>?</p>
+<details><summary>Lösung f)</summary>
+<pre><code>printf '17\nabc\n4\n' | sort -n                    # abc  4  17   (abc zählt als 0)
+printf '1e3\n20\n5\n' | sort -n                    # 1e3  5  20   (1e3 = "1")
+printf '1e3\n20\n5\n' | sort -g                    # 5  20  1e3   (1e3 = 1000)</code></pre>
+<p class="ex"><code class="i">-g</code> (general numeric) versteht auch Schreibweisen wie <code class="i">1e3</code>. Es ist langsamer und nur selten nötig.</p></details>
+<p><b>g)</b> Prüfe, ob eine Datei schon numerisch sortiert ist, und sortiere eine Datei in sich selbst.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>sort -nc ~/daten/zahlen.txt; echo $?               # 1  (nicht sortiert, mit Meldung)
+sort -nc notes/numbers-sorted.txt; echo $?         # 0  (sortiert)
+sort -n -o ~/daten/zahlen.txt ~/daten/zahlen.txt    # sicher in sich selbst schreiben</code></pre>
+<p class="ex"><code class="i">-c</code> prüft nur und meldet über den Exit-Code. <code class="i">-o</code> schreibt erst, nachdem alles gelesen wurde, und ist deshalb für dieselbe Datei sicher. Danach ist <code class="i">zahlen.txt</code> sortiert, legen Sie sie für Übung 22 bei Bedarf neu an.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
