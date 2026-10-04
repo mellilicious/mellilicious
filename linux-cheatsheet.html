@@ -1241,6 +1241,79 @@ wc -l notes/kopie.txt</code></pre>
 <p class="ex"><code class="i">tee</code> schreibt die Eingabe in die Datei <i>und</i> gibt sie weiter, hier an den Bildschirm. Mit <code class="i">tee -a</code> wird angehängt.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 9 · Text anhängen</h3>
+<p><b>Aufgabe:</b> Hänge in <code class="i">~/uebung</code> eine vierte Zeile <code class="i">grep</code> an die Datei <code class="i">notes/commands.txt</code> an.</p>
+<p class="ex">Geübt wird: <code class="i">&gt;&gt;</code> hängt an, <code class="i">&gt;</code> überschreibt. Die Datei stammt aus Übung 8 (drei Zeilen: <code class="i">pwd</code>, <code class="i">ls</code>, <code class="i">mkdir</code>). Falls sie fehlt, legen Sie sie dort an.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+printf 'grep\n' &gt;&gt; notes/commands.txt       # eine Zeile anhängen
+
+cat notes/commands.txt                      # pwd, ls, mkdir, grep
+wc -l notes/commands.txt                    # 4
+tail -n 1 notes/commands.txt                # letzte Zeile: grep</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Befehl</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>printf 'grep\n'</code></td><td>Gibt das Wort <code>grep</code> mit einem Zeilenumbruch aus.</td></tr>
+<tr><td class="nw"><code>&gt;&gt; datei</code></td><td>Hängt die Ausgabe ans <i>Ende</i> der Datei an. Der vorhandene Inhalt bleibt erhalten. Gibt es die Datei nicht, wird sie angelegt.</td></tr>
+<tr><td class="nw"><code>&gt; datei</code></td><td>Zum Vergleich: Überschreibt die Datei, der alte Inhalt ist weg.</td></tr>
+<tr><td class="nw"><code>wc -l datei</code></td><td>Zählt die Zeilen, hier jetzt <code>4</code>.</td></tr>
+<tr><td class="nw"><code>tail -n 1 datei</code></td><td>Zeigt die letzte Zeile, also die gerade angehängte.</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Anhängen statt neu schreiben:</b> Mit <code class="i">&gt;&gt;</code> ergänzen Sie eine Datei, ohne sie zu kennen oder neu aufzubauen. Typisch sind Logdateien, Notizen oder Konfigurationen, zu denen eine Zeile dazukommt.</p>
+<p><b>Mit Zeilenumbruch:</b> <code class="i">printf 'grep\n'</code> erzeugt eine vollständige Zeile. Ohne <code class="i">\n</code> würde der nächste Anhängevorgang direkt hinter <code class="i">grep</code> weiterschreiben.</p>
+<p><b>Vorher wichtig:</b> Hat die vorhandene Datei am Ende <i>keinen</i> Zeilenumbruch, landet der neue Text an der letzten Zeile (aus <code class="i">mkdir</code> wird <code class="i">mkdirgrep</code>). Bei einer mit <code class="i">printf '…\n'</code> erzeugten Datei ist das kein Problem.</p>
+<p><b>Kontrolle:</b> <code class="i">cat</code> zeigt den Inhalt, <code class="i">wc -l</code> die Zeilenzahl. Erwartet sind 4.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>&gt;</code> statt <code>&gt;&gt;</code></td><td>Die Datei wird überschrieben und enthält danach nur noch <code>grep</code> (1 Zeile). Die alten drei Zeilen sind verloren.</td></tr>
+<tr><td><code>\n</code> vergessen</td><td>Die Zeile hat kein Ende. Die nächste Anhängeaktion klebt an <code>grep</code>.</td></tr>
+<tr><td>Altes Ende ohne Zeilenumbruch</td><td>Es entsteht <code>mkdirgrep</code> statt zwei Zeilen. Vorher mit <code>cat -A</code> prüfen.</td></tr>
+<tr><td>Befehl zweimal ausgeführt</td><td>Die Zeile steht doppelt, die Datei hat 5 Zeilen. <code>&gt;&gt;</code> prüft nicht, ob der Text schon da ist.</td></tr>
+<tr><td>Falscher Pfad</td><td>Es wird still eine neue Datei an anderer Stelle angelegt, wenn der Ordner existiert. Mit <code>pwd</code> und <code>ls notes</code> prüfen.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 9 · Zum Weiterüben</h3>
+<p class="ex">Probieren Sie die Varianten im Übungsordner <code class="i">~/uebung</code> aus. Dafür eignet sich eine Kopie, zum Beispiel <code class="i">cp notes/commands.txt notes/test.txt</code>.</p>
+<p><b>a)</b> Hänge <code class="i">grep</code> mit <code class="i">echo</code> statt <code class="i">printf</code> an.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>echo grep &gt;&gt; notes/test.txt
+cat -A notes/test.txt</code></pre>
+<p class="ex"><code class="i">echo</code> setzt den Zeilenumbruch automatisch. Für einfachen Text reicht es, <code class="i">printf</code> ist bei Sonderzeichen und mehreren Zeilen sicherer.</p></details>
+<p><b>b)</b> Hänge zwei Zeilen <code class="i">sed</code> und <code class="i">awk</code> mit einem Befehl an.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>printf '%s\n' sed awk &gt;&gt; notes/test.txt
+tail -n 3 notes/test.txt</code></pre>
+<p class="ex"><code class="i">%s\n</code> wird für jedes Argument wiederholt: je Wort eine Zeile.</p></details>
+<p><b>c)</b> Hänge das aktuelle Datum als neue Zeile an eine Datei <code class="i">notes/log.txt</code> an.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>date +%F &gt;&gt; notes/log.txt          # z. B. 2026-10-04
+date +%F &gt;&gt; notes/log.txt          # läuft öfter: jeder Aufruf fügt eine Zeile hinzu
+cat notes/log.txt</code></pre>
+<p class="ex">Auch die Ausgabe jedes anderen Befehls lässt sich anhängen. So entstehen einfache Protokolle. Die Datei <code class="i">log.txt</code> wird beim ersten Mal automatisch angelegt.</p></details>
+<p><b>d)</b> Hänge <code class="i">cut</code> nur an, wenn die Zeile noch nicht in der Datei steht.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>grep -qx cut notes/test.txt || echo cut &gt;&gt; notes/test.txt</code></pre>
+<p class="ex"><code class="i">grep -qx</code> sucht still (<code class="i">-q</code>) nach einer Zeile, die <i>genau</i> so lautet (<code class="i">-x</code>). Findet es sie, ist der Befehl erfolgreich und <code class="i">||</code> führt den Rest nicht aus. Sonst wird angehängt. Der Befehl lässt sich beliebig oft wiederholen, ohne dass Dubletten entstehen.</p></details>
+<p><b>e)</b> Entferne die zuletzt angehängte Zeile wieder.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>sed -i '$d' notes/test.txt          # $d: letzte Zeile löschen, -i: in der Datei
+wc -l notes/test.txt</code></pre>
+<p class="ex"><code class="i">$</code> steht in <code class="i">sed</code> für die letzte Zeile, <code class="i">d</code> für löschen. Wegen <code class="i">-i</code> wird die Datei direkt verändert. Mit einfachen Anführungszeichen schützen Sie das <code class="i">$</code> vor der Shell. Zum Ausprobieren erst die Kopie verwenden.</p></details>
+<p><b>f)</b> Prüfe, ob eine Datei auf einen Zeilenumbruch endet, und ergänze ihn bei Bedarf.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>printf 'a\nb' &gt; notes/n.txt             # endet ohne Zeilenumbruch
+tail -c1 notes/n.txt | od -c           # zeigt das letzte Zeichen: b statt \n
+[ -n "$(tail -c1 notes/n.txt)" ] &amp;&amp; echo &gt;&gt; notes/n.txt
+cat -A notes/n.txt                     # jetzt: a$  b$</code></pre>
+<p class="ex"><code class="i">tail -c1</code> liefert das letzte Zeichen. Die Befehlsersetzung <code class="i">$(…)</code> schneidet einen Zeilenumbruch ab. Ist das Ergebnis nicht leer, fehlt also der Umbruch, und <code class="i">echo</code> fügt ihn hinzu.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
