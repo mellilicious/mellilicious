@@ -1314,6 +1314,81 @@ cat -A notes/n.txt                     # jetzt: a$  b$</code></pre>
 <p class="ex"><code class="i">tail -c1</code> liefert das letzte Zeichen. Die Befehlsersetzung <code class="i">$(…)</code> schneidet einen Zeilenumbruch ab. Ist das Ergebnis nicht leer, fehlt also der Umbruch, und <code class="i">echo</code> fügt ihn hinzu.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 10 · Werte aus einer Liste herausziehen</h3>
+<p><b>Aufgabe:</b> Aus der Datei <code class="i">words.list</code> sollen die fünf Werte mit dem Präfix <code class="i">lab:</code> in <code class="i">notes/words.txt</code> landen, einer pro Zeile und ohne das Präfix.</p>
+<p class="ex">Geübt wird: Zeilen mit <code class="i">grep</code> filtern, mit <code class="i">cut</code> ein Feld herausschneiden und beides per Pipe verbinden. In der echten Aufgabe liegt <code class="i">words.list</code> in einem vorgegebenen Datenordner. Hier nehmen wir <code class="i">~/daten/words.list</code> mit Beispieldaten. Setzen Sie für Ihre Aufgabe den Pfad aus der Aufgabenstellung ein.</p>
+<details><summary>Beispieldaten anlegen</summary>
+<pre><code>mkdir -p ~/daten
+printf 'lab:alpha\nnote:eins\nlab:bravo\ncollab:fake\nlab:charlie\nnote:zwei\nlab:delta\nlab:echo\ntodo:x\n' &gt; ~/daten/words.list
+cat ~/daten/words.list</code></pre>
+<p class="ex">Die Datei enthält Zeilen der Form <code class="i">präfix:wert</code>. Fünf davon beginnen mit <code class="i">lab:</code>. Die Zeile <code class="i">collab:fake</code> enthält <code class="i">lab:</code> ebenfalls, beginnt aber anders. Sie soll nicht dazugehören.</p></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes
+grep '^lab:' ~/daten/words.list | cut -d: -f2 &gt; notes/words.txt
+
+cat notes/words.txt              # alpha, bravo, charlie, delta, echo
+wc -l notes/words.txt            # 5</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>grep '^lab:' datei</code></td><td>Gibt nur die Zeilen aus, die mit <code>lab:</code> <i>beginnen</i>. Das <code>^</code> steht für den Zeilenanfang.</td></tr>
+<tr><td class="nw"><code>|</code></td><td>Reicht die Ausgabe von <code>grep</code> als Eingabe an <code>cut</code> weiter.</td></tr>
+<tr><td class="nw"><code>cut -d: -f2</code></td><td>Teilt jede Zeile am Doppelpunkt (<code>-d:</code>, <b>d</b>elimiter) und gibt das zweite Feld aus (<code>-f2</code>, <b>f</b>ield). Aus <code>lab:alpha</code> wird <code>alpha</code>.</td></tr>
+<tr><td class="nw"><code>&gt; notes/words.txt</code></td><td>Schreibt das Ergebnis in die Datei, jeder Wert in eine eigene Zeile.</td></tr>
+</table></div>
+<pre><code>lab:alpha  --grep--&gt;  lab:alpha  --cut--&gt;  alpha
+note:eins  --grep--&gt;  (entfällt)
+lab:bravo  --grep--&gt;  lab:bravo  --cut--&gt;  bravo</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Zwei kleine Werkzeuge:</b> Jedes macht eine Sache gut. <code class="i">grep</code> wählt Zeilen aus, <code class="i">cut</code> wählt Spalten aus. Die Pipe verbindet sie. Dieses Muster brauchen Sie ständig, bei Logdateien, CSV-Dateien oder <code class="i">/etc/passwd</code>.</p>
+<p><b>Warum <code class="i">^</code>?</b> Ohne Anker findet <code class="i">grep 'lab:'</code> auch <code class="i">collab:fake</code> und liefert 6 statt 5 Treffer. Mit <code class="i">^lab:</code> zählt nur, was wirklich mit <code class="i">lab:</code> anfängt.</p>
+<p><b>Einfache Anführungszeichen:</b> Sie verhindern, dass die Shell Zeichen wie <code class="i">^</code> oder <code class="i">$</code> selbst auswertet.</p>
+<p><b>Original bleibt unverändert:</b> Beide Befehle lesen nur. Die Quelldatei <code class="i">words.list</code> wird nie verändert, das Ergebnis geht in eine neue Datei.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>^</code> vergessen</td><td>Auch <code>collab:fake</code> wird erfasst, die Datei hat 6 Zeilen.</td></tr>
+<tr><td><code>cut -d: -f1</code></td><td>Liefert das Präfix <code>lab</code> statt der Werte. Feld 2 ist der Wert.</td></tr>
+<tr><td><code>-d:</code> vergessen</td><td><code>cut</code> trennt dann an Tabulatoren, nicht am Doppelpunkt, und gibt die ganze Zeile aus.</td></tr>
+<tr><td><code>&gt;&gt;</code> statt <code>&gt;</code></td><td>Beim zweiten Ausführen stehen alle Werte doppelt in der Datei (10 Zeilen).</td></tr>
+<tr><td>Falscher Pfad zu <code>words.list</code></td><td><code>grep: …: No such file or directory</code>. Die Zieldatei wird trotzdem angelegt, aber leer.</td></tr>
+<tr><td>Wert enthält selbst einen Doppelpunkt</td><td><code>cut -f2</code> schneidet ab, <code>cut -f2-</code> behält den Rest.</td></tr>
+<tr><td>Leerzeichen oder <code>\r</code> am Zeilenende</td><td>Unsichtbare Zeichen bleiben im Ergebnis. Mit <code>cat -A</code> prüfen, ob etwas wie <code>^M$</code> auftaucht.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 10 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit den Beispieldaten aus <code class="i">~/daten/words.list</code>. Die Ergebnisse können Sie mit <code class="i">notes/words.txt</code> vergleichen.</p>
+<p><b>a)</b> Zähle die <code class="i">lab:</code>-Zeilen, ohne sie auszugeben.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>grep -c '^lab:' ~/daten/words.list      # 5
+grep -n '^lab:' ~/daten/words.list      # mit Zeilennummern in der Quelldatei</code></pre>
+<p class="ex"><code class="i">-c</code> zählt die passenden Zeilen, <code class="i">-n</code> zeigt ihre Nummern.</p></details>
+<p><b>b)</b> Zeige alle Zeilen, die <i>nicht</i> mit <code class="i">lab:</code> beginnen.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>grep -v '^lab:' ~/daten/words.list</code></pre>
+<p class="ex"><code class="i">-v</code> kehrt die Auswahl um (invert). So bekommen Sie den Rest der Datei, in unseren Beispieldaten <code class="i">note:…</code>, <code class="i">todo:…</code> und <code class="i">collab:fake</code>.</p></details>
+<p><b>c)</b> Erledige Filtern und Abschneiden in einem einzigen Befehl mit <code class="i">sed</code>.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>sed -n 's/^lab://p' ~/daten/words.list | diff - notes/words.txt &amp;&amp; echo "gleich"</code></pre>
+<p class="ex"><code class="i">s/^lab://</code> ersetzt das Präfix am Zeilenanfang durch nichts, <code class="i">-n</code> mit <code class="i">p</code> gibt nur die Zeilen aus, bei denen ersetzt wurde. Steht nach dem Doppelpunkt ein Leerzeichen, hilft <code class="i">s/^lab: *//p</code>.</p></details>
+<p><b>d)</b> Löse es mit <code class="i">awk</code>.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>awk -F: '$1=="lab" {print $2}' ~/daten/words.list</code></pre>
+<p class="ex"><code class="i">-F:</code> setzt den Trenner, <code class="i">$1</code> und <code class="i">$2</code> sind die Felder. Ist das erste Feld genau <code class="i">lab</code>, wird das zweite ausgegeben. Der Vergleich ist exakt, <code class="i">collab</code> fällt also von selbst heraus.</p></details>
+<p><b>e)</b> Sortiere die Werte absteigend und zeige die ersten zwei.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>grep '^lab:' ~/daten/words.list | cut -d: -f2 | sort -r | head -n 2</code></pre>
+<p class="ex">Pipes lassen sich beliebig verlängern. <code class="i">sort -r</code> sortiert umgekehrt, <code class="i">head -n 2</code> behält die ersten zwei Zeilen.</p></details>
+<p><b>f)</b> Schneide stattdessen anhand der Zeichenposition: alles ab dem 5. Zeichen.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>grep '^lab:' ~/daten/words.list | cut -c5-</code></pre>
+<p class="ex"><code class="i">-c5-</code> gibt ab Zeichen 5 bis zum Zeilenende aus. Das Präfix <code class="i">lab:</code> hat vier Zeichen. Das funktioniert nur bei einem Präfix fester Länge, bei wechselnden Präfixen ist <code class="i">-d</code> und <code class="i">-f</code> robuster.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
