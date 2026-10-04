@@ -3088,6 +3088,128 @@ rm projects/nix.txt                   # Fehlermeldung, Exit-Code 1
 <p class="ex"><code class="i">-f</code> (force) unterdrückt Fehler bei fehlenden Dateien und fragt nie nach. Praktisch in Skripten, aber auch gefährlich, weil Tippfehler nicht auffallen. <code class="i">test -e</code> und <code class="i">test -d</code> prüfen Existenz und Typ.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 30 · Verzeichnis mit Inhalt löschen</h3>
+<p><b>Aufgabe:</b> Entferne das Verzeichnis <code class="i">notes-backup</code> samt allem, was darin liegt.</p>
+<p class="ex">Geübt wird: <code class="i">rm -r</code> löscht rekursiv. Das ist die gefährlichste der bisherigen Übungen, weil nichts nachfragt und nichts zurückkommt. Deshalb steht das Prüfen vor dem Löschen im Mittelpunkt. Die Kopie <code class="i">notes-backup</code> haben Sie in Übung 28 erstellt. Falls sie fehlt, legt die Vorbereitung eine an.</p>
+<details><summary>Vorbereitung: Kopie anlegen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes/archiv
+echo "Hallo" &gt; notes/greeting.txt
+echo "alt" &gt; notes/archiv/old.txt
+echo "versteckt" &gt; notes/.versteckt
+cp -a notes notes-backup           # die Kopie, die gleich gelöscht wird
+ls -A notes-backup</code></pre></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+pwd                                 # bin ich im richtigen Ordner?
+ls -R notes-backup                  # was würde gelöscht?
+diff -r notes notes-backup &amp;&amp; echo "identisch: notes-backup ist nur eine Kopie"
+
+rm -r notes-backup                  # Ordner samt Inhalt löschen
+
+ls -d notes-backup                  # Kontrolle: No such file or directory
+ls notes                            # das Original ist unberührt</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>rm -r ordner</code></td><td><b>r</b>ecursive: löscht den Ordner, alle Unterordner und alle Dateien darin, auch versteckte. Zuerst den Inhalt, zuletzt den Ordner selbst.</td></tr>
+<tr><td class="nw"><code>pwd</code></td><td>Zeigt, in welchem Verzeichnis Sie sind. Wichtig bei relativen Pfaden.</td></tr>
+<tr><td class="nw"><code>ls -R</code></td><td>Listet den Inhalt rekursiv. So sehen Sie vorher, was getroffen wird.</td></tr>
+<tr><td class="nw"><code>diff -r a b</code></td><td>Prüft, ob die Kopie dem Original gleicht. Keine Ausgabe heißt: identisch.</td></tr>
+</table></div>
+<pre><code>notes-backup/
+  greeting.txt
+  .versteckt          --rm -r--&gt;     (nichts mehr da)
+  archiv/old.txt
+notes/  (bleibt)</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Kein Papierkorb, keine Rückfrage:</b> <code class="i">rm -r</code> arbeitet sofort und endgültig. Ein Tippfehler im Pfad trifft die falschen Daten. Deshalb gilt die Reihenfolge: <i>prüfen, löschen, kontrollieren</i>.</p>
+<p><b>Warum <code class="i">rmdir</code> hier nicht reicht:</b> <code class="i">rmdir</code> löscht nur leere Ordner und meldet <code class="i">Directory not empty</code>. <code class="i">rm</code> ohne <code class="i">-r</code> meldet <code class="i">Is a directory</code>. Mit <code class="i">-r</code> sagen Sie ausdrücklich: „auch den Inhalt.“</p>
+<p><b>Nur die Kopie:</b> Dass <code class="i">notes-backup</code> eine Kopie ist, zeigt <code class="i">diff -r</code>. Das Original <code class="i">notes</code> bleibt erhalten, denn eine Kopie ist ein eigenständiger Ordner.</p>
+<p><b><code class="i">-f</code> nur mit Bedacht:</b> <code class="i">rm -rf</code> unterdrückt Fehlermeldungen und Rückfragen. Für diese Aufgabe ist <code class="i">-f</code> unnötig und nimmt Ihnen die Warnungen.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>-r</code> vergessen</td><td><code>rm: cannot remove 'notes-backup': Is a directory</code>.</td></tr>
+<tr><td><code>rmdir</code> statt <code>rm -r</code></td><td><code>rmdir: failed to remove 'notes-backup': Directory not empty</code>.</td></tr>
+<tr><td>Falscher Ordner (<code>rm -r notes</code>)</td><td>Das <i>Original</i> ist weg. Namen genau lesen, vorher mit <code>ls</code> prüfen.</td></tr>
+<tr><td>Leerzeichen im Pfad (<code>rm -r a b</code>)</td><td>Es werden <i>zwei</i> Ziele gelöscht, <code>a</code> und <code>b</code>. Beim Test blieb <code>"a b"</code> stehen und der Ordner <code>a</code> war weg. Pfade mit Leerzeichen in Anführungszeichen setzen.</td></tr>
+<tr><td>Muster mit <code>*</code> (<code>rm -r notes-b*</code>)</td><td>Trifft auch <code>notes-backup2</code> und andere. Vorher <code>echo rm -r notes-b*</code> ansehen.</td></tr>
+<tr><td>Ordner existiert nicht</td><td><code>rm: cannot remove '…': No such file or directory</code> (Exit-Code 1). Mit <code>-f</code> bleibt die Meldung aus, was Tippfehler verdeckt.</td></tr>
+<tr><td>Keine Berechtigung</td><td><code>Permission denied</code>. Zum Löschen eines Eintrags braucht man Schreibrecht auf dem <i>Ordner</i>, der ihn enthält, nicht auf der Datei selbst.</td></tr>
+<tr><td>Löschen für rückgängig halten</td><td>Gelöscht ist gelöscht. Wichtiges vorher mit <code>tar</code> oder <code>cp -a</code> sichern.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 30 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie nur im Übungsordner <code class="i">~/uebung</code> und legen Sie die Kopie vor jedem Beispiel mit <code class="i">cp -a notes notes-backup</code> neu an.</p>
+<p><b>a)</b> Prüfe vor dem Löschen, wie groß die Wirkung ist.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>find notes-backup | wc -l             # Anzahl der Einträge (5)
+du -sh notes-backup                   # Gesamtgröße
+ls -R notes-backup                    # Struktur
+ls -A notes-backup                    # auch versteckte Dateien</code></pre>
+<p class="ex">Diese vier Befehle zeigen vor dem Löschen, was dranhängt: Anzahl, Größe, Struktur und versteckte Einträge.</p></details>
+<p><b>b)</b> Lösche mit Ausgabe jeder Datei, und mit einer Sicherheitsabfrage.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>rm -rv notes-backup
+# removed 'notes-backup/greeting.txt'
+# removed 'notes-backup/.versteckt'
+# removed 'notes-backup/archiv/old.txt'
+# removed directory 'notes-backup/archiv'
+# removed directory 'notes-backup'
+
+cp -a notes notes-backup
+rm -rI notes-backup                   # rm: remove 1 argument recursively?  (y/n)</code></pre>
+<p class="ex"><code class="i">-v</code> protokolliert jeden Schritt. <code class="i">-I</code> fragt <i>einmal</i>, bevor rekursiv gelöscht wird (oder bei mehr als drei Dateien). Das ist eine gute Gewohnheit, wenn Sie manuell löschen.</p></details>
+<p><b>c)</b> Leere den Ordner, aber behalte ihn.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>cp -a notes notes-backup
+rm -r notes-backup/*                          # löscht Inhalt, aber keine versteckten Dateien
+ls -A notes-backup                            # .versteckt bleibt übrig
+
+find notes-backup -mindepth 1 -delete         # löscht alles darunter, auch Versteckte
+ls -A notes-backup | wc -l                    # 0
+ls -d notes-backup                            # Ordner existiert noch</code></pre>
+<p class="ex">Der Platzhalter <code class="i">*</code> trifft Namen mit führendem Punkt nicht. <code class="i">find -mindepth 1 -delete</code> erwischt alles unterhalb des Ordners und lässt den Ordner selbst stehen.</p></details>
+<p><b>d)</b> Was passiert beim Löschen von Verknüpfungen?</p>
+<details><summary>Lösung d)</summary>
+<pre><code>cp -a notes notes-backup
+ln -s notes-backup lnk                 # symbolischer Link auf den Ordner
+rm lnk                                 # entfernt nur den Link, nicht den Ordner
+ls -d notes-backup                     # noch da
+
+ln -s notes-backup lnk
+rm -r lnk                              # auch hier: nur der Link wird entfernt
+rm -r lnk/                             # rm: cannot remove 'lnk/': Not a directory</code></pre>
+<p class="ex">Ein Link ist nur ein Verweis. Wer ihn löscht, löscht nicht das Ziel. Mit einem Schrägstrich am Ende (<code class="i">lnk/</code>) behandelt <code class="i">rm</code> den Link als Ordner und verweigert das Löschen.</p></details>
+<p><b>e)</b> Schütze Skripte vor leeren Variablen.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>#!/usr/bin/env bash
+set -u                                 # unbekannte Variable = Fehler
+DIR="$1"
+rm -r "${DIR:?Verzeichnis fehlt}"/cache      # bricht ab, wenn DIR leer ist
+
+# ohne Schutz:  rm -rf "$DIR"/    -&gt;  bei leerem DIR wird daraus   rm -rf /</code></pre>
+<p class="ex"><code class="i">${DIR:?Meldung}</code> beendet das Skript mit einer Fehlermeldung, wenn <code class="i">DIR</code> leer oder nicht gesetzt ist. GNU <code class="i">rm</code> verweigert außerdem <code class="i">rm -r /</code> von sich aus (<code class="i">--preserve-root</code>), aber andere Pfade wie das Home-Verzeichnis schützt es nicht.</p></details>
+<p><b>f)</b> Lösche selektiv mit <code class="i">find</code>.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>find notes-backup -name '*.txt'               # erst ansehen
+find notes-backup -name '*.txt' -delete       # dann löschen
+find notes-backup -mindepth 1 -type d -empty -delete   # danach leere Unterordner</code></pre>
+<p class="ex">So löschen Sie nur bestimmte Dateien. Weil <code class="i">-delete</code> sofort wirkt, zuerst denselben Befehl ohne <code class="i">-delete</code> ausführen. Ohne <code class="i">-mindepth 1</code> würde <code class="i">find</code> am Ende auch <code class="i">notes-backup</code> selbst löschen, sobald es leer ist (siehe Übung 29).</p></details>
+<p><b>g)</b> Sichere, bevor du löschst, und prüfe die Sicherung.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>tar -czf notes-backup.tar.gz notes-backup     # Archiv anlegen (Übung 26)
+tar -tzf notes-backup.tar.gz | head -3        # Inhalt prüfen
+rm -r notes-backup                            # erst jetzt löschen
+tar -xzf notes-backup.tar.gz                  # bei Bedarf wiederherstellen
+ls -A notes-backup</code></pre>
+<p class="ex">Wer ein Archiv hat, kann Gelöschtes zurückholen. So wird aus dem endgültigen Löschen ein umkehrbarer Schritt. Archiv am Ende mit <code class="i">rm notes-backup.tar.gz</code> aufräumen.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
