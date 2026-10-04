@@ -866,6 +866,82 @@ umask                  # zeigt die Maske, meist 0022</code></pre>
 <p class="ex">Neue Dateien starten mit 666 minus der <code class="i">umask</code>. Bei <code class="i">0022</code> ergibt das 644. Neue Verzeichnisse starten mit 777 minus <code class="i">umask</code>, also 755.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 4 · Weiteres Verzeichnis anlegen</h3>
+<p><b>Aufgabe:</b> Lege das Verzeichnis <code class="i">~/uebung/projects</code> an.</p>
+<p class="ex">Geübt wird: <code class="i">mkdir</code> mit einem vollständigen (absoluten) Pfad und der Unterschied zwischen absoluten und relativen Pfaden.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>mkdir ~/uebung/projects          # mit vollem Pfad, funktioniert von überall
+
+# gleichwertig, wenn Sie schon in ~/uebung sind:
+cd ~/uebung
+mkdir projects
+
+ls -d ~/uebung/projects          # Kontrolle: gibt den Pfad aus
+ls -ld ~/uebung/projects         # zeigt drwxr-xr-x ... (d = Verzeichnis)</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Absolute und relative Pfade</h3>
+<p class="ex">Die Aufgabe nennt den vollständigen Pfad. Es gibt zwei Schreibweisen, die zum gleichen Ort führen können.</p><div class="tw"><table>
+<tr><th>Art</th><th>Beispiel</th><th>Bedeutung</th></tr>
+<tr><td class="nw">absolut</td><td><code>/home/anna/uebung/projects</code></td><td>beginnt bei <code>/</code>, gilt von überall</td></tr>
+<tr><td class="nw">mit Home</td><td><code>~/uebung/projects</code></td><td><code>~</code> ist Ihr Home-Verzeichnis, gilt ebenfalls von überall</td></tr>
+<tr><td class="nw">relativ</td><td><code>projects</code></td><td>gilt vom aktuellen Verzeichnis aus</td></tr>
+<tr><td class="nw">relativ</td><td><code>../projects</code></td><td><code>..</code> = eine Ebene höher</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Befehl</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>mkdir ~/uebung/projects</code></td><td><b>m</b>a<b>k</b>e <b>dir</b>ectory: legt <code>projects</code> in <code>~/uebung</code> an. <code>~/uebung</code> muss schon existieren.</td></tr>
+<tr><td class="nw"><code>ls -d pfad</code></td><td>Zeigt den Eintrag selbst, nicht seinen Inhalt. Bei Erfolg wird der Pfad ausgegeben, sonst eine Fehlermeldung.</td></tr>
+<tr><td class="nw"><code>ls -ld pfad</code></td><td>Wie oben, im langen Format. Ein <code>d</code> am Anfang der Rechte zeigt: ein Verzeichnis.</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Vollständiger Pfad:</b> Er funktioniert unabhängig davon, in welchem Ordner Sie gerade sind. Das ist besonders in Skripten und bei Aufgaben mit einer genauen Pfadvorgabe sicher.</p>
+<p><b>Relativ ist kürzer:</b> Wer schon in <code class="i">~/uebung</code> steht, schreibt nur <code class="i">mkdir projects</code>. Der Fehler dabei: Ohne vorheriges <code class="i">pwd</code> legen Sie den Ordner leicht im falschen Verzeichnis an.</p>
+<p><b>Kontrolle:</b> <code class="i">mkdir</code> meldet bei Erfolg nichts. Mit <code class="i">ls -d</code> prüfen Sie, ob der Ordner wirklich da ist.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td>Ordner existiert schon</td><td><code>mkdir: cannot create directory 'projects': File exists</code>. Mit <code>mkdir -p</code> bleibt die Meldung aus.</td></tr>
+<tr><td>Elternordner fehlt</td><td><code>mkdir: cannot create directory 'a/b': No such file or directory</code>. Mit <code>-p</code> werden fehlende Ebenen mit angelegt.</td></tr>
+<tr><td>Leerzeichen im Namen</td><td><code>mkdir mein projekt</code> legt <i>zwei</i> Ordner an, <code>mein</code> und <code>projekt</code>. Besser <code>mkdir "mein projekt"</code> oder ganz ohne Leerzeichen.</td></tr>
+<tr><td>Groß-/Kleinschreibung</td><td><code>Projects</code> und <code>projects</code> sind verschiedene Ordner. Die Aufgabe verlangt genau <code>projects</code>.</td></tr>
+<tr><td>Tippfehler im Pfad</td><td>Der Ordner liegt am falschen Ort, die Kontrolle mit <code>ls -d</code> schlägt fehl.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 4 · Zum Weiterüben</h3>
+<p class="ex">Alle Befehle im Übungsordner <code class="i">~/uebung</code> ausführen und mit <code class="i">ls</code> kontrollieren.</p>
+<p><b>a)</b> Lege in <code class="i">projects</code> die drei Ordner <code class="i">web</code>, <code class="i">api</code> und <code class="i">docs</code> an.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>mkdir projects/web projects/api projects/docs     # mehrere Argumente
+mkdir projects/{web,api,docs}                     # kürzer mit Klammern
+ls projects</code></pre>
+<p class="ex"><code class="i">mkdir</code> nimmt beliebig viele Namen. Die Schreibweise mit geschweiften Klammern wird von der Shell zu den drei Pfaden aufgelöst, bevor <code class="i">mkdir</code> startet. Den zweiten Befehl brauchen Sie nur, wenn die Ordner noch nicht existieren.</p></details>
+<p><b>b)</b> Lege <code class="i">archiv/2026/oktober</code> in einem Schritt an.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>mkdir -p archiv/2026/oktober
+ls -R archiv</code></pre>
+<p class="ex"><code class="i">-p</code> (parents) legt fehlende Elternordner mit an. <code class="i">ls -R</code> listet rekursiv alle Unterordner.</p></details>
+<p><b>c)</b> Führe <code class="i">mkdir -p projects</code> aus, obwohl <code class="i">projects</code> schon existiert. Was passiert?</p>
+<details><summary>Lösung c)</summary>
+<pre><code>mkdir -p projects
+echo $?          # 0 = Erfolg, kein Fehler</code></pre>
+<p class="ex">Mit <code class="i">-p</code> ist <code class="i">mkdir</code> „idempotent“: Existiert der Ordner schon, passiert nichts und es gibt keinen Fehler. Das ist praktisch in Skripten, die mehrfach laufen.</p></details>
+<p><b>d)</b> Lege einen Ordner mit dem Namen <code class="i">mein projekt</code> (mit Leerzeichen) an und prüfe ihn.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>mkdir "mein projekt"
+ls -d "mein projekt"
+ls -d mein\ projekt         # alternativ: Leerzeichen mit \ maskieren</code></pre>
+<p class="ex">Anführungszeichen halten den Namen zusammen. Auch bei <code class="i">cd</code>, <code class="i">cp</code> und <code class="i">rm</code> müssen solche Namen in Anführungszeichen stehen. Deshalb vermeidet man Leerzeichen am besten ganz, zum Beispiel mit <code class="i">mein-projekt</code>.</p></details>
+<p><b>e)</b> Prüfe per Befehl, ob <code class="i">projects</code> ein Verzeichnis ist, und gib dann einen Satz aus.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>test -d projects &amp;&amp; echo "projects ist ein Verzeichnis"
+[[ -d projects ]] &amp;&amp; echo "projects ist ein Verzeichnis"   # gleichwertig in Bash</code></pre>
+<p class="ex"><code class="i">-d</code> ist hier ein <i>Test</i>, nicht die Option von <code class="i">ls</code>. Der Befehl vor <code class="i">&amp;&amp;</code> liefert nur bei Erfolg den Exit-Code 0, dann läuft <code class="i">echo</code>.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
