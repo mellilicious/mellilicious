@@ -1167,6 +1167,80 @@ file projects/empty.txt projects/empty-dir
 <p class="ex"><code class="i">file</code> erkennt den Typ am Inhalt und nicht am Namen, bei leeren Dateien meldet es <code class="i">empty</code>.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 8 · Mehrere Zeilen schreiben</h3>
+<p><b>Aufgabe:</b> Lege in <code class="i">~/uebung</code> die Datei <code class="i">notes/commands.txt</code> an. Sie soll genau drei Zeilen enthalten: <code class="i">pwd</code>, <code class="i">ls</code>, <code class="i">mkdir</code>, in dieser Reihenfolge.</p>
+<p class="ex">Geübt wird: <code class="i">printf</code> mit Zeilenumbrüchen (<code class="i">\n</code>), der Unterschied zu <code class="i">echo</code> und die Kontrolle mit <code class="i">cat</code>. Die Wörter sind hier nur Text. Es wird kein Befehl ausgeführt.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes                              # nur nötig, falls notes fehlt
+printf 'pwd\nls\nmkdir\n' &gt; notes/commands.txt
+
+cat notes/commands.txt                      # zeigt die drei Zeilen
+wc -l notes/commands.txt                    # zählt: 3</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Befehl</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>printf 'pwd\nls\nmkdir\n'</code></td><td>Gibt den Text aus und ersetzt dabei <code>\n</code> durch einen Zeilenumbruch. Anders als <code>echo</code> hängt <code>printf</code> <i>keinen</i> Umbruch von selbst an, daher das <code>\n</code> am Ende.</td></tr>
+<tr><td class="nw"><code>&gt; notes/commands.txt</code></td><td>Schreibt diese Ausgabe in die Datei (überschreibt, falls vorhanden).</td></tr>
+<tr><td class="nw"><code>cat datei</code></td><td>Gibt den Dateiinhalt aus, zur Sichtkontrolle.</td></tr>
+<tr><td class="nw"><code>wc -l datei</code></td><td><b>w</b>ord <b>c</b>ount, Option <code>-l</code>: zählt die Zeilenumbrüche, also die Zeilen. Erwartet: <code>3</code>.</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Ein Befehl, mehrere Zeilen:</b> Mit <code class="i">printf</code> und <code class="i">\n</code> steht der ganze Inhalt in einem Aufruf. Die Datei wird in einem Schritt geschrieben und enthält danach genau das, was Sie angegeben haben.</p>
+<p><b>Warum nicht <code class="i">echo</code>?</b> In Bash schreibt <code class="i">echo "pwd\nls"</code> den Text <i>wörtlich</i> mit Backslash. Erst <code class="i">echo -e</code> wertet <code class="i">\n</code> aus, und das Verhalten unterscheidet sich je nach Shell. <code class="i">printf</code> verhält sich überall gleich und ist deshalb die sichere Wahl.</p>
+<p><b>Das Zeilenende zählt:</b> Eine Zeile gilt unter Linux erst dann als vollständig, wenn sie mit einem Zeilenumbruch endet. Fehlt er hinter <code class="i">mkdir</code>, zählt <code class="i">wc -l</code> nur 2 Zeilen. Darum steht ein <code class="i">\n</code> am Ende.</p>
+<p><b>Text, kein Befehl:</b> In den Anführungszeichen ist <code class="i">pwd</code> nur ein Wort. Mit <code class="i">$(pwd)</code> dagegen würde der Befehl ausgeführt und sein Ergebnis eingesetzt.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>echo "pwd\nls\nmkdir"</code></td><td>Die Datei enthält <i>eine</i> Zeile mit den Zeichen <code>pwd\nls\nmkdir</code>.</td></tr>
+<tr><td>Kein <code>\n</code> am Ende</td><td>Die letzte Zeile hat kein Zeilenende, <code>wc -l</code> meldet <code>2</code>.</td></tr>
+<tr><td>Ein zusätzliches <code>\n</code> (<code>\n\n</code>)</td><td>Es entsteht eine Leerzeile, die Datei hat vier Zeilen statt drei.</td></tr>
+<tr><td>Falsche Reihenfolge oder Tippfehler</td><td>Die Datei stimmt nicht mit der Vorgabe überein. Mit <code>cat</code> prüfen.</td></tr>
+<tr><td>Einzelne <code>echo</code>-Befehle alle mit <code>&gt;</code></td><td>Jeder Aufruf überschreibt die Datei, übrig bleibt nur die letzte Zeile. Ab der zweiten Zeile <code>&gt;&gt;</code> verwenden.</td></tr>
+<tr><td>Doppelte Anführungszeichen mit <code>$</code> oder <code>!</code></td><td>Die Shell ersetzt solche Zeichen. Bei festem Text besser einfache Anführungszeichen <code>'...'</code>.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 8 · Zum Weiterüben</h3>
+<p class="ex">Alle Befehle im Übungsordner <code class="i">~/uebung</code> ausführen und das Ergebnis mit <code class="i">cat -A datei</code> prüfen. Dabei markiert <code class="i">$</code> jedes Zeilenende.</p>
+<p><b>a)</b> Schreibe dieselben drei Zeilen mit drei <code class="i">echo</code>-Befehlen.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>echo pwd &gt; notes/m.txt        # erste Zeile: &gt; legt die Datei neu an
+echo ls &gt;&gt; notes/m.txt        # &gt;&gt; hängt an
+echo mkdir &gt;&gt; notes/m.txt
+cat -A notes/m.txt</code></pre>
+<p class="ex"><code class="i">echo</code> hängt automatisch einen Zeilenumbruch an. Nur der erste Aufruf nutzt <code class="i">&gt;</code>, alle weiteren <code class="i">&gt;&gt;</code>.</p></details>
+<p><b>b)</b> Schreibe den Inhalt mit einem Here-Document, also direkt als mehrzeiligen Text.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>cat &gt; notes/h.txt &lt;&lt;'EOF'
+pwd
+ls
+mkdir
+EOF
+cat -A notes/h.txt</code></pre>
+<p class="ex">Alles bis zur Zeile <code class="i">EOF</code> wird als Eingabe an <code class="i">cat</code> übergeben, das es in die Datei schreibt. Die einfachen Anführungszeichen um <code class="i">EOF</code> verhindern, dass die Shell <code class="i">$</code> im Text ersetzt. Praktisch für längere Texte.</p></details>
+<p><b>c)</b> Schreibe die drei Wörter mit <code class="i">printf '%s\n'</code>, ohne <code class="i">\n</code> im Text.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>printf '%s\n' pwd ls mkdir &gt; notes/p.txt
+diff notes/commands.txt notes/p.txt &amp;&amp; echo "gleich"</code></pre>
+<p class="ex">Das Format <code class="i">%s\n</code> wird für jedes Argument wiederholt: Text, dann Zeilenumbruch. So bekommt jedes Wort eine eigene Zeile. <code class="i">diff</code> ohne Ausgabe heißt: Die Dateien sind gleich.</p></details>
+<p><b>d)</b> Zeige nur die ersten zwei Zeilen, nur die letzte Zeile und alle Zeilen mit Nummern.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>head -n 2 notes/commands.txt      # pwd, ls
+tail -n 1 notes/commands.txt      # mkdir
+sed -n '3p' notes/commands.txt    # nur Zeile 3
+nl notes/commands.txt             # mit Zeilennummern</code></pre>
+<p class="ex"><code class="i">head</code> und <code class="i">tail</code> liefern Anfang und Ende, <code class="i">sed -n 'Np'</code> eine einzelne Zeile, <code class="i">nl</code> nummeriert.</p></details>
+<p><b>e)</b> Zeige den Inhalt einer Datei auf dem Bildschirm und speichere ihn gleichzeitig in einer zweiten Datei.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>cat notes/commands.txt | tee notes/kopie.txt
+wc -l notes/kopie.txt</code></pre>
+<p class="ex"><code class="i">tee</code> schreibt die Eingabe in die Datei <i>und</i> gibt sie weiter, hier an den Bildschirm. Mit <code class="i">tee -a</code> wird angehängt.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
