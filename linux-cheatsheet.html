@@ -1472,6 +1472,80 @@ sort -c ~/daten/unsorted.txt; echo $?   # 1 = nicht sortiert, mit Fundstelle</co
 <p class="ex"><code class="i">-o</code> ist die sichere Variante zu <code class="i">&gt; datei</code> auf derselben Datei. <code class="i">-c</code> (check) sortiert nichts, sondern prüft nur und meldet über den Exit-Code, ob die Reihenfolge stimmt.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 12 · Doppelte Zeilen entfernen</h3>
+<p><b>Aufgabe:</b> Lege <code class="i">notes/unique.txt</code> mit den drei Zeilen <code class="i">amber</code>, <code class="i">blue</code> und <code class="i">coral</code> an. Jede Zeile soll nur einmal vorkommen.</p>
+<p class="ex">Geübt wird: <code class="i">uniq</code> entfernt doppelte Zeilen, aber nur direkt aufeinanderfolgende. Deshalb arbeitet man mit der sortierten Datei <code class="i">notes/sorted.txt</code> aus Übung 11 (<code class="i">amber</code>, <code class="i">amber</code>, <code class="i">blue</code>, <code class="i">blue</code>, <code class="i">coral</code>). Falls sie fehlt, legen Sie sie mit dem <code class="i">printf</code>-Befehl unten an.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+printf 'amber\namber\nblue\nblue\ncoral\n' &gt; notes/sorted.txt   # nur falls Übung 11 fehlt
+
+uniq notes/sorted.txt &gt; notes/unique.txt
+
+cat notes/unique.txt           # amber blue coral
+wc -l notes/unique.txt         # 3</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Befehl</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>uniq datei</code></td><td>Gibt die Datei aus und lässt dabei jede Zeile weg, die genau der <i>vorherigen</i> Zeile gleicht.</td></tr>
+<tr><td class="nw"><code>&gt; notes/unique.txt</code></td><td>Schreibt das Ergebnis in die neue Datei.</td></tr>
+<tr><td class="nw"><code>wc -l</code></td><td>Kontrolle: 3 Zeilen.</td></tr>
+</table></div>
+<pre><code>sorted.txt      unique.txt
+amber           amber
+amber    --&gt;    blue
+blue            coral
+blue
+coral</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Nur Nachbarn werden verglichen:</b> <code class="i">uniq</code> merkt sich nur die letzte Zeile und liest die Datei in einem Durchgang. Das ist schnell und braucht kaum Speicher, funktioniert aber nur, wenn gleiche Zeilen direkt untereinander stehen. Darum kommt vorher <code class="i">sort</code>.</p>
+<p><b>Zwei Wege zum gleichen Ergebnis:</b> <code class="i">sort | uniq</code> und <code class="i">sort -u</code> liefern bei beliebigen Eingaben dasselbe. Haben Sie die Daten schon sortiert, reicht <code class="i">uniq</code>.</p>
+<p><b>Praktisch:</b> Zum Beispiel für eine Liste aller verschiedenen IP-Adressen in einer Logdatei oder aller Benutzer in einer Ausgabe.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>uniq</code> auf unsortierten Zeilen</td><td>Nicht benachbarte Duplikate bleiben. Aus <code>coral blue amber blue amber</code> werden nicht 3, sondern weiter 5 Zeilen.</td></tr>
+<tr><td><code>uniq datei &gt; datei</code></td><td>Die Datei wird geleert, bevor <code>uniq</code> sie liest. Ergebnis: leere Datei. Über eine Zwischendatei gehen (<code>&gt; t.txt &amp;&amp; mv t.txt datei</code>).</td></tr>
+<tr><td>Groß-/Kleinschreibung</td><td><code>Amber</code> und <code>amber</code> gelten als verschieden. Mit <code>uniq -i</code> werden sie zusammengefasst.</td></tr>
+<tr><td>Leerzeichen am Zeilenende oder Leerzeilen</td><td><code>amber </code> ist nicht gleich <code>amber</code>. Eine Leerzeile dazwischen trennt gleiche Zeilen, dann bleiben beide.</td></tr>
+<tr><td>Falsche Quelldatei</td><td>Ergebnis passt nicht zur Aufgabe. Mit <code>cat</code> die Eingabe ansehen.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 12 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit <code class="i">notes/sorted.txt</code> aus Übung 11.</p>
+<p><b>a)</b> Zähle, wie oft jede Zeile vorkommt.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>uniq -c notes/sorted.txt
+#   2 amber
+#   2 blue
+#   1 coral</code></pre>
+<p class="ex"><code class="i">-c</code> (count) stellt jeder Zeile die Anzahl voran. Bei einer unsortierten Datei vorher <code class="i">sort</code> verwenden.</p></details>
+<p><b>b)</b> Zeige nur die Zeilen, die mehrfach vorkommen, und danach nur die, die genau einmal vorkommen.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>uniq -d notes/sorted.txt     # amber blue    (duplicated)
+uniq -u notes/sorted.txt     # coral         (unique)</code></pre>
+<p class="ex"><code class="i">-d</code> gibt je eine Zeile für alle Wiederholten aus, <code class="i">-u</code> nur die Zeilen ohne Wiederholung.</p></details>
+<p><b>c)</b> Entferne Duplikate in einer <i>unsortierten</i> Datei und erhalte die Namen alphabetisch.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>printf 'coral\nblue\namber\nblue\namber\n' | sort | uniq
+printf 'coral\nblue\namber\nblue\namber\n' | sort -u       # gleichwertig</code></pre>
+<p class="ex">Erst sortieren, damit gleiche Zeilen aneinanderrücken, dann <code class="i">uniq</code>. <code class="i">sort -u</code> erledigt beides in einem Schritt.</p></details>
+<p><b>d)</b> Behandle <code class="i">Amber</code> und <code class="i">amber</code> als gleich.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>printf 'Amber\namber\nblue\n' | uniq -i       # Amber blue</code></pre>
+<p class="ex"><code class="i">-i</code> (ignore case) ignoriert die Groß-/Kleinschreibung. Von mehreren gleichen Zeilen bleibt die erste erhalten.</p></details>
+<p><b>e)</b> Finde die häufigste Zeile einer Datei.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>sort notes/sorted.txt | uniq -c | sort -rn | head -n 1</code></pre>
+<p class="ex">Klassisches Pipe-Muster: sortieren, zählen, nach Anzahl absteigend sortieren (<code class="i">-rn</code>), die oberste Zeile behalten. Es funktioniert ähnlich für Logdateien, etwa die häufigste IP-Adresse.</p></details>
+<p><b>f)</b> Vergleiche nur die ersten Zeichen jeder Zeile.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>printf 'a 1\na 2\nb 3\n' | uniq -w1        # a 1  und  b 3</code></pre>
+<p class="ex"><code class="i">-w1</code> vergleicht nur das erste Zeichen. Von den Zeilen mit gleichem Anfang bleibt die erste erhalten.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
