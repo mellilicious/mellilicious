@@ -2987,6 +2987,107 @@ rm -r /tmp/notes-alt                   # aufräumen</code></pre>
 <p class="ex"><code class="i">mv</code> kopiert nicht, es ändert nur den Namen oder Ort. Ein Ordner braucht dafür kein <code class="i">-r</code>.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 29 · Leere Dateien und Ordner löschen</h3>
+<p><b>Aufgabe:</b> Entferne <code class="i">projects/empty.txt</code> mit <code class="i">rm</code> und das leere Verzeichnis <code class="i">projects/empty-dir</code> mit <code class="i">rmdir</code>.</p>
+<p class="ex">Geübt wird: <code class="i">rm</code> löscht Dateien, <code class="i">rmdir</code> nur <i>leere</i> Verzeichnisse. Beide hatten Sie in Übung 7 angelegt. Falls sie fehlen, erzeugt sie die Vorbereitung. Unter Linux gibt es keinen Papierkorb: Gelöscht ist gelöscht.</p>
+<details><summary>Vorbereitung: Dateien anlegen</summary>
+<pre><code>cd ~/uebung
+mkdir -p projects
+touch projects/empty.txt
+mkdir -p projects/empty-dir
+ls -l projects</code></pre></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+ls -l projects                    # vorher ansehen: Datei (-) und Ordner (d)
+
+rm projects/empty.txt             # Datei löschen
+rmdir projects/empty-dir          # leeren Ordner löschen
+
+ls -A projects                    # Kontrolle: nichts mehr da</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Befehl</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>rm datei</code></td><td><b>r</b>e<b>m</b>ove: löscht die Datei. Der Name verschwindet aus dem Verzeichnis, es gibt keine Rückfrage und keinen Papierkorb.</td></tr>
+<tr><td class="nw"><code>rmdir ordner</code></td><td><b>rm</b> <b>dir</b>ectory: löscht ein Verzeichnis, aber <i>nur, wenn es leer ist</i>. Das ist eine Schutzfunktion.</td></tr>
+<tr><td class="nw"><code>ls -l</code>, <code>ls -A</code></td><td>Zum Prüfen vorher und nachher. <code>-A</code> zeigt auch versteckte Dateien, aber nicht <code>.</code> und <code>..</code>.</td></tr>
+</table></div>
+<pre><code>projects/                   projects/
+  empty.txt     --rm--&gt;       (leer)
+  empty-dir/    --rmdir--&gt;</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Zwei Werkzeuge, zwei Sicherheitsstufen:</b> <code class="i">rm</code> ist für Dateien gedacht. Bei einem Ordner verweigert es sich (<code class="i">Is a directory</code>). <code class="i">rmdir</code> löscht nur Ordner und nur, wenn nichts darin liegt. So verhindert man, dass man versehentlich Inhalt mitlöscht.</p>
+<p><b>Der gefährliche Weg:</b> <code class="i">rm -r</code> löscht einen Ordner samt Inhalt, ohne zu fragen. Mit <code class="i">-f</code> (force) auch ohne Fehlermeldungen. <code class="i">rm -rf</code> auf den falschen Pfad kann ein ganzes System zerstören. Setzen Sie es nur ein, wenn Sie den Pfad geprüft haben.</p>
+<p><b>Erst ansehen, dann löschen:</b> Mit <code class="i">ls</code> oder <code class="i">find</code> prüfen, was getroffen wird. Bei Mustern mit <code class="i">*</code> hilft ein Trockenlauf: <code class="i">echo rm projects/*.tmp</code> zeigt, welche Namen die Shell einsetzen würde.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>rm</code> auf den Ordner</td><td><code>rm: cannot remove 'projects/empty-dir': Is a directory</code>. Ein leerer Ordner geht mit <code>rmdir</code> (oder <code>rm -d</code>).</td></tr>
+<tr><td><code>rmdir</code> auf die Datei</td><td><code>rmdir: failed to remove 'projects/empty.txt': Not a directory</code>.</td></tr>
+<tr><td><code>rmdir</code> auf einen gefüllten Ordner</td><td><code>rmdir: failed to remove '…': Directory not empty</code>. Erst den Inhalt entfernen oder bewusst <code>rm -r</code> nehmen.</td></tr>
+<tr><td>Falscher Pfad / schon gelöscht</td><td><code>rm: cannot remove '…': No such file or directory</code> (Exit-Code 1).</td></tr>
+<tr><td>Leerzeichen im Namen</td><td><code>rm mein datei</code> versucht zwei Dateien <code>mein</code> und <code>datei</code> zu löschen. Mit Anführungszeichen: <code>rm "mein datei"</code>.</td></tr>
+<tr><td>Name beginnt mit <code>-</code></td><td><code>rm -x.txt</code> wird als Option gelesen (<code>invalid option</code>). Mit <code>--</code> davor: <code>rm -- -x.txt</code>.</td></tr>
+<tr><td>Zu breites Muster (<code>rm *</code>)</td><td>Löscht alles im aktuellen Ordner. Erst mit <code>ls</code> oder <code>echo</code> prüfen, und mit <code>pwd</code> den Ort.</td></tr>
+<tr><td>Löschen für rückgängig halten</td><td>Es gibt keinen Papierkorb. Wiederherstellen geht nur aus einer Sicherung (Übung 26 und 28).</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 29 · Zum Weiterüben</h3>
+<p class="ex">Legen Sie vor jedem Beispiel die Testdateien neu an (siehe Vorbereitung). Nutzen Sie nur den Übungsordner <code class="i">~/uebung</code>.</p>
+<p><b>a)</b> Lösche mit Rückmeldung oder mit Rückfrage.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>rm -v projects/empty.txt              # removed 'projects/empty.txt'
+rmdir -v projects/empty-dir           # rmdir: removing directory, 'projects/empty-dir'
+
+touch projects/x.txt
+rm -i projects/x.txt                  # rm: remove regular empty file 'projects/x.txt'?  (y/n)</code></pre>
+<p class="ex"><code class="i">-v</code> meldet jede Aktion, <code class="i">-i</code> fragt vor dem Löschen. Mit <code class="i">-I</code> wird nur bei mehr als drei Dateien oder bei <code class="i">-r</code> einmal gefragt, das ist ein guter Kompromiss.</p></details>
+<p><b>b)</b> Lösche einen Ordner samt Inhalt, und einen leeren Ordner mit <code class="i">rm</code>.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>mkdir -p projects/voll; touch projects/voll/a
+rm -r projects/voll                   # Ordner samt Inhalt
+
+mkdir projects/leer
+rm -d projects/leer                   # -d: leeren Ordner entfernen (wie rmdir)</code></pre>
+<p class="ex"><code class="i">-r</code> löscht rekursiv, <code class="i">-d</code> entspricht <code class="i">rmdir</code>. Prüfen Sie den Pfad, bevor Sie <code class="i">rm -r</code> abschicken.</p></details>
+<p><b>c)</b> Lösche eine ganze Ordnerkette, wenn alles darin leer ist.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>mkdir -p a/b/c
+rmdir -p a/b/c                        # löscht c, dann b, dann a</code></pre>
+<p class="ex"><code class="i">rmdir -p</code> (parents) entfernt auch die Elternordner, solange sie nach dem Löschen leer sind. Das Gegenstück zu <code class="i">mkdir -p</code>.</p></details>
+<p><b>d)</b> Lösche mehrere Dateien mit einem Muster, und prüfe vorher.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>touch projects/a.tmp projects/b.tmp
+ls projects/*.tmp                     # was würde getroffen?
+echo rm projects/*.tmp                # Trockenlauf: zeigt den Befehl
+rm projects/*.tmp</code></pre>
+<p class="ex">Die Shell ersetzt <code class="i">*.tmp</code> durch die Namen, <code class="i">rm</code> sieht nur die fertige Liste. Mit <code class="i">echo</code> davor sehen Sie diese Liste, ohne etwas zu löschen.</p></details>
+<p><b>e)</b> Lösche alle leeren Einträge unter einem Ordner. Was fällt auf?</p>
+<details><summary>Lösung e)</summary>
+<pre><code>find projects -empty                  # zeigt leere Dateien und Ordner
+find projects -empty -delete          # löscht sie
+ls projects                           # Achtung: auch projects selbst ist weg</code></pre>
+<p class="ex"><code class="i">-delete</code> arbeitet von unten nach oben. Sind alle Einträge entfernt, ist <code class="i">projects</code> selbst leer und wird mitgelöscht. Erst ohne <code class="i">-delete</code> ansehen, oder mit <code class="i">-mindepth 1</code> den Startordner schützen.</p></details>
+<p><b>f)</b> Lösche eine Datei, die mit einem Bindestrich beginnt, und eine mit Leerzeichen.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>touch -- -x.txt "mein datei"
+rm -- -x.txt                          # -- beendet die Optionen
+rm "mein datei"                       # Anführungszeichen halten den Namen zusammen
+rm ./-x.txt                           # alternativ mit ./ davor</code></pre>
+<p class="ex">Nach <code class="i">--</code> ist alles ein Dateiname, keine Option. Auch <code class="i">./-x.txt</code> löst das Problem, weil der Name dann nicht mit <code class="i">-</code> beginnt.</p></details>
+<p><b>g)</b> Lösche nur, wenn etwas vorhanden ist, und prüfe das Ergebnis im Skript.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>rm -f projects/nix.txt                # -f: kein Fehler, wenn die Datei fehlt
+echo $?                               # 0
+
+rm projects/nix.txt                   # Fehlermeldung, Exit-Code 1
+[ -e projects/empty.txt ] || echo "weg"
+[ -d projects/empty-dir ] &amp;&amp; echo "Ordner ist noch da"</code></pre>
+<p class="ex"><code class="i">-f</code> (force) unterdrückt Fehler bei fehlenden Dateien und fragt nie nach. Praktisch in Skripten, aber auch gefährlich, weil Tippfehler nicht auffallen. <code class="i">test -e</code> und <code class="i">test -d</code> prüfen Existenz und Typ.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
