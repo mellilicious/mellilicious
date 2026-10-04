@@ -4190,6 +4190,136 @@ ls -l projects/private.txt                # -rw------- 1 root ...</code></pre>
 <p class="ex">Nur der Besitzer (und der Administrator) darf <code class="i">chmod</code> anwenden. Den Besitzer wechselt nur der Administrator mit <code class="i">chown</code>. Nach <code class="i">sudo chown root</code> können Sie die Datei selbst nicht mehr lesen. Zum Zurückgeben: <code class="i">sudo chown $(whoami) projects/private.txt</code>.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 40 · Mit dem Handbuch filtern</h3>
+<p><b>Aufgabe:</b> Lies in <code class="i">man grep</code> nach, was <code class="i">-v</code> macht, und speichere dann jede Zeile der Logdatei <code class="i">events.log</code>, die <i>nicht</i> <code class="i">INFO</code> ist, in <code class="i">notes/non-info.log</code>.</p>
+<p class="ex">Geübt wird: sich Optionen selbst im Handbuch erschließen und mit <code class="i">grep -v</code> das Gegenteil einer Auswahl bilden. Wir nehmen die Beispieldatei <code class="i">~/daten/events3.log</code> aus Übung 27. Setzen Sie Ihren Pfad aus der Aufgabenstellung ein.</p>
+<details><summary>Beispieldaten anlegen</summary>
+<pre><code>mkdir -p ~/daten
+cat &gt; ~/daten/events3.log &lt;&lt;'EOF'
+2026-10-01 10:00:01 INFO start
+2026-10-01 10:00:09 WARN slow response
+2026-10-01 10:01:12 ERROR timeout
+2026-10-01 10:02:30 WARN disk 90% full
+2026-10-01 10:03:44 INFO request ok
+2026-10-01 10:04:10 INFO WARNING banner shown
+2026-10-01 10:05:02 WARN cache miss rate high
+2026-10-01 10:06:19 DEBUG heartbeat
+2026-10-01 10:07:45 ERROR connection refused
+2026-10-01 10:08:30 WARN retry 3 of 5
+EOF</code></pre>
+<p class="ex">Zehn Zeilen. Drei haben den Level <code class="i">INFO</code> (Zeilen 1, 5 und 6), sieben nicht.</p></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes
+man grep                                           # nach -v suchen: /invert, Enter, q beendet
+
+grep -v ' INFO ' ~/daten/events3.log &gt; notes/non-info.log
+
+cat notes/non-info.log
+wc -l notes/non-info.log                           # 7</code></pre>
+<p class="ex">Im Handbuch steht bei <code class="i">-v</code> (<code class="i">--invert-match</code>) sinngemäß: Die Auswahl umkehren und die nicht passenden Zeilen ausgeben. Das kurze Muster <code class="i">' INFO '</code> mit Leerzeichen trifft den Level in der dritten Spalte.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Das Handbuch benutzen</h3>
+<p class="ex"><code class="i">man</code> zeigt die offizielle Beschreibung eines Befehls. Es nutzt denselben Pager wie <code class="i">less</code> (Übung 27), die Tasten sind dieselben.</p><div class="tw"><table>
+<tr><th>Tasten / Befehl</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>man grep</code></td><td>Öffnet die Handbuchseite von <code>grep</code></td></tr>
+<tr><td class="nw"><code>Leertaste</code> / <code>b</code></td><td>eine Seite vor / zurück</td></tr>
+<tr><td class="nw"><code>/invert</code> + Enter</td><td>nach „invert“ suchen. <code>n</code> springt zum nächsten Treffer, <code>N</code> zum vorherigen</td></tr>
+<tr><td class="nw"><code>g</code> / <code>G</code></td><td>zum Anfang / zum Ende</td></tr>
+<tr><td class="nw"><code>q</code></td><td>beenden</td></tr>
+<tr><td class="nw"><code>man -k stichwort</code></td><td>Handbuchseiten nach Stichwort suchen (wie <code>apropos</code>)</td></tr>
+<tr><td class="nw"><code>man 5 passwd</code></td><td>Abschnitt wählen (hier 5 = Dateiformate)</td></tr>
+<tr><td class="nw"><code>befehl --help</code></td><td>Kurzhilfe direkt im Terminal, Optionen in einer Zeile</td></tr>
+<tr><td class="nw"><code>help cd</code>, <code>type cd</code></td><td>für eingebaute Shell-Befehle wie <code>cd</code> (ohne eigene Handbuchseite)</td></tr>
+</table></div>
+<pre><code>Aufbau einer Handbuchseite:
+NAME           Name und Kurzbeschreibung
+SYNOPSIS       wie der Befehl aufgebaut ist
+DESCRIPTION    was er macht
+OPTIONS        alle Optionen mit Erklärung   &lt;-- hier steht -v
+EXIT STATUS    was der Exit-Code bedeutet
+SEE ALSO       verwandte Befehle</code></pre></div>
+
+<div class="blk"><h3>Was jeder Teil macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>grep ' INFO ' datei</code></td><td>Gibt die Zeilen mit dem Level <code>INFO</code> aus (3 von 10).</td></tr>
+<tr><td class="nw"><code>-v</code></td><td><code>--invert-match</code>: kehrt die Auswahl um. Ausgegeben werden alle Zeilen, die <i>nicht</i> passen (7 von 10).</td></tr>
+<tr><td class="nw"><code>&gt; notes/non-info.log</code></td><td>Schreibt die ausgewählten Zeilen in die Datei, in der ursprünglichen Reihenfolge.</td></tr>
+</table></div>
+<pre><code>events3.log  (10 Zeilen)         notes/non-info.log (7 Zeilen)
+INFO  start                      (entfällt)
+WARN  slow response        --&gt;   WARN  slow response
+ERROR timeout              --&gt;   ERROR timeout
+...                              ...
+INFO  WARNING banner shown       (entfällt, Level ist INFO)</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Ausschließen statt aufzählen:</b> „Alles außer INFO“ ist kürzer als „WARN oder ERROR oder DEBUG oder …“. Besonders, wenn unbekannt ist, welche anderen Level es gibt.</p>
+<p><b>Selbst nachschlagen:</b> Niemand kennt alle Optionen. Der Weg ist: <code class="i">--help</code> für den schnellen Überblick, <code class="i">man</code> für die genaue Beschreibung und Beispiele. Mit <code class="i">/begriff</code> finden Sie die Stelle in Sekunden.</p>
+<p><b>Auch Gegenproben helfen:</b> 3 INFO-Zeilen plus 7 andere ergeben die 10 Zeilen der Datei. Stimmt die Summe, ist das Filter vollständig.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>-v</code> vergessen</td><td>Es werden die <i>INFO</i>-Zeilen gespeichert, also das Gegenteil.</td></tr>
+<tr><td>Kein Leerzeichen im Muster (<code>grep -v INFO</code>)</td><td>Funktioniert hier, schließt aber auch Zeilen aus, die das Wort nur in der Meldung haben (siehe Weiterüben a).</td></tr>
+<tr><td><code>grep -V</code> (großes V) statt <code>-v</code></td><td>Gibt nur die Version von <code>grep</code> aus. Groß und klein sind verschiedene Optionen.</td></tr>
+<tr><td><code>&gt;&gt;</code> statt <code>&gt;</code></td><td>Beim zweiten Lauf stehen die Zeilen doppelt in der Datei (14 statt 7).</td></tr>
+<tr><td>Nach dem Lesen von <code>man</code> nicht beendet</td><td>Das Terminal wartet. Mit <code>q</code> verlassen.</td></tr>
+<tr><td>Falscher Pfad</td><td><code>grep: …: No such file or directory</code>, die Zieldatei bleibt leer.</td></tr>
+<tr><td>Handbuch fehlt</td><td>Auf Servern ist <code>man</code> manchmal nicht installiert (<code>No manual entry</code> oder eine Hinweismeldung). Dann hilft <code>grep --help</code>.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 40 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit <code class="i">~/daten/events3.log</code>.</p>
+<p><b>a)</b> Zeige, warum das Muster genau sein muss.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>cp ~/daten/events3.log e5.log
+echo "2026-10-01 10:09:00 ERROR INFO endpoint unreachable" &gt;&gt; e5.log     # ERROR-Zeile mit INFO in der Meldung
+
+grep -v ' INFO ' e5.log | wc -l                          # 7  (die neue ERROR-Zeile fehlt!)
+grep -v INFO e5.log | wc -l                              # 7  (ebenso)
+grep -vE '^[^ ]+ [^ ]+ INFO ' e5.log | wc -l             # 8  (richtig: nur der Level zählt)
+awk '$3 != "INFO"' e5.log | wc -l                        # 8  (Level im dritten Feld)</code></pre>
+<p class="ex">Ein einfaches Muster findet das Wort überall in der Zeile. Das Muster <code class="i">^[^ ]+ [^ ]+ INFO </code> verlangt zwei Felder davor und prüft so die Level-Spalte. <code class="i">awk</code> vergleicht die Spalte direkt und ist am einfachsten zu lesen.</p></details>
+<p><b>b)</b> Schließe mehrere Level aus.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>grep -v -e ' INFO ' -e ' DEBUG ' ~/daten/events3.log | wc -l          # 6
+grep -vE ' (INFO|DEBUG) ' ~/daten/events3.log | wc -l                 # 6</code></pre>
+<p class="ex">Jedes <code class="i">-e</code> ist ein Muster, mit <code class="i">-v</code> werden Zeilen ausgeschlossen, die <i>irgendeines</i> davon treffen. Mit <code class="i">-E</code> und <code class="i">|</code> geht es in einem Ausdruck.</p></details>
+<p><b>c)</b> Zähle und nummeriere die Gegenmenge.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>grep -vc ' INFO ' ~/daten/events3.log                  # 7
+grep -vn ' INFO ' ~/daten/events3.log | cut -d: -f1 | tr '\n' ' '    # 2 3 4 7 8 9 10
+grep -c ' INFO ' ~/daten/events3.log                   # 3  (Gegenprobe: 3 + 7 = 10)</code></pre>
+<p class="ex"><code class="i">-c</code> zählt, <code class="i">-n</code> zeigt die Zeilennummern in der Quelldatei. Kombiniert mit <code class="i">-v</code> beziehen sie sich auf die nicht passenden Zeilen.</p></details>
+<p><b>d)</b> Entferne Leerzeilen und Kommentare aus einer Datei.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>printf 'a\n\nb\n' | grep -v '^$'                         # a  b   (leere Zeilen weg)
+printf '# x\nkey=1\n  # y\nkey=2\n' | grep -v '^#'        # lässt "  # y" stehen
+printf '# x\nkey=1\n  # y\nkey=2\n' | grep -vE '^\s*(#|$)'   # key=1  key=2</code></pre>
+<p class="ex">Typischer Einsatz von <code class="i">-v</code>: Konfigurationsdateien ohne Kommentare und Leerzeilen ansehen. <code class="i">\s*</code> steht für beliebig viele Leerzeichen vor dem <code class="i">#</code>.</p></details>
+<p><b>e)</b> Nutze <code class="i">--help</code>, um selbst Optionen zu finden.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>grep --help | grep -E -- ' -v,| -c,| -i,| -w,| -e,'
+#   -e, --regexp=PATTERNS     use PATTERNS for matching
+#   -i, --ignore-case         ignore case distinctions in patterns and data
+#   -w, --word-regexp         match only whole words
+#   -v, --invert-match        select non-matching lines
+#   -c, --count               print only a count of selected lines per FILE</code></pre>
+<p class="ex">Die Hilfe zeigt die kurzen und langen Namen jeder Option. Mit <code class="i">grep</code> auf <code class="i">grep --help</code> finden Sie gezielt eine Option. Das <code class="i">--</code> sagt <code class="i">grep</code>, dass danach keine Optionen mehr kommen.</p></details>
+<p><b>f)</b> Finde heraus, wie man Befehle nachschlägt, die du nicht kennst.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>man -k "copy file"            # Handbuchseiten nach Stichwort (apropos)
+whatis grep                   # Einzeiler: Name und Kurzbeschreibung
+man 5 passwd                  # Abschnitt 5: Dateiformat von /etc/passwd
+help cd                       # eingebaute Befehle der Shell
+type cd                       # cd is a shell builtin
+type ls                       # Alias, Programm oder eingebaut?</code></pre>
+<p class="ex">Die Abschnitte: 1 = Befehle, 5 = Dateiformate, 8 = Administration. <code class="i">man -k</code> und <code class="i">whatis</code> brauchen eine installierte Datenbank der Handbuchseiten und fehlen daher manchmal auf schlanken Systemen.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
