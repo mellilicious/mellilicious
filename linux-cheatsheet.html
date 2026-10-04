@@ -2558,6 +2558,96 @@ grep -wE 'ERROR (auth|storage)' ~/daten/events2.log                  # 4 Zeilen<
 <p class="ex">Weil die Reihenfolge erhalten bleibt, ist die letzte Zeile der neueste Eintrag. Mit <code class="i">tail -n 5</code> bekommen Sie die letzten fünf.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 25 · Dateien mit find suchen</h3>
+<p><b>Aufgabe:</b> Suche mit <code class="i">find</code> die Datei <code class="i">notes/people.csv</code> und speichere nur ihren Dateinamen (ohne Verzeichnis) in <code class="i">notes/found.txt</code>.</p>
+<p class="ex">Geübt wird: <code class="i">find</code> nach Name, <code class="i">basename</code> schneidet das Verzeichnis ab, und die Befehlsersetzung <code class="i">$(…)</code> verbindet beide. Die Datei <code class="i">notes/people.csv</code> stammt aus Übung 18. Falls sie fehlt, legen Sie sie mit dem <code class="i">printf</code>-Befehl am Anfang der Lösung an.</p>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes
+printf 'id,name,city\nu3,Carla,Köln\n' &gt; notes/people.csv      # nur falls Übung 18 fehlt
+
+find notes -name people.csv                                      # Kontrolle: notes/people.csv
+basename "$(find notes -name people.csv)" &gt; notes/found.txt
+
+cat notes/found.txt            # people.csv</code></pre>
+<p class="ex">Gleichwertig, ohne <code class="i">$(…)</code>: <code class="i">find notes -name people.csv -exec basename {} \; &gt; notes/found.txt</code>.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>find notes</code></td><td>Durchsucht das Verzeichnis <code>notes</code> und alle Unterverzeichnisse. Der Startpfad steht <i>vor</i> den Bedingungen.</td></tr>
+<tr><td class="nw"><code>-name people.csv</code></td><td>Bedingung: Der Dateiname (ohne Verzeichnis) muss genau <code>people.csv</code> lauten. Gefunden wird mit Pfad: <code>notes/people.csv</code>.</td></tr>
+<tr><td class="nw"><code>$( … )</code></td><td>Befehlsersetzung: Die Shell führt den Befehl darin aus und setzt seine Ausgabe an dieser Stelle ein.</td></tr>
+<tr><td class="nw"><code>basename pfad</code></td><td>Gibt nur den letzten Teil des Pfads aus. Aus <code>notes/people.csv</code> wird <code>people.csv</code>.</td></tr>
+<tr><td class="nw"><code>&gt; notes/found.txt</code></td><td>Schreibt das Ergebnis in die Datei.</td></tr>
+</table></div>
+<pre><code>find notes -name people.csv   --&gt;   notes/people.csv
+basename notes/people.csv     --&gt;   people.csv   --&gt;  notes/found.txt</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b><code class="i">find</code> sucht im Dateisystem, nicht in Dateien:</b> Es prüft Namen, Typ, Größe und Alter. Für den Inhalt gibt es <code class="i">grep -r</code>. Anders als <code class="i">ls</code> geht <code class="i">find</code> rekursiv in alle Unterordner.</p>
+<p><b>Pfad und Name sind verschiedene Dinge:</b> <code class="i">find</code> gibt den Pfad aus. Die Aufgabe verlangt nur den Namen, dafür gibt es <code class="i">basename</code>. Das Gegenstück <code class="i">dirname</code> liefert nur das Verzeichnis (<code class="i">notes</code>).</p>
+<p><b>Befehle verschachteln:</b> Mit <code class="i">$(…)</code> wird die Ausgabe des einen Befehls zum Argument des nächsten. Eine Pipe ginge hier nicht direkt, weil <code class="i">basename</code> seinen Pfad als Argument erwartet und nicht von der Standardeingabe liest.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>find … | basename</code></td><td>Es erscheint die Meldung <code>missing operand</code>. <code>basename</code> liest nicht von der Pipe. Nutzen Sie <code>$(…)</code>, <code>-exec</code> oder <code>xargs</code>.</td></tr>
+<tr><td>Nur <code>find</code>, ohne <code>basename</code></td><td>In der Datei steht <code>notes/people.csv</code> statt <code>people.csv</code>.</td></tr>
+<tr><td>Pfad statt Name bei <code>-name</code> (<code>-name notes/people.csv</code>)</td><td>Findet nichts, denn <code>-name</code> vergleicht nur den Namen ohne Verzeichnis. Für Pfade gibt es <code>-path</code>.</td></tr>
+<tr><td>Muster ohne Anführungszeichen (<code>-name *.csv</code>)</td><td>Die Shell ersetzt <code>*.csv</code> schon vor <code>find</code> durch Dateinamen im aktuellen Ordner. Bei mehreren Treffern kommt <code>paths must precede expression</code>. Immer <code>'*.csv'</code>.</td></tr>
+<tr><td>Mehrere Treffer</td><td>Gibt es weitere <code>people.csv</code> in Unterordnern, erscheinen mehrere Zeilen. Mit <code>-maxdepth 1</code> oder genauerem Startpfad eingrenzen.</td></tr>
+<tr><td>Falscher Startpfad</td><td><code>find: 'nix': No such file or directory</code>, die Datei bleibt leer.</td></tr>
+<tr><td>Groß-/Kleinschreibung</td><td><code>-name</code> unterscheidet sie. <code>People.CSV</code> wird erst mit <code>-iname</code> gefunden.</td></tr>
+<tr><td>Auch Ordner treffen</td><td>Ein Ordner namens <code>people.csv.d</code> passt auf <code>-name 'people*'</code>. <code>-type f</code> beschränkt auf Dateien.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 25 · Zum Weiterüben</h3>
+<p class="ex">Legen Sie zum Üben ein paar Dateien an: <code class="i">mkdir -p notes/archiv; cp notes/people.csv notes/archiv/; touch notes/a.csv notes/b.csv notes/other.txt</code>. Alle Ergebnisse sehen Sie direkt im Terminal.</p>
+<p><b>a)</b> Finde alle <code class="i">.csv</code>-Dateien unter <code class="i">notes</code>, und nur Dateien, nicht Ordner.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>find notes -name '*.csv'
+find notes -type f -name '*.csv'          # -type f: nur Dateien (d = Verzeichnisse)
+find notes -iname '*.csv'                 # Groß-/Kleinschreibung egal</code></pre>
+<p class="ex"><code class="i">'*.csv'</code> steht in Anführungszeichen, damit <code class="i">find</code> das Muster erhält und nicht die Shell. Mehrere Bedingungen gelten gemeinsam („und“).</p></details>
+<p><b>b)</b> Begrenze die Suchtiefe, und suche in einem bestimmten Unterpfad.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>find notes -maxdepth 1 -name 'people.csv'      # nur direkt in notes, nicht in archiv
+find . -path '*archiv/*' -name '*.csv'         # nur Treffer, deren Pfad archiv/ enthält</code></pre>
+<p class="ex"><code class="i">-maxdepth 1</code> sucht nur im Startordner. <code class="i">-path</code> vergleicht den ganzen Pfad, nicht nur den Namen.</p></details>
+<p><b>c)</b> Gib nur Dateinamen oder nur die Verzeichnisse der Treffer aus.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>find notes -name people.csv -printf '%f\n'      # Name (GNU find)
+find notes -name people.csv -printf '%h\n'      # Verzeichnis
+find notes -name people.csv | xargs -n1 dirname
+find notes -name people.csv | xargs basename -a  # mehrere Pfade auf einmal</code></pre>
+<p class="ex"><code class="i">-printf</code> bestimmt das Ausgabeformat (<code class="i">%f</code> Name, <code class="i">%h</code> Verzeichnis, <code class="i">%p</code> Pfad). <code class="i">xargs</code> macht aus Eingabezeilen Argumente. Bei mehreren Pfaden braucht <code class="i">basename</code> die Option <code class="i">-a</code>, sonst deutet es das zweite Argument als Endung.</p></details>
+<p><b>d)</b> Führe für jeden Treffer einen Befehl aus.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>find notes -name '*.csv' -exec wc -l {} \;      # Zeilen jeder Datei zählen
+find notes -name '*.csv' -exec wc -l {} +       # alle Dateien in einem Aufruf
+find notes -name '*.tmp' -delete                # gefundene Dateien löschen</code></pre>
+<p class="ex"><code class="i">{}</code> steht für den gefundenen Pfad. <code class="i">\;</code> ruft den Befehl einmal je Datei auf, <code class="i">+</code> sammelt viele Dateien in einem Aufruf. Vor <code class="i">-delete</code> erst ohne die Option prüfen, was <code class="i">find</code> findet.</p></details>
+<p><b>e)</b> Suche nach Größe, Alter und leeren Einträgen.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>find . -type f -size +1M              # größer als 1 MB
+find . -type f -mtime -1              # in den letzten 24 Stunden geändert
+find . -type f -mtime +30             # älter als 30 Tage
+find notes -empty                     # leere Dateien und Ordner</code></pre>
+<p class="ex"><code class="i">+</code> bedeutet „mehr als“, <code class="i">-</code> „weniger als“. Ohne Vorzeichen: genau dieser Wert.</p></details>
+<p><b>f)</b> Verknüpfe Bedingungen mit „oder“ und „nicht“.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>find notes -maxdepth 1 -type f \( -name '*.txt' -o -name '*.csv' \)
+find notes -maxdepth 1 -type f -not -name '*.csv'</code></pre>
+<p class="ex"><code class="i">-o</code> ist „oder“, <code class="i">-not</code> (oder <code class="i">!</code>) kehrt um. Die Klammern müssen mit Backslash geschützt werden.</p></details>
+<p><b>g)</b> Finde Dateien nach ihrem <i>Inhalt</i>.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>grep -rl 'Carla' notes            # Namen der Dateien, die "Carla" enthalten
+grep -rn 'Carla' notes            # mit Zeilennummern
+find notes -type f -exec grep -l 'Carla' {} +     # dasselbe mit find</code></pre>
+<p class="ex"><code class="i">find</code> sucht nach Eigenschaften der Datei, <code class="i">grep -r</code> nach Text darin. <code class="i">-l</code> listet nur die Dateinamen auf.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
