@@ -4320,6 +4320,129 @@ type ls                       # Alias, Programm oder eingebaut?</code></pre>
 <p class="ex">Die Abschnitte: 1 = Befehle, 5 = Dateiformate, 8 = Administration. <code class="i">man -k</code> und <code class="i">whatis</code> brauchen eine installierte Datenbank der Handbuchseiten und fehlen daher manchmal auf schlanken Systemen.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 41 · Befehle aus dem Verlauf wiederholen</h3>
+<p><b>Aufgabe:</b> Hole mit <code class="i">history</code> einen früheren <code class="i">grep</code>-Befehl zurück (den Verlauf selbst nicht speichern) und speichere dann nur die <code class="i">ERROR</code>-Zeilen des Dienstes <code class="i">auth</code> aus <code class="i">events.log</code> in <code class="i">projects/auth-errors.txt</code>.</p>
+<p class="ex">Geübt wird: die Befehlshistorie der Shell und das erneute Ausführen früherer Befehle (<code class="i">!!</code>, <code class="i">!grep</code>, <code class="i">!n</code>, Strg+R). Das Ergebnis ist dieselbe Filterung wie in Übung 24. In der Datei stehen die Logzeilen, <i>nicht</i> der Verlauf. Wir nehmen die Beispieldatei <code class="i">~/daten/events2.log</code> aus Übung 24. Setzen Sie Ihren Pfad aus der Aufgabenstellung ein.</p>
+<details><summary>Beispieldaten anlegen</summary>
+<pre><code>mkdir -p ~/daten
+cat &gt; ~/daten/events2.log &lt;&lt;'EOF'
+2026-10-01 10:00:01 INFO auth login ok
+2026-10-01 10:00:05 ERROR auth invalid password
+2026-10-01 10:01:12 ERROR network timeout
+2026-10-01 10:02:30 WARN storage disk 90% full
+2026-10-01 10:03:44 ERROR storage disk full
+2026-10-01 10:04:10 ERROR authz permission denied
+2026-10-01 10:05:02 ERROR network retry after auth failure
+2026-10-01 10:06:19 ERROR auth token expired
+2026-10-01 10:07:45 INFO storage backup done
+2026-10-01 10:08:30 ERROR storage write failed
+EOF</code></pre>
+<p class="ex">Zehn Zeilen. Zwei davon sind <code class="i">ERROR auth</code> (Zeilen 2 und 8). Zeile 6 (<code class="i">authz</code>) und Zeile 7 (<code class="i">network</code>, mit <code class="i">auth</code> in der Meldung) sind Fallen wie in Übung 24.</p></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p projects
+
+# 1. Irgendeinen grep-Befehl ausführen, damit er im Verlauf steht
+grep -c ' ERROR ' ~/daten/events2.log
+
+# 2. Verlauf ansehen und den grep-Befehl wiederfinden
+history | grep grep               # Nummer und Befehl
+
+# 3. Den Befehl zurückholen (ein Beispiel von mehreren Wegen)
+!grep                             # wiederholt den letzten Befehl, der mit "grep" beginnt
+
+# 4. Der gesuchte Befehl, mit dem Ergebnis in die Datei:
+grep -E ' ERROR auth ' ~/daten/events2.log &gt; projects/auth-errors.txt
+
+cat projects/auth-errors.txt      # 2 Zeilen: ERROR auth ...
+wc -l projects/auth-errors.txt    # 2</code></pre>
+<p class="ex">Der entscheidende Befehl ist der vierte. Das Zurückholen aus dem Verlauf ist das Werkzeug, mit dem Sie ihn nicht erneut tippen müssen: Holen Sie einen früheren <code class="i">grep</code> zurück, ändern Sie das Muster in <code class="i">' ERROR auth '</code> und hängen Sie <code class="i">&gt; projects/auth-errors.txt</code> an.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Befehle aus dem Verlauf zurückholen</h3>
+<p class="ex">Die Shell merkt sich die eingegebenen Befehle. Mit <code class="i">history</code> sehen Sie die Liste, mit Kürzeln mit <code class="i">!</code> führen Sie frühere Befehle erneut aus. Das <code class="i">!</code> wirkt nur in der interaktiven Shell, nicht in Skripten.</p><div class="tw"><table>
+<tr><th>Eingabe</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>history</code></td><td>zeigt alle gemerkten Befehle mit Nummern. <code>history 10</code> nur die letzten zehn.</td></tr>
+<tr><td class="nw"><code>history | grep grep</code></td><td>sucht im Verlauf nach einem Stichwort</td></tr>
+<tr><td class="nw"><code>↑</code> / <code>↓</code></td><td>durch frühere Befehle blättern, dann Enter oder bearbeiten</td></tr>
+<tr><td class="nw"><code>Strg+R</code></td><td>im Verlauf <i>rückwärts suchen</i>: Tippen Sie einen Teil, Enter führt aus, Strg+R sucht weiter, Pfeil rechts zum Bearbeiten</td></tr>
+<tr><td class="nw"><code>!!</code></td><td>wiederholt den letzten Befehl (<code>sudo !!</code> mit sudo davor)</td></tr>
+<tr><td class="nw"><code>!grep</code></td><td>wiederholt den letzten Befehl, der mit <code>grep</code> beginnt</td></tr>
+<tr><td class="nw"><code>!?auth ?</code></td><td>wiederholt den letzten Befehl, der <code>auth </code> <i>enthält</i></td></tr>
+<tr><td class="nw"><code>!2</code></td><td>wiederholt Befehl Nummer 2 aus der Liste</td></tr>
+<tr><td class="nw"><code>!$</code></td><td>das letzte Wort des vorigen Befehls (<code>echo eins zwei</code>, dann <code>echo !$</code> gibt <code>zwei</code> aus)</td></tr>
+<tr><td class="nw"><code>fc -l -5</code></td><td>listet die letzten fünf Befehle</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Nicht alles neu tippen:</b> Lange Befehle mit Pfaden und Mustern sind fehleranfällig. Ein früherer Befehl ist geprüft, Sie ändern nur, was anders sein soll.</p>
+<p><b>Sichtbar vor dem Ausführen:</b> Die Shell zeigt bei <code class="i">!!</code> und <code class="i">!grep</code> zuerst den Befehl, den sie ausführt, zum Beispiel <code class="i">grep -E ' ERROR auth ' …</code>. Sie sehen also, was passiert.</p>
+<p><b>Verlauf ist ein Werkzeug, kein Ergebnis:</b> Die Aufgabe sagt: Speichern Sie den Verlauf <i>nicht</i>. Gemeint ist, dass die Zieldatei die gefilterten Logzeilen enthält und nicht die Ausgabe von <code class="i">history</code>. Kontrollieren Sie, dass die Datei <code class="i">ERROR auth</code>-Zeilen enthält, nicht nummerierte Befehle.</p>
+<p><b>Privates bleibt privat:</b> Ein Befehl mit einem führenden Leerzeichen kommt bei <code class="i">HISTCONTROL=ignorespace</code> nicht in den Verlauf (Standard bei vielen Systemen). So lassen sich Passwörter in Befehlen vermeiden. Besser ist es, Passwörter gar nicht auf der Kommandozeile zu tippen.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>history &gt; projects/auth-errors.txt</code></td><td>In der Datei steht der <i>Verlauf</i> (nummerierte Befehle), nicht die Logzeilen. Genau das soll nicht passieren.</td></tr>
+<tr><td><code>!grep &gt; datei</code> hängt <i>eine zweite</i> Umleitung an einen Befehl, der schon eine hat</td><td>Die Shell setzt den Befehl <i>mit</i> seiner alten Umleitung ein: <code>grep … &gt; alt.txt &gt; neu.txt</code>. Dann gewinnt die letzte, und <code>alt.txt</code> wird leer (im Test 0 Zeilen).</td></tr>
+<tr><td>Falschen Befehl erwischt</td><td><code>!grep</code> führt den <i>zuletzt</i> eingegebenen <code>grep</code> aus, nicht unbedingt den gewünschten. Erst mit <code>history | grep grep</code> suchen und <code>!Nummer</code> nehmen.</td></tr>
+<tr><td>Befehl mit Nebenwirkung wiederholt</td><td><code>!!</code> führt <i>sofort</i> aus. Bei <code>rm</code>-Befehlen vorher mit <code>!!:p</code> nur anzeigen lassen.</td></tr>
+<tr><td>Muster ohne Leerzeichen (<code>ERROR auth</code>)</td><td>Trifft auch <code>authz</code> (3 statt 2 Zeilen). Mit Leerzeichen am Ende: <code>' ERROR auth '</code>.</td></tr>
+<tr><td><code>!</code> im Text (<code>echo "wow!tmp"</code>)</td><td>Bash deutet <code>!tmp</code> als Verlaufskürzel: <code>bash: !tmp: event not found</code>. Einfache Anführungszeichen (<code>'wow!tmp'</code>) schützen vor der Ersetzung.</td></tr>
+<tr><td>Verlauf nach neuem Anmelden leer</td><td>Der Verlauf wird erst beim Beenden der Sitzung in die Datei <code>~/.bash_history</code> geschrieben. Parallele Sitzungen überschreiben sich.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 41 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie in einer <i>interaktiven</i> Shell. Die Kürzel mit <code class="i">!</code> funktionieren nur dort. Die Ausgaben stammen aus einem Test mit dieser Shell.</p>
+<p><b>a)</b> Zeige und wiederhole Befehle.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>history 5                        # die letzten fünf
+!!                               # letzten Befehl wiederholen
+!2                               # Befehl Nr. 2 wiederholen
+!grep                            # letzten grep wiederholen
+!?auth ?                         # letzter Befehl, der "auth " enthält</code></pre>
+<p class="ex">Die Shell schreibt den erweiterten Befehl vor dem Ausführen auf den Bildschirm, damit Sie ihn sehen. Mit Strg+C brechen Sie ihn bei Bedarf ab.</p></details>
+<p><b>b)</b> Zeige einen Befehl nur an, ohne ihn auszuführen.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>!grep:p                          # zeigt den Befehl nur an (p = print) und merkt ihn
+!!                               # führt ihn jetzt aus</code></pre>
+<p class="ex">Mit <code class="i">:p</code> prüfen Sie, welcher Befehl getroffen würde. Besonders sinnvoll vor <code class="i">!rm</code> oder <code class="i">sudo !!</code>.</p></details>
+<p><b>c)</b> Nutze das letzte Argument oder Wort wieder.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>echo eins zwei
+echo !$                          # echo zwei          (letztes Wort)
+mkdir -p projects/neu
+cd !$                            # cd projects/neu   (letztes Argument wiederverwenden)</code></pre>
+<p class="ex"><code class="i">!$</code> spart das erneute Tippen von langen Pfaden. Die Tastenkombination <code class="i">Alt+.</code> macht dasselbe und lässt Sie das Wort vor dem Ausführen sehen.</p></details>
+<p><b>d)</b> Suche mit Strg+R und bearbeite einen alten Befehl.</p>
+<details><summary>Lösung d)</summary>
+<pre data-lang="plain"><code>Strg+R              # (reverse-i-search)`':
+auth                # tippen: zeigt den letzten Befehl mit "auth"
+Strg+R              # nochmal: noch weiter zurück
+Pfeil rechts        # Befehl zum Bearbeiten übernehmen (Enter führt ihn aus)
+Strg+G / Esc        # abbrechen</code></pre>
+<p class="ex">Die inkrementelle Suche ist die schnellste Art, einen alten Befehl zu finden, besonders bei langen Verläufen.</p></details>
+<p><b>e)</b> Halte Befehle aus dem Verlauf heraus oder lösche einen Eintrag.</p>
+<details><summary>Lösung e)</summary>
+<pre><code> echo geheim                      # führendes Leerzeichen: nicht im Verlauf (bei HISTCONTROL=ignorespace)
+history -d 4                      # Eintrag Nr. 4 löschen
+history -c                        # ganzen Verlauf dieser Sitzung löschen
+echo $HISTSIZE $HISTFILE          # Größe und Datei des Verlaufs</code></pre>
+<p class="ex">Im Test blieb <code class="i">echo geheim</code> mit führendem Leerzeichen aus dem Verlauf heraus. Ob das Verhalten aktiv ist, hängt von <code class="i">HISTCONTROL</code> ab (<code class="i">ignorespace</code> oder <code class="i">ignoreboth</code>).</p></details>
+<p><b>f)</b> Hole einen Befehl zurück und ändere dabei das Muster.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>grep -c ' ERROR ' ~/daten/events2.log          # 7 (alle ERROR-Zeilen)
+^ERROR^WARN^                                    # ersetzt im letzten Befehl ERROR durch WARN: 1
+!!:s/WARN/INFO/                                 # Variante mit s/alt/neu/: 2 (INFO-Zeilen)</code></pre>
+<p class="ex"><code class="i">^alt^neu^</code> ersetzt den <i>ersten</i> Treffer im letzten Befehl und führt ihn aus. So passen Sie einen Befehl an, ohne ihn ganz neu zu schreiben. Die Suche muss im letzten Befehl vorkommen, sonst meldet Bash <code class="i">substitution failed</code>.</p></details>
+<p><b>g)</b> Sichere den Verlauf aus Absicht, aber nicht als Ergebnis.</p>
+<details><summary>Lösung g)</summary>
+<pre><code>history -w ~/uebung/verlauf.txt                 # Verlauf bewusst in eine Datei schreiben
+tail -n 3 ~/uebung/verlauf.txt                  # prüfen
+rm ~/uebung/verlauf.txt                         # und wieder aufräumen</code></pre>
+<p class="ex">Das ist der Unterschied zur Aufgabe: Hier wird der Verlauf bewusst gespeichert, in der Aufgabe soll er <i>nicht</i> im Ergebnis stehen. Prüfen Sie am Ende, dass <code class="i">projects/auth-errors.txt</code> nur Logzeilen enthält.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
