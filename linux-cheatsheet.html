@@ -2459,6 +2459,105 @@ ls -l f1 f2 | awk '{s+=$5} END {print s}'              # 6   (2 + 4 Bytes)</code
 <p class="ex">In <code class="i">ls -l</code> steht die Größe im fünften Feld. Diese Auswertung ist nützlich, aber <code class="i">du</code> oder <code class="i">wc -c</code> liefern Größen auch direkt.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 24 · Fehlerlog gezielt filtern</h3>
+<p><b>Aufgabe:</b> Kopiere aus der Logdatei <code class="i">events.log</code> nur die <code class="i">ERROR</code>-Zeilen der Dienste <code class="i">auth</code> oder <code class="i">storage</code> in die Datei <code class="i">result.txt</code> im Übungsordner. Die ursprüngliche Reihenfolge der Zeilen muss erhalten bleiben.</p>
+<p class="ex">Geübt wird: <code class="i">grep -E</code> mit „oder“ (<code class="i">|</code>) und Gruppen, mehrere Bedingungen gleichzeitig und die Reihenfolge der Ausgabe. In der Kursaufgabe sehen die Zeilen vermutlich ähnlich aus wie hier: <code class="i">Datum Uhrzeit LEVEL dienst meldung</code>. Wir nehmen die Beispieldatei <code class="i">~/daten/events2.log</code>. Setzen Sie Ihren Pfad aus der Aufgabenstellung ein. Beachten Sie, dass <code class="i">result.txt</code> direkt im Übungsordner liegt und nicht in <code class="i">notes/</code>.</p>
+<details><summary>Beispieldaten anlegen</summary>
+<pre><code>mkdir -p ~/daten
+cat &gt; ~/daten/events2.log &lt;&lt;'EOF'
+2026-10-01 10:00:01 INFO auth login ok
+2026-10-01 10:00:05 ERROR auth invalid password
+2026-10-01 10:01:12 ERROR network timeout
+2026-10-01 10:02:30 WARN storage disk 90% full
+2026-10-01 10:03:44 ERROR storage disk full
+2026-10-01 10:04:10 ERROR authz permission denied
+2026-10-01 10:05:02 ERROR network retry after auth failure
+2026-10-01 10:06:19 ERROR auth token expired
+2026-10-01 10:07:45 INFO storage backup done
+2026-10-01 10:08:30 ERROR storage write failed
+EOF
+cat -n ~/daten/events2.log</code></pre>
+<p class="ex">Zehn Zeilen. Gesucht sind die Zeilen 2, 5, 8 und 10. Die Zeilen 6 (<code class="i">authz</code>) und 7 (<code class="i">network</code>, aber mit dem Wort <code class="i">auth</code> in der Meldung) sind Fallen.</p></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+grep -E ' ERROR (auth|storage) ' ~/daten/events2.log &gt; result.txt
+
+cat -n result.txt
+#  1  ... ERROR auth invalid password
+#  2  ... ERROR storage disk full
+#  3  ... ERROR auth token expired
+#  4  ... ERROR storage write failed
+wc -l result.txt               # 4</code></pre>
+<p class="ex">Das Muster lautet: Leerzeichen, <code class="i">ERROR</code>, Leerzeichen, <code class="i">auth</code> oder <code class="i">storage</code>, Leerzeichen.</p>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>grep -E</code></td><td><b>E</b>xtended: erweiterte reguläre Ausdrücke. Damit stehen <code>|</code> (oder) und <code>( )</code> (Gruppe) ohne Backslash zur Verfügung.</td></tr>
+<tr><td class="nw"><code>' ERROR (auth|storage) '</code></td><td>Passt auf Zeilen mit <code> ERROR </code>, direkt danach <code>auth</code> <i>oder</i> <code>storage</code>, dann ein Leerzeichen. Die Leerzeichen vorn und hinten sind wichtig.</td></tr>
+<tr><td class="nw"><code>&gt; result.txt</code></td><td>Schreibt die passenden Zeilen in die Datei.</td></tr>
+</table></div>
+<pre><code>Zeile 2   ... ERROR auth invalid password       passt
+Zeile 5   ... ERROR storage disk full            passt
+Zeile 6   ... ERROR authz permission denied      passt nicht (authz)
+Zeile 7   ... ERROR network retry after auth ... passt nicht (Dienst ist network)</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Beide Bedingungen in einem Muster:</b> Gesucht sind Zeilen, die <code class="i">ERROR</code> <i>und</i> einen der beiden Dienste enthalten. Ein einzelnes Muster mit Gruppe legt auch die Position fest: Der Dienst muss direkt nach dem Level stehen.</p>
+<p><b>Ein Durchgang erhält die Reihenfolge:</b> <code class="i">grep</code> liest die Datei einmal von oben nach unten und gibt Treffer in dieser Reihenfolge aus. Genau das verlangt die Aufgabe. Zwei getrennte Suchläufe würden erst alle <code class="i">auth</code>-, dann alle <code class="i">storage</code>-Zeilen liefern.</p>
+<p><b>Leerzeichen als Grenzen:</b> Mit dem Leerzeichen hinter <code class="i">auth</code> fällt <code class="i">authz</code> heraus. Auch <code class="i">grep -w</code> würde das Wort begrenzen.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>grep -E 'ERROR|auth|storage'</code></td><td>Das <code>|</code> verbindet <i>alles</i> mit „oder“. Es werden alle zehn Zeilen gefunden, auch <code>INFO auth</code>.</td></tr>
+<tr><td>Zwei Suchläufe nacheinander (<code>grep auth &gt; r; grep storage &gt;&gt; r</code>)</td><td>Erst alle <code>auth</code>-, dann alle <code>storage</code>-Zeilen. Die Reihenfolge stimmt nicht mehr.</td></tr>
+<tr><td><code>grep ERROR f | grep -E 'auth|storage'</code></td><td>Die Reihenfolge bleibt, aber der Dienst kann <i>irgendwo</i> in der Zeile stehen: Es kommen 6 Zeilen heraus, darunter <code>authz</code> und <code>network retry after auth failure</code>.</td></tr>
+<tr><td>Ohne Leerzeichen am Ende (<code>ERROR (auth|storage)</code>)</td><td><code>authz</code> passt zu <code>auth</code>. Ergebnis: 5 statt 4 Zeilen.</td></tr>
+<tr><td><code>-E</code> vergessen</td><td>Ohne <code>-E</code> sind <code>|</code> und <code>( )</code> gewöhnliche Zeichen. Die Gruppe passt auf nichts, <code>result.txt</code> bleibt leer.</td></tr>
+<tr><td><code>&gt;&gt;</code> statt <code>&gt;</code></td><td>Beim zweiten Lauf stehen die Treffer doppelt in der Datei (8 Zeilen).</td></tr>
+<tr><td>Kleinschreibung</td><td><code>error</code> passt nicht auf <code>ERROR</code>. Mit <code>-i</code> egal.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 24 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit <code class="i">~/daten/events2.log</code>. Alle Ergebnisse sehen Sie direkt im Terminal.</p>
+<p><b>a)</b> Löse es mit zwei Mustern über <code class="i">-e</code> oder mit einer Musterdatei.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>grep -e ' ERROR auth ' -e ' ERROR storage ' ~/daten/events2.log
+
+printf ' ERROR auth \n ERROR storage \n' &gt; muster.txt
+grep -Ff muster.txt ~/daten/events2.log        # -F: feste Texte, -f: Muster aus Datei</code></pre>
+<p class="ex">Jedes <code class="i">-e</code> ist ein weiteres Muster, die Zeile gilt als Treffer, wenn <i>eines</i> davon passt. Mit <code class="i">-f</code> liest <code class="i">grep</code> die Muster aus einer Datei, praktisch bei langen Listen.</p></details>
+<p><b>b)</b> Löse es mit <code class="i">awk</code> und prüfe die Felder einzeln.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>awk '$3=="ERROR" &amp;&amp; ($4=="auth" || $4=="storage")' ~/daten/events2.log
+awk '$3=="ERROR" &amp;&amp; $4 ~ /^(auth|storage)$/' ~/daten/events2.log</code></pre>
+<p class="ex">Hier steht der Level im dritten, der Dienst im vierten Feld. <code class="i">&amp;&amp;</code> heißt „und“, <code class="i">||</code> „oder“. Vergleiche mit <code class="i">==</code> sind exakt, das macht <code class="i">awk</code> robuster als eine Textsuche.</p></details>
+<p><b>c)</b> Zeige mit Zeilennummern, wo die Treffer stehen, und zähle sie.</p>
+<details><summary>Lösung c)</summary>
+<pre><code>grep -nE ' ERROR (auth|storage) ' ~/daten/events2.log     # 2:  5:  8:  10:
+grep -cE ' ERROR (auth|storage) ' ~/daten/events2.log     # 4</code></pre>
+<p class="ex"><code class="i">-n</code> zeigt die Zeilennummern in der Quelldatei, <code class="i">-c</code> zählt die Treffer.</p></details>
+<p><b>d)</b> Ignoriere die Schreibweise und begrenze auf ganze Wörter.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>printf '10:00 error auth x\n' | grep -iE 'ERROR (auth|storage)'     # 1 Treffer
+grep -wE 'ERROR (auth|storage)' ~/daten/events2.log                  # 4 Zeilen</code></pre>
+<p class="ex"><code class="i">-i</code> ignoriert Groß-/Kleinschreibung, <code class="i">-w</code> verlangt, dass der Treffer an Wortgrenzen endet. Damit ist <code class="i">authz</code> ausgeschlossen, auch ohne Leerzeichen im Muster.</p></details>
+<p><b>e)</b> Zähle die Fehler pro Dienst.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>grep ' ERROR ' ~/daten/events2.log | awk '{print $4}' | sort | uniq -c
+#   2 auth
+#   1 authz
+#   2 network
+#   2 storage</code></pre>
+<p class="ex">Fehlerzeilen filtern, das vierte Feld (Dienst) ausgeben, sortieren und zählen. Dasselbe Muster wie in Übung 12.</p></details>
+<p><b>f)</b> Zeige den jüngsten passenden Fehler.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>grep -E ' ERROR (auth|storage) ' ~/daten/events2.log | tail -n 1
+# 2026-10-01 10:08:30 ERROR storage write failed</code></pre>
+<p class="ex">Weil die Reihenfolge erhalten bleibt, ist die letzte Zeile der neueste Eintrag. Mit <code class="i">tail -n 5</code> bekommen Sie die letzten fünf.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
