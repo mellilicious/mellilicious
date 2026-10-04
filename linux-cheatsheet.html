@@ -1546,6 +1546,94 @@ printf 'coral\nblue\namber\nblue\namber\n' | sort -u       # gleichwertig</code>
 <p class="ex"><code class="i">-w1</code> vergleicht nur das erste Zeichen. Von den Zeilen mit gleichem Anfang bleibt die erste erhalten.</p></details>
 </div>
 
+<div class="blk wide"><h3>Übung 13 · Fehler in einem Log zählen</h3>
+<p><b>Aufgabe:</b> Filtere die <code class="i">ERROR</code>-Einträge aus der Logdatei <code class="i">events.log</code>, zähle sie mit <code class="i">wc -l</code> und speichere nur die Zahl in <code class="i">notes/count.txt</code>.</p>
+<p class="ex">Geübt wird: Pipe aus <code class="i">grep</code> und <code class="i">wc -l</code>, das Ergebnis in eine Datei umleiten. In der Kursaufgabe liegt <code class="i">events.log</code> in einem vorgegebenen Datenordner. Hier nehmen wir die Beispieldatei <code class="i">~/daten/events.log</code>. Setzen Sie für Ihre Aufgabe den Pfad aus der Aufgabenstellung ein.</p>
+<details><summary>Beispieldaten anlegen</summary>
+<pre><code>mkdir -p ~/daten
+cat &gt; ~/daten/events.log &lt;&lt;'EOF'
+2026-10-01 10:00:01 INFO start
+2026-10-01 10:00:05 ERROR disk full
+2026-10-01 10:01:12 WARN slow response
+2026-10-01 10:02:30 ERROR timeout
+2026-10-01 10:03:44 INFO request ok
+2026-10-01 10:04:10 ERROR connection refused
+2026-10-01 10:05:02 DEBUG cache hit
+2026-10-01 10:06:19 ERROR out of memory
+2026-10-01 10:07:45 INFO request ok
+2026-10-01 10:08:30 ERROR disk full
+2026-10-01 10:09:00 INFO stop
+EOF</code></pre>
+<p class="ex">Elf Zeilen, davon fünf mit dem Level <code class="i">ERROR</code>.</p></details>
+<details><summary>Lösung anzeigen</summary>
+<pre><code>cd ~/uebung
+mkdir -p notes
+grep ERROR ~/daten/events.log | wc -l &gt; notes/count.txt
+
+cat notes/count.txt            # 5</code></pre>
+</details>
+</div>
+
+<div class="blk"><h3>Was jeder Befehl macht</h3><div class="tw"><table>
+<tr><th>Teil</th><th>Wirkung</th></tr>
+<tr><td class="nw"><code>grep ERROR datei</code></td><td>Gibt alle Zeilen aus, die das Wort <code>ERROR</code> enthalten. Die anderen werden verworfen.</td></tr>
+<tr><td class="nw"><code>|</code></td><td>Übergibt diese Zeilen an den nächsten Befehl.</td></tr>
+<tr><td class="nw"><code>wc -l</code></td><td><b>w</b>ord <b>c</b>ount, <code>-l</code> (lines): zählt die Zeilen der Eingabe. Kommt die Eingabe aus einer Pipe, gibt <code>wc -l</code> <i>nur die Zahl</i> aus.</td></tr>
+<tr><td class="nw"><code>&gt; notes/count.txt</code></td><td>Schreibt die Zahl in die Datei.</td></tr>
+</table></div>
+<pre><code>events.log --grep--&gt; 5 ERROR-Zeilen --wc -l--&gt; 5 --&gt;  count.txt</code></pre></div>
+
+<div class="blk"><h3>Warum macht man es so?</h3>
+<p><b>Filtern, dann zählen:</b> Zwei einfache Schritte ergeben eine Auswertung. Dasselbe Muster zählt Logins, 404-Fehler oder Zeilen mit einem Stichwort in beliebigen Textdateien.</p>
+<p><b>Warum nur die Zahl?</b> Rufen Sie <code class="i">wc -l datei</code> direkt auf einer Datei auf, steht der Dateiname hinter der Zahl (<code class="i">11 events.log</code>). Aus einer Pipe liest <code class="i">wc</code> keinen Dateinamen und gibt nur <code class="i">5</code> aus. Genau das verlangt die Aufgabe.</p>
+<p><b>Kurzer Weg:</b> <code class="i">grep -c ERROR datei</code> zählt direkt und gibt ebenfalls nur die Zahl aus. Die Aufgabe verlangt aber ausdrücklich <code class="i">wc -l</code>, das auch hinter anderen Befehlen funktioniert.</p></div>
+
+<div class="blk"><h3>Typische Fehler</h3><div class="tw"><table>
+<tr><th>Fehler</th><th>Folge</th></tr>
+<tr><td><code>wc -l events.log</code> ohne <code>grep</code></td><td>Zählt <i>alle</i> Zeilen (hier 11) und schreibt zusätzlich den Dateinamen dazu.</td></tr>
+<tr><td><code>grep ERROR</code> ohne Pipe, nur <code>&gt;</code></td><td>In der Datei stehen die <i>Zeilen</i>, nicht deren Anzahl.</td></tr>
+<tr><td><code>&gt;&gt;</code> statt <code>&gt;</code></td><td>Bei jedem Lauf kommt eine Zeile dazu (<code>5</code>, <code>5</code>, …), die Datei enthält mehr als eine Zahl.</td></tr>
+<tr><td>Falscher Pfad zur Logdatei</td><td>Die Fehlermeldung von <code>grep</code> erscheint im Terminal, in <code>count.txt</code> steht <code>0</code>.</td></tr>
+<tr><td><code>ERROR</code> in einer Meldung</td><td><code>grep ERROR</code> findet das Wort überall in der Zeile, auch in Meldungstexten oder Wörtern wie <code>ERRORS</code>. Genauer: <code>grep -w</code> (siehe unten).</td></tr>
+<tr><td>Kleinschreibung (<code>error</code>)</td><td>Wird von <code>grep ERROR</code> nicht erfasst. Mit <code>-i</code> ignoriert man die Schreibweise.</td></tr>
+</table></div></div>
+
+<div class="blk wide"><h3>Übung 13 · Zum Weiterüben</h3>
+<p class="ex">Arbeiten Sie mit den Beispieldaten aus <code class="i">~/daten/events.log</code>.</p>
+<p><b>a)</b> Zähle direkt mit <code class="i">grep</code>, ohne <code class="i">wc</code>.</p>
+<details><summary>Lösung a)</summary>
+<pre><code>grep -c ERROR ~/daten/events.log        # 5</code></pre>
+<p class="ex"><code class="i">-c</code> (count) gibt die Zahl der passenden Zeilen aus. Das Ergebnis ist dasselbe wie bei <code class="i">grep | wc -l</code>.</p></details>
+<p><b>b)</b> Zähle die Zeilen <i>ohne</i> <code class="i">ERROR</code>.</p>
+<details><summary>Lösung b)</summary>
+<pre><code>grep -v ERROR ~/daten/events.log | wc -l        # 6</code></pre>
+<p class="ex"><code class="i">-v</code> dreht die Auswahl um. Fünf plus sechs ergibt die elf Zeilen der Datei.</p></details>
+<p><b>c)</b> Welche Fehlermeldung kommt am häufigsten vor?</p>
+<details><summary>Lösung c)</summary>
+<pre><code>grep ERROR ~/daten/events.log | cut -d' ' -f4- | sort | uniq -c | sort -rn | head -n 2
+#   2 disk full
+#   1 timeout</code></pre>
+<p class="ex">Schritt für Schritt: ERROR-Zeilen filtern, ab dem 4. Feld ausschneiden (<code class="i">cut -d' ' -f4-</code>, Trenner ist das Leerzeichen), sortieren, zählen (Übung 12), nach Häufigkeit absteigend sortieren, die obersten zwei zeigen.</p></details>
+<p><b>d)</b> Zeige die Uhrzeiten der ERROR-Einträge.</p>
+<details><summary>Lösung d)</summary>
+<pre><code>grep ERROR ~/daten/events.log | cut -d' ' -f2
+# 10:00:05  10:02:30  10:04:10 ...</code></pre>
+<p class="ex">Die Zeilen bestehen aus Datum, Uhrzeit, Level und Meldung, getrennt durch Leerzeichen. <code class="i">-f2</code> ist die Uhrzeit.</p></details>
+<p><b>e)</b> Speichere die ERROR-Zeilen in <code class="i">notes/errors.log</code> und zähle sie in einem Schritt.</p>
+<details><summary>Lösung e)</summary>
+<pre><code>grep ERROR ~/daten/events.log | tee notes/errors.log | wc -l     # 5</code></pre>
+<p class="ex"><code class="i">tee</code> schreibt den Datenstrom in die Datei und reicht ihn zugleich an <code class="i">wc</code> weiter.</p></details>
+<p><b>f)</b> Zähle in einer Logdatei nur Einträge mit dem Level <code class="i">ERROR</code>, nicht Zeilen, in denen das Wort nur in der Meldung steht.</p>
+<details><summary>Lösung f)</summary>
+<pre><code>printf '10:00 INFO no ERROR here\n10:01 ERROR real\n10:02 error lower\n10:03 ERRORS plural\n10:04 WARN x\n' &gt; t.log
+
+grep ERROR t.log | wc -l                  # 3  (auch "no ERROR here" und ERRORS)
+grep -w ERROR t.log | wc -l               # 2  (ganze Wörter: "no ERROR here" bleibt)
+awk '$2=="ERROR"' t.log | wc -l           # 1  (Level genau im 2. Feld)
+grep -i error t.log | wc -l               # 4  (Groß/Klein egal)</code></pre>
+<p class="ex">Je nach Frage gibt es verschiedene richtige Antworten. <code class="i">-w</code> findet nur ganze Wörter, <code class="i">awk</code> prüft das Feld, in dem das Level steht, und ist am genauesten. Für die Kursaufgabe genügt <code class="i">grep ERROR</code>, weil dort nur der Level das Wort enthält.</p></details>
+</div>
+
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
