@@ -4,9 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Java CheatSheet</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: sticky Themen-Navigation links, Snippet-Karten in mehrspaltigem Fluss rechts */
 :root{
@@ -90,6 +87,35 @@ footer{grid-column:1/-1;color:var(--muted);font-size:13px}
 @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
 body{margin:0}
 [hidden]{display:none!important}
+
+h1{overflow-wrap:anywhere;font-size:clamp(1.7rem,7vw,3rem)}
+.nw{white-space:nowrap}
+.list{margin:0 0 8px;padding-left:20px}.list li{margin:3px 0}
+.plan{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.day{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--bg)}
+.day h4{margin:0 0 6px;font-family:var(--f-display);font-size:1rem}
+label{display:block;margin:4px 0;cursor:pointer}
+label.done{margin-top:10px;color:var(--muted);font-size:13.5px}
+input[type=checkbox]{margin-right:6px;accent-color:var(--accent);width:16px;height:16px;vertical-align:-3px}
+.progress{margin:10px 0 0;font-weight:600;color:var(--accent)}
+table.check td:nth-child(2){text-align:center}
+details{margin:8px 0}
+details>summary{cursor:pointer;font-weight:600;padding:4px 0}
+details.fx summary code{white-space:normal;word-break:break-word}
+details.fx{border-bottom:1px solid var(--line);padding:4px 0}
+.lvl{font-family:var(--f-body);font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:4px;text-transform:none;letter-spacing:0;margin-left:6px}
+pre[data-lang="out"]{background:#0b1b14;color:#bfe3c9}
+#top{position:fixed;right:16px;bottom:16px;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);box-shadow:0 2px 8px rgba(0,0,0,.2)}
+@media print{
+  body{background:#fff;color:#000;font-size:11px;padding:0}
+  .wrap{display:block}header.top .tools,nav,#top,.cp{display:none!important}
+  details>*{display:block}details:not([open])>*:not(summary){display:block}
+  .blk{break-inside:avoid;border-color:#999}
+  pre{background:#f4f4f4!important;color:#000!important;white-space:pre-wrap}
+  pre span{color:#000!important}
+  section{margin-bottom:16px}
+}
+.why{margin:8px 0 8px;font-size:13.5px}.why .list{margin-top:4px}
 </style>
 </head>
 <body>
@@ -107,6 +133,7 @@ body{margin:0}
 <nav aria-label="Themen"><ul id="nav"></ul></nav>
 <main id="main">
 
+
 <section id="grundgeruest" data-grp="Sprache"><h2>Grundgerüst</h2><div class="grid">
 <div class="blk"><h3>Hello World</h3><p class="ex">Jedes Java-Programm startet in der <code class="i">main</code>-Methode. Der Dateiname muss zum Namen der <code class="i">public</code>-Klasse passen.</p>
 <pre><code>public class Main {
@@ -119,6 +146,36 @@ body{margin:0}
 java Main            # ausführen
 java Main.java       # Single-File direkt starten (ab Java 11)
 jshell               # interaktive Konsole</code></pre></div>
+</div></section>
+
+<section id="konsole" data-grp="Sprache"><h2>Konsole &amp; char <small>Ein-/Ausgabe</small></h2><div class="grid">
+<div class="blk"><h3>Scanner (Eingabe)</h3><pre><code>Scanner sc = new Scanner(System.in);   // import java.util.Scanner;
+int n    = sc.nextInt();
+double d = sc.nextDouble();            // Dezimaltrennzeichen laut System
+char c   = sc.next().charAt(0);
+sc.nextLine();                         // Rest der Zeile verwerfen
+String s = sc.nextLine();              // ganze Zeile</code></pre>
+<p class="ex">Nach <code class="i">nextInt()</code> bleibt der Zeilenumbruch im Puffer: vor <code class="i">nextLine()</code> einmal <code class="i">nextLine()</code> aufrufen.</p></div>
+<div class="blk"><h3>Ausgabe &amp; Formatierung</h3><pre><code>System.out.print("n: ");               // ohne Zeilenumbruch
+System.out.println("fertig");          // mit Zeilenumbruch
+System.out.printf("%2d %5.2f %s%n", 5, 3.14159, "x");
+String.format("%.2f", 2.5);            // "2.50"
+String.format("%-6s|%6s|", "ab", "cd");
+// %d ganze Zahl  %f Kommazahl  %s Text  %c Zeichen  %n Umbruch  %% Prozent
+// %4d Breite 4   %-4d linksbuendig   %04d mit Nullen   %.2f 2 Stellen</code></pre></div>
+<div class="blk"><h3>Rechnen mit char</h3><pre><code>(int) 'A'                  // 65
+(char) 66                  // 'B'
+(char) ('A' + 2)           // 'C'  (char + int = int, daher Cast)
+'a' - 'A'                  // 32
+(char) (c - 'A' + 'a')     // gross -&gt; klein
+(char) (c - 'a' + 'A')     // klein -&gt; gross
+'7' - '0'                  // 7
+c &gt;= 'a' &amp;&amp; c &lt;= 'z'     // Kleinbuchstabe?</code></pre></div>
+<div class="blk"><h3>Escape-Zeichen &amp; Literale</h3><pre><code>"\\"  Backslash    "\""  Anfuehrungszeichen
+"\n"  Zeilenumbruch  "\t"  Tabulator
+0xFF   hexadezimal (255)   012  oktal (10)   0b101  binaer (5)
+80L    long   5.5f  float   8.88e1  double (88.8)   'Z'  char
+1_000_000      Unterstriche als Trenner</code></pre></div>
 </div></section>
 
 <section id="datentypen" data-grp="Sprache"><h2>Datentypen</h2><div class="grid">
@@ -969,7 +1026,7 @@ implementation 'org.springframework.boot:spring-boot-starter-web'</code></pre>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
 </main>
-<footer>Java 21 / Spring Boot 3. Beispiele sind verkürzt, Imports sind weggelassen.</footer>
+<footer>Alle Lösungen wurden mit Java 21 kompiliert und mit den Beispielen des Übungsblatts getestet.</footer>
 </div>
 <script>
 (function(){
@@ -1007,7 +1064,7 @@ implementation 'org.springframework.boot:spring-boot-starter-web'</code></pre>
   document.querySelectorAll('pre').forEach(function(pre){
     var code = pre.querySelector('code');
     var raw = code.textContent;
-    hl(code, pre.getAttribute('data-lang') || 'java');
+    if (pre.getAttribute('data-lang') !== 'out') hl(code, pre.getAttribute('data-lang') || 'java');
     var wrap = document.createElement('div'); wrap.className = 'code';
     pre.parentNode.insertBefore(wrap, pre); wrap.appendChild(pre);
     var b = document.createElement('button'); b.type = 'button'; b.className = 'cp'; b.textContent = 'Kopieren';
@@ -1057,6 +1114,30 @@ implementation 'org.springframework.boot:spring-boot-starter-web'</code></pre>
     empty.classList.toggle('hide', any);
   }
   q.addEventListener('input', filter);
+
+
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type=checkbox][data-key]'));
+  function store(k, v){ try { if (v) localStorage.setItem('jp-' + k, '1'); else localStorage.removeItem('jp-' + k); } catch (e) {} }
+  function load(k){ try { return localStorage.getItem('jp-' + k) === '1'; } catch (e) { return false; } }
+  function cnt(pfx){ var l = boxes.filter(function(b){ return b.getAttribute('data-key').indexOf(pfx) === 0; }); return [l.filter(function(b){ return b.checked; }).length, l.length]; }
+  function upd(){
+    var p = document.getElementById('plan-progress'), t = document.getElementById('task-progress'), a, c;
+    if (p) { a = cnt('p-'); p.textContent = a[0] + ' von ' + a[1] + ' Schritten erledigt'; }
+    if (t) { c = cnt('a-'); t.textContent = c[0] + ' von ' + c[1] + ' Aufgaben gelöst'; }
+  }
+  boxes.forEach(function(b){
+    b.checked = load(b.getAttribute('data-key'));
+    b.addEventListener('change', function(){ store(b.getAttribute('data-key'), b.checked); upd(); });
+  });
+  upd();
+  document.addEventListener('keydown', function(e){
+    var ae = document.activeElement, typing = ae && /INPUT|TEXTAREA/.test(ae.tagName) && ae.type !== 'checkbox';
+    if (e.key === '/' && !typing) { e.preventDefault(); q.focus(); }
+    if (e.key === 'Escape' && ae === q) { q.value = ''; filter(); q.blur(); }
+  });
+  var topBtn = document.createElement('button'); topBtn.id = 'top'; topBtn.type = 'button'; topBtn.textContent = 'Nach oben';
+  topBtn.addEventListener('click', function(){ scrollTo({top: 0}); });
+  document.body.appendChild(topBtn);
 
   // Theme
   var root = document.documentElement;

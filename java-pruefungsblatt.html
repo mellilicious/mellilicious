@@ -1,0 +1,2116 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Java Prüfungsblatt</title>
+<style>
+/* Layout: sticky Themen-Navigation links, Snippet-Karten in mehrspaltigem Fluss rechts */
+:root{
+  --bg:#f3f6f7; --surface:#ffffff; --fg:#13222b; --muted:#566a75; --line:#d5dee3;
+  --accent:#c2410c; --accent-soft:#fde9dc; --code-bg:#12232d; --code-fg:#dbe7ec;
+  --k:#ff9e64; --s:#9ece6a; --c:#6f8794; --a:#7dcfff; --n:#e0af68; --tbl:#eaf0f3;
+  --f-display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --f-body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1a21; --surface:#14252e; --fg:#e4edf1; --muted:#93a7b2; --line:#26404c;
+    --accent:#ff8a4c; --accent-soft:#3a2418; --code-bg:#0a141a; --code-fg:#d3e1e8;
+    --tbl:#1a2f3a; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1a21; --surface:#14252e; --fg:#e4edf1; --muted:#93a7b2; --line:#26404c;
+  --accent:#ff8a4c; --accent-soft:#3a2418; --code-bg:#0a141a; --code-fg:#d3e1e8;
+  --tbl:#1a2f3a; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1320px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+@media(min-width:960px){.wrap{grid-template-columns:200px minmax(0,1fr);gap:32px}}
+header.top{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px}
+h1{font-family:var(--f-display);font-size:clamp(2rem,5vw,3rem);line-height:1.05;margin:0;letter-spacing:-.02em;text-wrap:balance}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);margin:6px 0 0;max-width:60ch}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+input[type=search]{font:inherit;padding:9px 12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:6px;width:min(100%,260px)}
+button{font:inherit;cursor:pointer}
+.btn{padding:9px 12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:6px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+nav{min-width:0}
+nav ul{list-style:none;margin:0;padding:0;display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
+nav a{display:block;white-space:nowrap;padding:5px 10px;border:1px solid var(--line);border-radius:999px;color:var(--fg);text-decoration:none;font-size:13px;background:var(--surface)}
+nav a:hover{border-color:var(--accent);color:var(--accent)}
+@media(min-width:960px){
+  nav{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);overflow-y:auto}
+  nav ul{flex-direction:column;gap:0;overflow:visible}
+  nav a{border:0;border-radius:4px;border-left:2px solid var(--line);border-top-left-radius:0;border-bottom-left-radius:0;background:transparent;padding:5px 10px}
+  nav a:hover{border-left-color:var(--accent);background:var(--accent-soft)}
+  nav .grp{margin:14px 0 4px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+}
+nav .grp{display:none}
+@media(min-width:960px){nav .grp{display:block}}
+main{min-width:0}
+section{margin-bottom:40px;scroll-margin-top:16px}
+h2{font-family:var(--f-display);font-size:1.6rem;margin:0 0 14px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h2 small{font-family:var(--f-body);font-size:12px;font-weight:500;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:4px;letter-spacing:.04em;text-transform:uppercase}
+.grid{columns:2 380px;column-gap:16px}
+.blk{break-inside:avoid;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px;margin:0 0 16px;min-width:0}
+.blk.wide{column-span:all}
+.blk h3{margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.blk p{margin:0 0 8px}
+.blk p:last-child{margin-bottom:0}
+.blk p.ex{color:var(--muted);font-size:13.5px}
+.code{position:relative;margin:0 0 8px}
+.code:last-child{margin-bottom:0}
+pre{margin:0;background:var(--code-bg);color:var(--code-fg);border-radius:6px;padding:12px 14px;overflow-x:auto;font-family:var(--f-mono);font-size:12.5px;line-height:1.6;tab-size:4}
+pre code{font:inherit}
+.cp{position:absolute;top:6px;right:6px;font-size:11px;padding:2px 8px;border-radius:4px;border:1px solid #3a5564;background:#1b3340;color:#cfe0e8;opacity:0}
+.code:hover .cp,.cp:focus-visible{opacity:1}
+@media(hover:none){.cp{opacity:.85}}
+.k{color:var(--k)}.s{color:var(--s)}.c{color:var(--c);font-style:italic}.a{color:var(--a)}.n{color:var(--n)}
+code.i{font-family:var(--f-mono);font-size:.88em;background:var(--tbl);padding:1px 5px;border-radius:4px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--tbl);font-weight:600;white-space:nowrap}
+.wide td:nth-child(4){min-width:240px}
+.wide td:nth-child(5){white-space:nowrap}
+td code{font-family:var(--f-mono);font-size:12px}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:8px 12px;border-radius:0 6px 6px 0;font-size:13.5px;margin:0 0 8px}
+.empty{color:var(--muted);padding:24px 0}
+.hide{display:none!important}
+footer{grid-column:1/-1;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0}
+[hidden]{display:none!important}
+
+h1{overflow-wrap:anywhere;font-size:clamp(1.7rem,7vw,3rem)}
+.nw{white-space:nowrap}
+.list{margin:0 0 8px;padding-left:20px}.list li{margin:3px 0}
+.plan{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.day{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--bg)}
+.day h4{margin:0 0 6px;font-family:var(--f-display);font-size:1rem}
+label{display:block;margin:4px 0;cursor:pointer}
+label.done{margin-top:10px;color:var(--muted);font-size:13.5px}
+input[type=checkbox]{margin-right:6px;accent-color:var(--accent);width:16px;height:16px;vertical-align:-3px}
+.progress{margin:10px 0 0;font-weight:600;color:var(--accent)}
+table.check td:nth-child(2){text-align:center}
+details{margin:8px 0}
+details>summary{cursor:pointer;font-weight:600;padding:4px 0}
+details.fx summary code{white-space:normal;word-break:break-word}
+details.fx{border-bottom:1px solid var(--line);padding:4px 0}
+.lvl{font-family:var(--f-body);font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:4px;text-transform:none;letter-spacing:0;margin-left:6px}
+pre[data-lang="out"]{background:#0b1b14;color:#bfe3c9}
+#top{position:fixed;right:16px;bottom:16px;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);box-shadow:0 2px 8px rgba(0,0,0,.2)}
+@media print{
+  body{background:#fff;color:#000;font-size:11px;padding:0}
+  .wrap{display:block}header.top .tools,nav,#top,.cp{display:none!important}
+  details>*{display:block}details:not([open])>*:not(summary){display:block}
+  .blk{break-inside:avoid;border-color:#999}
+  pre{background:#f4f4f4!important;color:#000!important;white-space:pre-wrap}
+  pre span{color:#000!important}
+  section{margin-bottom:16px}
+}
+.why{margin:8px 0 8px;font-size:13.5px}.why .list{margin-top:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div>
+    <h1>Java <span>Prüfungsblatt</span></h1>
+    <p class="sub">Vorbereitung auf die Programmierprüfung: Lernplan, Tipps, Bausteine und alle 22 Aufgaben Ihrer Übungsblätter mit Lösung und Erklärung. Läuft offline. Mit <b>/</b> springen Sie in die Suche.</p>
+  </div>
+  <div class="tools">
+    <input type="search" id="q" placeholder="Suchen (/), z. B. Scanner, printf, char" aria-label="Cheatsheet durchsuchen">
+    <button class="btn" id="theme" type="button" aria-label="Farbschema wechseln">Hell / Dunkel</button>
+  </div>
+</header>
+<nav aria-label="Themen"><ul id="nav"></ul></nav>
+<main id="main">
+<section id="lernplan" data-grp="Vorbereitung"><h2>Lernplan bis Donnerstag <small>Start hier</small></h2><div class="grid"><div class="blk wide"><h3>So nutzen Sie diese Datei</h3>
+<p class="ex">Ihre Prüfung baut auf drei Übungsblättern auf. Alle 22 Aufgaben stehen hier mit Hinweisen, Lösung (kompiliert und mit den Beispielen des Blatts getestet) und Erklärung. Die Datei braucht kein Internet. Die Navigation links springt zu jedem Abschnitt, mit <code class="i">/</code> springen Sie in die Suche.</p>
+<ul class="list">
+<li><b>Üben:</b> Jede Aufgabe zuerst <i>allein</i> in Ihrer Entwicklungsumgebung lösen, nur mit den Hinweisen. Erst danach die Lösung öffnen und vergleichen.</li>
+<li><b>Die Prüfung wird vermutlich ähnliche Aufgaben stellen,</b> nicht exakt diese. Lernen Sie deshalb die <b>Muster</b> (Schleifen-Muster, Scanner-Einlesen, char-Rechnung, Methoden mit Arrays), nicht die Lösungen auswendig.</li>
+<li><b>In der Prüfung:</b> Öffnen Sie die Datei vorher im Browser und lassen Sie den Tab offen. Fragen Sie vorab, ob Dateien auf dem Laptop als „Unterlagen“ gelten oder ob Sie ausdrucken müssen (Strg+P, die Seite hat ein Druckformat).</li>
+</ul></div><div class="blk wide"><h3>Der Plan: heute bis Donnerstag</h3>
+<p class="ex">Richtwert 2 bis 3 Stunden pro Tag. Wichtigste Regel: <b>Programmieren lernt man nur durch Programmieren.</b> Lesen allein reicht nicht. Die Häkchen werden auf diesem Rechner im Browser gespeichert.</p>
+<div class="plan">
+<div class="day"><h4>Sonntag</h4>
+<label><input type="checkbox" data-key="p-so1"> „Bausteine“ und „Tipps für die Prüfung“ lesen (30 Minuten)</label>
+<label><input type="checkbox" data-key="p-so2"> Übung 1, Aufgaben 1 bis 5 allein lösen</label>
+<label><input type="checkbox" data-key="p-so3"> Übung 1, Aufgaben 6 bis 10 allein lösen</label>
+</div>
+<div class="day"><h4>Montag</h4>
+<label><input type="checkbox" data-key="p-mo1"> Übung 2, Aufgaben 1 bis 3 (Schleifen, Muster)</label>
+<label><input type="checkbox" data-key="p-mo2"> Übung 2, Aufgaben 4 bis 6 (Raute, Noten, Happy Numbers)</label>
+<label><input type="checkbox" data-key="p-mo3"> Zusatzaufgaben 1 und 2 (Rechteck, Einmaleins)</label>
+</div>
+<div class="day"><h4>Dienstag</h4>
+<label><input type="checkbox" data-key="p-di1"> Übung 3, Aufgaben 1 bis 3 (Kalender, lcg, Zahlenraten)</label>
+<label><input type="checkbox" data-key="p-di2"> Übung 3, Aufgaben 4 bis 6 (Arrays tauschen, CamelCase, Prüfziffer)</label>
+<label><input type="checkbox" data-key="p-di3"> Zusatzaufgaben 3 bis 6</label>
+</div>
+<div class="day"><h4>Mittwoch</h4>
+<label><input type="checkbox" data-key="p-mi1"> <b>Probelauf:</b> vier Aufgaben (zum Beispiel Raute, Happy Numbers, CamelCase, Kalender) in 90 Minuten, nur diese Datei, ohne Lösung</label>
+<label><input type="checkbox" data-key="p-mi2"> Fehler auswerten: Was kostete Zeit? Genau das wiederholen</label>
+<label><input type="checkbox" data-key="p-mi3"> „Fehlermeldungen“ und „Typische Denkfehler“ überfliegen</label>
+<label><input type="checkbox" data-key="p-mi4"> Früh schlafen</label>
+</div>
+<div class="day"><h4>Donnerstag · Prüfung</h4>
+<label><input type="checkbox" data-key="p-do1"> Nur 20 Minuten „Tipps“ und „Bausteine“ überfliegen, nichts Neues</label>
+<label><input type="checkbox" data-key="p-do2"> Laptop geladen, Entwicklungsumgebung startet, diese Datei im Browser geöffnet</label>
+<label><input type="checkbox" data-key="p-do3"> Ausweis, Stifte, Wasser, rechtzeitig da sein</label>
+</div>
+</div>
+<p class="progress"><span id="plan-progress">0 von 0 erledigt</span> · <span id="task-progress">0 von 0 Aufgaben gelöst</span></p></div><div class="blk wide"><h3>Muster: Was Sie können müssen</h3><div class="tw"><table class="check">
+<tr><th>Muster</th><th>Wo üben</th></tr>
+<tr><td>Scanner: Zahlen, Kommazahlen, Zeichen, Zeilen einlesen</td><td><a href="#bausteine">Bausteine</a>, Übung 1 (4 bis 10)</td></tr>
+<tr><td>Exakte Ausgabe: print/println, printf/format, Leerzeichen</td><td><a href="#bausteine">Bausteine</a>, <a href="#a1-2">1.2</a>, <a href="#a2-1">2.1</a>, <a href="#a3-1">3.1</a></td></tr>
+<tr><td>Literale, Typen, Casts</td><td><a href="#a1-3">1.3</a></td></tr>
+<tr><td>if/else, switch, logische Operatoren</td><td><a href="#a1-6">1.6</a> bis <a href="#a1-9">1.9</a></td></tr>
+<tr><td>while-Schleife mit Abbruchbedingung</td><td><a href="#a2-1">2.1</a>, <a href="#a2-5">2.5</a>, <a href="#a2-6">2.6</a></td></tr>
+<tr><td>Verschachtelte Schleifen und Muster (Dreieck, Pyramide, Raute)</td><td><a href="#a2-2">2.2</a> bis <a href="#a2-4">2.4</a>, <a href="#v1">Zusatz 1</a></td></tr>
+<tr><td>Ziffern zerlegen mit / und %</td><td><a href="#a1-10">1.10</a>, <a href="#a2-6">2.6</a>, <a href="#v6">Zusatz 6</a></td></tr>
+<tr><td>char-Rechnung (Groß/Klein, ASCII)</td><td><a href="#a2-4">2.4</a>, <a href="#a3-5">3.5</a>, <a href="#v5">Zusatz 5</a></td></tr>
+<tr><td>Methoden, Parameter, Rückgabewerte</td><td>Übung 3, <a href="#bausteine">Bausteine</a></td></tr>
+<tr><td>Arrays als Parameter, Tauschen, Durchlaufen</td><td><a href="#a3-4">3.4</a>, <a href="#a3-6">3.6</a>, <a href="#v4">Zusatz 4</a></td></tr>
+<tr><td>Fehlermeldungen lesen und beheben</td><td><a href="#fehler">Fehlermeldungen</a></td></tr>
+</table></div></div></div></section>
+<section id="tipps" data-grp="Vorbereitung"><h2>Tipps für die Prüfung</h2><div class="grid"><div class="blk"><h3>Die Regeln Ihrer Übungsblätter</h3><ul class="list">
+<li><b>Das Programm muss kompilieren und ausführbar sein.</b> Das ist die Voraussetzung für jede Bewertung. Ein Programm mit Compilerfehler bringt 0 Punkte.</li>
+<li><b>Ausgabe exakt wie verlangt:</b> Groß/Klein, Satzzeichen, Leerzeichen, Zeilenumbrüche. „Number 1: “ mit Leerzeichen nach dem Doppelpunkt.</li>
+<li><b>Aufforderungen zur Eingabe mit <code class="i">print</code>,</b> alles andere mit <code class="i">println</code>.</li>
+<li><b>Vorgegebenes Grundgerüst verwenden, keine Namen ändern.</b> Klassen-, Methoden- und Parameternamen so lassen. Methoden in <code class="i">App</code> sind <code class="i">public static</code>.</li>
+<li><b>Vorgegebene Testdateien (<code class="i">AppTest.java</code>) oder der <code class="i">.github</code>-Ordner dürfen nicht verändert werden.</b> Das gilt als K.O.-Kriterium.</li>
+<li><b>Verbote beachten:</b> „Keine API-Klassen“, „kein <code class="i">toUpperCase()</code>“, „nur eine Scanner-Variable“. Wer verbotene Mittel nutzt, verliert Punkte, auch wenn die Ausgabe stimmt.</li>
+</ul></div><div class="blk"><h3>Die ersten fünf Minuten</h3><ol class="list">
+<li>Alles lesen, bevor Sie tippen. Punkte und Reihenfolge notieren.</li>
+<li>Mit der sichersten Aufgabe beginnen.</li>
+<li>Beispielausgaben der Aufgabe als Test nehmen: Ihr Programm muss <i>genau</i> das ausgeben.</li>
+<li>Unklarheiten sofort der Aufsicht stellen.</li>
+</ol></div><div class="blk"><h3>Pro Aufgabe</h3><ol class="list">
+<li><b>Gerüst zuerst:</b> Klasse und leere Methoden anlegen und kompilieren.</li>
+<li><b>Beispiel von Hand durchrechnen,</b> bevor Sie die Schleife schreiben.</li>
+<li><b>Kleine Schritte:</b> nach jeder Methode kompilieren und mit einem Beispiel testen.</li>
+<li><b>Randfälle:</b> 0, negative Zahl, eine einzige Eingabe, leerer String, Array mit einem Element.</li>
+<li>Ausgabe Zeichen für Zeichen mit dem Beispiel vergleichen (Leerzeichen am Zeilenende!).</li>
+</ol></div><div class="blk"><h3>Die häufigsten Stolpersteine dieser Blätter</h3><ul class="list">
+<li><b>Ganzzahldivision:</b> <code class="i">7 / 2</code> ist 3. Für den Durchschnitt <code class="i">(double) summe / anzahl</code>.</li>
+<li><b><code class="i">\</code> im String</b> muss <code class="i">\\</code> geschrieben werden (ASCII-Art).</li>
+<li><b>switch ohne <code class="i">break</code></b> läuft in den nächsten Fall.</li>
+<li><b>char + int ergibt int:</b> mit <code class="i">(char)</code> zurückwandeln.</li>
+<li><b>Dezimalkomma:</b> auf deutschem System erzeugt <code class="i">%.2f</code> ein Komma, <code class="i">Scanner</code> erwartet es auch bei der Eingabe.</li>
+<li><b>Nur ein Scanner,</b> und nach <code class="i">nextInt()</code> vor <code class="i">nextLine()</code> den Rest der Zeile lesen.</li>
+<li><b>Off-by-one:</b> <code class="i">&lt;</code> oder <code class="i">&lt;=</code>? Mit dem kleinsten Beispiel (n=1) prüfen.</li>
+<li><b>Endlosschleife:</b> wird die Variable in der Bedingung in der Schleife verändert?</li>
+<li><b>Unvollständige letzte Zeile</b> (Kalender): die Zeile muss trotzdem mit <code class="i">println()</code> beendet werden.</li>
+</ul></div><div class="blk"><h3>Wenn Sie nicht weiterkommen</h3><ol class="list">
+<li>Lesen Sie die <b>erste</b> Fehlermeldung, die folgenden sind oft Folgefehler (siehe „Fehlermeldungen“).</li>
+<li>Zwischenwerte ausgeben: <code class="i">System.out.println("i=" + i + " summe=" + summe);</code></li>
+<li>Kleineres Problem zuerst lösen (nur n=1, nur ein Wert).</li>
+<li>Suchen Sie mit <code class="i">/</code> in dieser Datei nach dem Stichwort.</li>
+<li>Nach fünf Minuten ohne Fortschritt: Kommentar schreiben, was fehlt, nächste Aufgabe, später zurückkehren.</li>
+</ol></div><div class="blk"><h3>Die letzten zehn Minuten</h3><ol class="list">
+<li>Alles speichern und noch einmal komplett kompilieren und starten.</li>
+<li>Nicht kompilierende Teile auskommentieren und kurz erklären, was geplant war.</li>
+<li>Test- und Debug-Ausgaben entfernen, wenn die Aufgabe eine exakte Ausgabe verlangt.</li>
+<li>Dateinamen, Abgabeformat und Namen prüfen.</li>
+</ol></div><div class="blk"><h3>Zeitplan für 90 Minuten (Beispiel)</h3><div class="tw"><table><tr><th>Minuten</th><th>Was</th></tr>
+<tr><td class="nw">0 bis 5</td><td>Lesen, Reihenfolge festlegen</td></tr>
+<tr><td class="nw">5 bis 70</td><td>Aufgaben bearbeiten, immer kompilieren und testen</td></tr>
+<tr><td class="nw">70 bis 80</td><td>Offenes nachziehen, Randfälle</td></tr>
+<tr><td class="nw">80 bis 90</td><td>Abschluss: speichern, kompilieren, Abgabeformat</td></tr></table></div></div></div></section>
+<section id="bausteine" data-grp="Vorbereitung"><h2>Bausteine zum Kopieren <small>getestet</small></h2><div class="grid"><div class="blk wide"><h3>Einlesen mit Scanner</h3><p class="ex">Ein Scanner pro Programm. Prompts mit <code class="i">print</code>. Nach <code class="i">next()</code> oder <code class="i">nextInt()</code> den Rest der Zeile mit <code class="i">nextLine()</code> verwerfen, bevor Sie eine ganze Zeile lesen.</p><pre><code>import java.util.Scanner;
+
+public class Grundgeruest {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);      // genau ein Scanner pro Programm
+
+        System.out.print("Zahl: ");                // Prompt: print, KEIN println
+        int n = sc.nextInt();                      // ganze Zahl
+        System.out.print("Kommazahl: ");
+        double d = sc.nextDouble();                // Dezimaltrennzeichen: laut Systemeinstellung
+        System.out.print("Zeichen: ");
+        char c = sc.next().charAt(0);              // ein einzelnes Zeichen
+        sc.nextLine();                             // Rest der Zeile wegwerfen ...
+        System.out.print("Text: ");
+        String s = sc.nextLine();                  // ... bevor eine ganze Zeile gelesen wird
+
+        System.out.println(n + " " + d + " " + c + " " + s);
+    }
+}</code></pre><details><summary>Ablauf</summary><pre data-lang="out"><code>Zahl: 42
+Kommazahl: 3.5
+Zeichen: x
+Text: Hallo Welt
+42 3.5 x Hallo Welt</code></pre></details></div><div class="blk wide"><h3>Schleifen-Muster</h3><p class="ex">Dreieck, zentrierte Pyramide, Zähler über zwei Schleifen. Das Prinzip: <b>außen die Zeile, innen die Spalte</b>, nach der inneren Schleife <code class="i">println()</code>.</p><pre><code>public class Muster {
+    public static void main(String[] args) {
+        int n = 4;
+
+        // 1) Rechtwinkliges Dreieck: in Zeile z stehen z Sterne
+        for (int z = 1; z &lt;= n; z++) {
+            for (int i = 0; i &lt; z; i++) {
+                System.out.print("*");
+            }
+            System.out.println();                  // Zeilenumbruch NACH der inneren Schleife
+        }
+        System.out.println();
+
+        // 2) Zentriert: erst Leerzeichen, dann Zeichen
+        for (int z = 1; z &lt;= n; z++) {
+            for (int i = 0; i &lt; n - z; i++) {
+                System.out.print(" ");
+            }
+            for (int i = 0; i &lt; 2 * z - 1; i++) {
+                System.out.print("*");
+            }
+            System.out.println();
+        }
+        System.out.println();
+
+        // 3) Zaehler ueber beide Schleifen hinweg
+        int zahl = 1;
+        for (int z = 1; z &lt;= n; z++) {
+            for (int i = 1; i &lt;= z; i++) {
+                System.out.print(zahl++ + " ");
+            }
+            System.out.println();
+        }
+    }
+}</code></pre><details><summary>Ausgabe</summary><pre data-lang="out"><code>*
+**
+***
+****
+
+   *
+  ***
+ *****
+*******
+
+1 
+2 3 
+4 5 6 
+7 8 9 10 </code></pre></details></div><div class="blk wide"><h3>Rechnen mit char</h3><p class="ex">Ein <code class="i">char</code> ist ein Zahlencode. Mit <code class="i">(char)</code> wandeln Sie das Rechenergebnis zurück in ein Zeichen.</p><pre><code>public class CharRechnen {
+    public static void main(String[] args) {
+        char c = 'H';
+        System.out.println((int) c);                  // 72: Zeichencode
+        System.out.println((char) 73);                // I: Code zu Zeichen
+        System.out.println((char) (c + 1));           // I: Zeichen + int ergibt int, daher Cast
+        System.out.println(c + 1);                    // 73 (!) ohne Cast bleibt es eine Zahl
+        System.out.println('a' - 'A');                // 32: Abstand klein/gross
+        System.out.println((char) (c - 'A' + 'a'));   // h: gross -&gt; klein
+        System.out.println('7' - '0');                // 7: Ziffernzeichen -&gt; Zahl
+        System.out.println((char) ('0' + 7));         // 7: Zahl -&gt; Ziffernzeichen
+
+        System.out.println(c &gt;= 'A' &amp;&amp; c &lt;= 'Z');     // Grossbuchstabe?
+        System.out.println(c &gt;= '0' &amp;&amp; c &lt;= '9');     // Ziffer?
+
+        // Alphabet durchlaufen
+        for (char x = 'a'; x &lt;= 'e'; x++) {
+            System.out.print(x);
+        }
+        System.out.println();
+    }
+}</code></pre><details><summary>Ausgabe</summary><pre data-lang="out"><code>72
+I
+I
+73
+32
+h
+7
+7
+true
+false
+abcde</code></pre></details></div><div class="blk wide"><h3>Formatierte Ausgabe</h3><p class="ex"><code class="i">%d</code> ganze Zahl, <code class="i">%f</code> Kommazahl, <code class="i">%s</code> Text, <code class="i">%n</code> Zeilenumbruch, <code class="i">%%</code> Prozentzeichen. Zahl zwischen <code class="i">%</code> und Buchstabe: Mindestbreite. <code class="i">-</code>: linksbündig, <code class="i">0</code>: mit Nullen auffüllen, <code class="i">.2</code>: Nachkommastellen.</p><pre><code>public class Formatieren {
+    public static void main(String[] args) {
+        int zahl = 7;
+        double d = 3.14159;
+        String s = "abc";
+
+        System.out.println(String.format("|%d|", zahl));        // |7|
+        System.out.println(String.format("|%4d|", zahl));       // |   7|  rechtsbuendig, Breite 4
+        System.out.println(String.format("|%-4d|", zahl));      // |7   |  linksbuendig
+        System.out.println(String.format("|%04d|", zahl));      // |0007|  mit Nullen
+        System.out.println(String.format("|%.2f|", d));         // |3.14|  2 Nachkommastellen
+        System.out.println(String.format("|%8.3f|", d));        // |   3.142|
+        System.out.println(String.format("|%s|", s));           // |abc|
+        System.out.println(String.format("|%5s|", s));          // |  abc|
+        System.out.printf("%2d %2d%n", 5, 10);                   // %n = Zeilenumbruch
+        System.out.printf("%d%%%n", 50);                         // %% = Prozentzeichen
+    }
+}</code></pre><details><summary>Ausgabe</summary><pre data-lang="out"><code>|7|
+|   7|
+|7   |
+|0007|
+|3.14|
+|   3.142|
+|abc|
+|  abc|
+ 5 10
+50%</code></pre></details></div><div class="blk wide"><h3>Methoden und Arrays als Parameter</h3><p class="ex">Primitive Werte werden kopiert, Arrays als Referenz übergeben. Rückgabewert mit <code class="i">return</code>, <code class="i">void</code> ohne.</p><pre><code>public class Methoden {
+    // Rueckgabewert: Methode liefert etwas zurueck
+    public static int quadrat(int x) {
+        return x * x;
+    }
+
+    // void: kein Rueckgabewert, nur Wirkung (Ausgabe)
+    public static void gruss(String name) {
+        System.out.println("Hallo " + name);
+    }
+
+    // Primitive Typen werden KOPIERT: der Aufrufer sieht die Aenderung nicht
+    public static void erhoehe(int x) {
+        x = x + 1;
+    }
+
+    // Arrays werden als REFERENZ uebergeben: Aenderungen an Elementen sind sichtbar
+    public static void erhoeheAlle(int[] a) {
+        for (int i = 0; i &lt; a.length; i++) {
+            a[i] = a[i] + 1;
+        }
+    }
+
+    // Array zurueckgeben
+    public static int[] ersteN(int n) {
+        int[] r = new int[n];
+        for (int i = 0; i &lt; n; i++) {
+            r[i] = i + 1;
+        }
+        return r;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(quadrat(5));
+        gruss("Anna");
+
+        int z = 5;
+        erhoehe(z);
+        System.out.println(z);                     // 5, unveraendert
+
+        int[] a = {1, 2, 3};
+        erhoeheAlle(a);
+        System.out.println(java.util.Arrays.toString(a));   // [2, 3, 4]
+        System.out.println(java.util.Arrays.toString(ersteN(4)));
+    }
+}</code></pre><details><summary>Ausgabe</summary><pre data-lang="out"><code>25
+Hallo Anna
+5
+[2, 3, 4]
+[1, 2, 3, 4]</code></pre></details></div><div class="blk wide"><h3>Typische Zeichenketten- und Array-Schleifen</h3><pre><code>// Alle Zeichen durchlaufen
+for (char c : text.toCharArray()) { ... }
+for (int i = 0; i &lt; text.length(); i++) { char c = text.charAt(i); ... }
+
+// Array durchlaufen, Summe, Maximum
+int summe = 0, max = a[0];
+for (int i = 0; i &lt; a.length; i++) { summe += a[i]; if (a[i] &gt; max) max = a[i]; }
+
+// Zaehler / Flag
+boolean gefunden = false;
+for (int x : a) { if (x == ziel) { gefunden = true; break; } }
+
+// Ziffern zerlegen
+while (n &gt; 0) { int ziffer = n % 10; n /= 10; }</code></pre></div></div></section>
+<section id="uebung1" data-grp="Aufgaben"><h2>Übung 1 <small>Ein-/Ausgabe, Operatoren, Verzweigungen</small></h2><div class="grid">
+<div class="blk wide"><p class="ex">Zehn Aufgaben zu Ein- und Ausgabe, Literalen, Operatoren und Verzweigungen. Die Texte sind aus Ihrem Übungsblatt zusammengefasst. Format der Ablaufprotokolle: Was Sie tippen, steht direkt hinter dem Prompt, genau wie im Terminal.</p></div>
+<div class="blk wide ex-card" id="a1-1"><h3>Aufgabe 1.1 · Hello World</h3>
+<p>Geben Sie die Zeichenkette „Hello World!“ mit <code class="i">System.out.println()</code> aus.</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Klasse, <code class="i">main</code>-Methode, eine Ausgabe-Zeile. Der Text steht in Anführungszeichen.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+    }
+}</code></pre><p><b>Ausgabe</b></p><pre data-lang="out"><code>Hello World!</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li><code class="i">println</code> gibt den Text aus und hängt einen Zeilenumbruch an. <code class="i">print</code> macht keinen Zeilenumbruch.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-1-1"> erledigt</label></div>
+<div class="blk wide ex-card" id="a1-2"><h3>Aufgabe 1.2 · Hello Robot (ASCII-Art)</h3>
+<p>Erzeugen Sie die abgebildete Grafik. Maximale Breite 22 Zeichen, Zeilen nicht mit Leerzeichen auffüllen, zum Ausrichten nur Leerzeichen verwenden.</p>
+<p><b>Gewünschte Ausgabe:</b></p><pre data-lang="out"><code>         __
+ _(\    |@@|
+(__/\__ \--/ __
+   \___|----| |    __
+       \ }{ /\ )_ / _\
+       /\__/\ \__O (__
+      (--/\--)    \__/
+      _)( )(_
+     `---''---`</code></pre>
+<details><summary>Hinweise</summary><ul class="list"><li>Eine <code class="i">println</code>-Zeile pro Bildzeile. Die Zeichen werden 1:1 in den String kopiert.</li><li><b>Der Rückwärtsschrägstrich <code class="i">\</code> muss im String als <code class="i">\\</code> geschrieben werden</b> (Escape-Zeichen). Ein Anführungszeichen wäre <code class="i">\"</code>.</li><li>Zählen Sie die Leerzeichen genau. Die Zahlenzeile 0123456789... in der Aufgabe hilft dabei.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>public class HelloRobot {
+    public static void main(String[] args) {
+        System.out.println("         __");
+        System.out.println(" _(\\    |@@|");
+        System.out.println("(__/\\__ \\--/ __");
+        System.out.println("   \\___|----| |    __");
+        System.out.println("       \\ }{ /\\ )_ / _\\");
+        System.out.println("       /\\__/\\ \\__O (__");
+        System.out.println("      (--/\\--)    \\__/");
+        System.out.println("      _)( )(_");
+        System.out.println("     `---''---`");
+    }
+}</code></pre><p><b>Ausgabe</b></p><pre data-lang="out"><code>         __
+ _(\    |@@|
+(__/\__ \--/ __
+   \___|----| |    __
+       \ }{ /\ )_ / _\
+       /\__/\ \__O (__
+      (--/\--)    \__/
+      _)( )(_
+     `---''---`</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li><code class="i">\</code> leitet in Java-Strings Sonderzeichen ein (<code class="i">\n</code>, <code class="i">\t</code>). Ein echtes Backslash-Zeichen erhalten Sie daher nur mit <code class="i">\\</code>.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-1-2"> erledigt</label></div>
+<div class="blk wide ex-card" id="a1-3"><h3>Aufgabe 1.3 · Verwendung von Literalen</h3>
+<p>Gegeben: <code class="i">'Z'</code>, <code class="i">0xface</code>, <code class="i">012</code>, <code class="i">80L</code>, <code class="i">44e-1f</code>, <code class="i">5.5f</code>, <code class="i">8.88e1</code>, <code class="i">99.9</code>. Deklarieren Sie zu jedem Literal eine Variable mit passendem Typ und eine <code class="i">int</code>-Variable <code class="i">sum</code>. Geben Sie die Summe aus (nur die Zahl). Die Summe darf <b>nicht erst am Ende</b> in int umgewandelt werden.</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Typ je Literal: Zeichen → <code class="i">char</code>, <code class="i">0x…</code> → hexadezimal int, führende <code class="i">0</code> → oktal int, <code class="i">L</code> → long, <code class="i">f</code> → float, <code class="i">e</code>-Schreibweise ohne Suffix → double, Kommazahl ohne Suffix → double.</li><li>Jeden Summanden einzeln mit <code class="i">(int)</code> casten. Der Cast schneidet Nachkommastellen ab (4.4 → 4, 88.8 → 88, 99.9 → 99).</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>public class Literale {
+    public static void main(String[] args) {
+        char a = 'Z';          // Zeichen, Wert 90
+        int b = 0xface;        // hexadezimal (0x), Wert 64206
+        int c = 012;           // oktal (fuehrende 0), Wert 10
+        long d = 80L;          // long (L)
+        float e = 44e-1f;      // 44 * 10^-1 = 4.4, float (f)
+        float f = 5.5f;
+        double g = 8.88e1;     // 8.88 * 10^1 = 88.8
+        double h = 99.9;       // ohne Suffix: double
+
+        // jedes Literal einzeln in int casten, dann addieren
+        int sum = (int) a + b + c + (int) d + (int) e + (int) f + (int) g + (int) h;
+        System.out.println(sum);
+    }
+}</code></pre><p><b>Ausgabe</b></p><pre data-lang="out"><code>64582</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li><code class="i">0xface</code> = 15·4096 + 10·256 + 15·16 + 14 = 64206. <code class="i">012</code> ist oktal: 1·8 + 2 = <b>10</b>, nicht 12. <code class="i">44e-1f</code> = 44 · 10<sup>-1</sup> = 4.4. <code class="i">'Z'</code> hat den Zeichencode 90.</li><li>Summe: 90 + 64206 + 10 + 80 + 4 + 5 + 88 + 99 = <b>64582</b>.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-1-3"> erledigt</label></div>
+<div class="blk wide ex-card" id="a1-4"><h3>Aufgabe 1.4 · Zahlen addieren</h3>
+<p>Lesen Sie mit der Klasse <code class="i">Scanner</code> zwei Integer ein und geben Sie das Ergebnis aus. Es darf nur <b>eine</b> Scanner-Variable deklariert werden.</p>
+<details><summary>Hinweise</summary><ul class="list"><li><code class="i">import java.util.Scanner;</code> nicht vergessen.</li><li><code class="i">sc.nextInt()</code> liest die nächste ganze Zahl, egal ob Leerzeichen oder Zeilenumbruch dazwischen steht.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>import java.util.Scanner;
+
+public class Addieren {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);   // nur EIN Scanner
+        int a = sc.nextInt();
+        int b = sc.nextInt();
+        System.out.println(a + b);
+    }
+}</code></pre><p><b>Ablauf</b></p><pre data-lang="out"><code>5
+5
+10</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Ein <code class="i">Scanner</code> auf <code class="i">System.in</code> reicht für das ganze Programm. Mehrere Scanner auf derselben Eingabe verschlucken sich gegenseitig Zeichen.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-1-4"> erledigt</label></div>
+<div class="blk wide ex-card" id="a1-5"><h3>Aufgabe 1.5 · Zahlen im Speicher vertauschen</h3>
+<p>Vertauschen Sie zwei Variablen <b>ohne dritte Hilfsvariable</b> (mit + und -, alternativ XOR). „x: “ und „y: “ werden mit <code class="i">print</code> ausgegeben.</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Dreischritt: <code class="i">x = x + y; y = x - y; x = x - y;</code></li><li>Rechnen Sie es mit x=9, y=4 auf Papier durch.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>import java.util.Scanner;
+
+public class Vertauschen {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Before Swap:");
+        System.out.print("x: ");
+        int x = sc.nextInt();
+        System.out.print("y: ");
+        int y = sc.nextInt();
+
+        x = x + y;      // x = Summe
+        y = x - y;      // y = altes x
+        x = x - y;      // x = altes y
+
+        System.out.println("After Swap:");
+        System.out.println("x: " + x);
+        System.out.println("y: " + y);
+    }
+}</code></pre><p><b>Ablauf</b></p><pre data-lang="out"><code>Before Swap:
+x: 9
+y: 4
+After Swap:
+x: 4
+y: 9</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Nach <code class="i">x = x + y</code> steht in x die Summe (13). <code class="i">y = x - y</code> ergibt 13 − 4 = 9, das alte x. <code class="i">x = x - y</code> ergibt 13 − 9 = 4, das alte y. Alternative: <code class="i">x ^= y; y ^= x; x ^= y;</code></li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-1-5"> erledigt</label></div>
+<div class="blk wide ex-card" id="a1-6"><h3>Aufgabe 1.6 · Zahlen vergleichen</h3>
+<p>Lesen Sie zwei Zahlen ein und geben Sie <code class="i">n1 &gt; n2</code>, <code class="i">n2 &gt; n1</code> oder <code class="i">n1 == n2</code> aus (drei Fälle).</p>
+<details><summary>Hinweise</summary><ul class="list"><li><code class="i">if … else if … else</code>. Der letzte Fall braucht keine Bedingung mehr.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>import java.util.Scanner;
+
+public class Vergleichen {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("n1: ");
+        int n1 = sc.nextInt();
+        System.out.print("n2: ");
+        int n2 = sc.nextInt();
+
+        if (n1 &gt; n2) {
+            System.out.println("n1 &gt; n2");
+        } else if (n2 &gt; n1) {
+            System.out.println("n2 &gt; n1");
+        } else {
+            System.out.println("n1 == n2");
+        }
+    }
+}</code></pre><p><b>Ablauf</b> 1 (Eingabe: 6, 3)</p><pre data-lang="out"><code>n1: 6
+n2: 3
+n1 &gt; n2</code></pre><p><b>Ablauf</b> 2 (Eingabe: 3, 6)</p><pre data-lang="out"><code>n1: 3
+n2: 6
+n2 &gt; n1</code></pre><p><b>Ablauf</b> 3 (Eingabe: 3, 3)</p><pre data-lang="out"><code>n1: 3
+n2: 3
+n1 == n2</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Genau eine der drei Aussagen trifft zu, deshalb reicht eine <code class="i">if-else-if</code>-Kette. Bei Zahlen vergleichen Sie mit <code class="i">==</code> (nur bei Strings wäre <code class="i">equals</code> nötig).</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-1-6"> erledigt</label></div>
+<div class="blk wide ex-card" id="a1-7"><h3>Aufgabe 1.7 · Rating Sales Person</h3>
+<p>Lesen Sie den Jahresumsatz ein. &lt; 0 oder ≥ 100000: „Invalid Revenue“; 0 bis &lt; 20000: „Poor Sales Revenue“; 20000 bis &lt; 50000: „Average Sales Revenue“; 50000 bis &lt; 80000: „Good Sales Revenue“; 80000 bis &lt; 100000: „Excellent Sales Revenue“.</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Zuerst den ungültigen Bereich mit <code class="i">||</code> abfangen, danach von unten nach oben prüfen. Dann genügt jeweils eine obere Grenze.</li><li>Alternative mit <code class="i">&amp;&amp;</code>: <code class="i">umsatz &gt;= 20000 &amp;&amp; umsatz &lt; 50000</code>.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>import java.util.Scanner;
+
+public class Umsatz {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter annual Revenue: ");
+        int umsatz = sc.nextInt();
+
+        if (umsatz &lt; 0 || umsatz &gt;= 100000) {
+            System.out.println("Invalid Revenue");
+        } else if (umsatz &lt; 20000) {
+            System.out.println("Poor Sales Revenue");
+        } else if (umsatz &lt; 50000) {
+            System.out.println("Average Sales Revenue");
+        } else if (umsatz &lt; 80000) {
+            System.out.println("Good Sales Revenue");
+        } else {
+            System.out.println("Excellent Sales Revenue");
+        }
+    }
+}</code></pre><p><b>Ablauf</b> 1 (Eingabe: 100000)</p><pre data-lang="out"><code>Enter annual Revenue: 100000
+Invalid Revenue</code></pre><p><b>Ablauf</b> 2 (Eingabe: 50000)</p><pre data-lang="out"><code>Enter annual Revenue: 50000
+Good Sales Revenue</code></pre><p><b>Ablauf</b> 3 (Eingabe: 19999)</p><pre data-lang="out"><code>Enter annual Revenue: 19999
+Poor Sales Revenue</code></pre><p><b>Ablauf</b> 4 (Eingabe: -5)</p><pre data-lang="out"><code>Enter annual Revenue: -5
+Invalid Revenue</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Die Reihenfolge der Prüfung ersetzt die untere Grenze: Wer bis zu <code class="i">else if (umsatz &lt; 20000)</code> gekommen ist, ist garantiert ≥ 0 und gültig.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-1-7"> erledigt</label></div>
+<div class="blk wide ex-card" id="a1-8"><h3>Aufgabe 1.8 · Commission Rate</h3>
+<p>Speichern Sie die Provision je Klasse in einer Variablen und geben Sie sie aus: 1 → 0,01 · 2 → 0,02 · 3 → 0,03 · 4 → 0,04, alles andere 0. Verwenden Sie ein <b>switch-Statement</b>.</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Jeder <code class="i">case</code> endet mit <code class="i">break</code>, sonst läuft Java in den nächsten Fall weiter (Fall-through).</li><li>Der <code class="i">default</code>-Zweig deckt „alle anderen Eingaben“ ab.</li><li>Ausgabe mit zwei Nachkommastellen: <code class="i">String.format("%.2f", rate)</code>. Auf einem deutschen System entsteht dabei ein Komma (0,02). Wollen Sie den Punkt erzwingen: <code class="i">String.format(Locale.US, …)</code>.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>import java.util.Scanner;
+
+public class Provision {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter CommissionClass: ");
+        int klasse = sc.nextInt();
+
+        double rate;
+        switch (klasse) {
+            case 1: rate = 0.01; break;
+            case 2: rate = 0.02; break;
+            case 3: rate = 0.03; break;
+            case 4: rate = 0.04; break;
+            default: rate = 0;
+        }
+        System.out.println("Your Commission Rate was set to " + String.format("%.2f", rate));
+    }
+}</code></pre><p><b>Ablauf</b> 1 (Eingabe: 2)</p><pre data-lang="out"><code>Enter CommissionClass: 2
+Your Commission Rate was set to 0.02</code></pre><p><b>Ablauf</b> 2 (Eingabe: 100)</p><pre data-lang="out"><code>Enter CommissionClass: 100
+Your Commission Rate was set to 0.00</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li><code class="i">double</code> für die Provision, weil 0.01 keine ganze Zahl ist. Der Wert 0 muss als „0.00“ erscheinen, deshalb die Formatierung.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-1-8"> erledigt</label></div>
+<div class="blk wide ex-card" id="a1-9"><h3>Aufgabe 1.9 · Schaltjahr</h3>
+<p>Lesen Sie eine Jahreszahl ein: Schaltjahr, wenn durch 4 teilbar; <b>kein</b> Schaltjahr, wenn durch 100 teilbar, <b>außer</b> sie ist durch 400 teilbar. Ausgabe „Leapyear“ bzw. „Not a Leapyear“.</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Rest einer Division mit <code class="i">%</code>: <code class="i">jahr % 4 == 0</code> heißt „teilbar durch 4“.</li><li>Kurzform: <code class="i">(jahr % 4 == 0 &amp;&amp; jahr % 100 != 0) || jahr % 400 == 0</code></li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>import java.util.Scanner;
+
+public class Schaltjahr {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Year: ");
+        int jahr = sc.nextInt();
+
+        boolean schalt = (jahr % 4 == 0 &amp;&amp; jahr % 100 != 0) || jahr % 400 == 0;
+        if (schalt) {
+            System.out.println("Leapyear");
+        } else {
+            System.out.println("Not a Leapyear");
+        }
+    }
+}</code></pre><p><b>Ablauf</b> 1 (Eingabe: 1980)</p><pre data-lang="out"><code>Year: 1980
+Leapyear</code></pre><p><b>Ablauf</b> 2 (Eingabe: 1900)</p><pre data-lang="out"><code>Year: 1900
+Not a Leapyear</code></pre><p><b>Ablauf</b> 3 (Eingabe: 2000)</p><pre data-lang="out"><code>Year: 2000
+Leapyear</code></pre><p><b>Ablauf</b> 4 (Eingabe: 2023)</p><pre data-lang="out"><code>Year: 2023
+Not a Leapyear</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Die Bedingung als Boolean in eine Variable zu legen macht den Code lesbar. 1900 ist durch 100, aber nicht durch 400 teilbar → kein Schaltjahr. 2000 ist durch 400 teilbar → Schaltjahr.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-1-9"> erledigt</label></div>
+<div class="blk wide ex-card" id="a1-10"><h3>Aufgabe 1.10 · Zahlendreher</h3>
+<p>Lesen Sie eine maximal dreistellige ganze Zahl ein und geben Sie sie verkehrt herum aus. Verwenden Sie <code class="i">/</code> und <code class="i">%</code>, dann <code class="i">*</code>.</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Einer: <code class="i">n % 10</code>. Zehner: <code class="i">n / 10 % 10</code>. Hunderter: <code class="i">n / 100</code>.</li><li>Zusammensetzen: Einer·100 + Zehner·10 + Hunderter.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>import java.util.Scanner;
+
+public class Zahlendreher {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Number: ");
+        int n = sc.nextInt();
+
+        int h = n / 100;           // Hunderter
+        int z = n / 10 % 10;       // Zehner
+        int e = n % 10;            // Einer
+        System.out.println(e * 100 + z * 10 + h);
+    }
+}</code></pre><p><b>Ablauf</b></p><pre data-lang="out"><code>Number: 123
+321</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Ganzzahldivision schneidet ab: 123 / 10 = 12, und 12 % 10 = 2. Bei weniger als drei Stellen ist der Hunderter 0 (aus 40 wird 040, das Ergebnis ist die Zahl 40). Die Aufgabe verlangt ausdrücklich <code class="i">*</code>, also das Zusammensetzen als Zahl.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-1-10"> erledigt</label></div>
+</div></section>
+<section id="uebung2" data-grp="Aufgaben"><h2>Übung 2 <small>Schleifen, Strings, Muster</small></h2><div class="grid">
+<div class="blk wide"><p class="ex">Sechs Aufgaben zu Schleifen, Mustern und Zahlenverarbeitung. Auf einem deutschen System erwarten <code class="i">Scanner</code> und <code class="i">String.format</code> ein Dezimalkomma. Diese Protokolle sind mit englischer Einstellung (Punkt) aufgenommen, genau wie in den Beispielen des Blatts.</p></div>
+<div class="blk wide ex-card" id="a2-1"><h3>Aufgabe 2.1 · Largest Number</h3>
+<p>Ermitteln Sie die größte Zahl einer beliebig langen Eingabefolge positiver Zahlen (auch Kommazahlen). Bei 0 oder negativer Zahl endet die Eingabe und die größte Zahl wird mit genau zwei Nachkommastellen ausgegeben. Ist schon die erste Zahl ≤ 0: „No number entered.“</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Die erste Zahl getrennt einlesen und prüfen. Sie startet auch den Wert für das Maximum.</li><li><code class="i">while (x &gt; 0) { … x = sc.nextDouble(); }</code> mit einem Zähler für „Number n:“.</li><li>Ausgabe: <code class="i">String.format("%.2f", max)</code>.</li><li>Die Eingabe von Kommazahlen hängt vom System ab (Punkt oder Komma). <code class="i">Scanner</code> verwendet die Systemeinstellung automatisch.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>import java.util.Scanner;
+
+public class LargestNumber {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        double max = 0;
+        int count = 1;
+
+        System.out.print("Number 1: ");
+        double x = sc.nextDouble();
+        if (x &lt;= 0) {
+            System.out.println("No number entered.");
+            return;
+        }
+        max = x;
+        while (x &gt; 0) {
+            count++;
+            System.out.print("Number " + count + ": ");
+            x = sc.nextDouble();
+            if (x &gt; max) {
+                max = x;
+            }
+        }
+        System.out.println("The largest number is " + String.format("%.2f", max));
+    }
+}</code></pre><p><b>Ablauf</b> 1 (Eingabe: 3, 4.67, 120.5, 70, 0)</p><pre data-lang="out"><code>Number 1: 3
+Number 2: 4.67
+Number 3: 120.5
+Number 4: 70
+Number 5: 0
+The largest number is 120.50</code></pre><p><b>Ablauf</b> 2 (Eingabe: -1.111)</p><pre data-lang="out"><code>Number 1: -1.111
+No number entered.</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Das Maximum startet mit dem ersten eingelesenen Wert, nicht mit 0. Die abschließende 0 darf nicht in den Vergleich eingehen: Sie beendet die Schleife (<code class="i">while (x &gt; 0)</code>), und das Maximum wird nur für Werte innerhalb der Schleife aktualisiert, die vorher geprüft wurden.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-2-1"> erledigt</label></div>
+<div class="blk wide ex-card" id="a2-2"><h3>Aufgabe 2.2 · Zahlentreppe</h3>
+<p>Lesen Sie die Zeilenzahl n ein und geben Sie mit zwei Schleifen aus: Zeile 1: <code class="i">1</code>, Zeile 2: <code class="i">2 3</code>, Zeile 3: <code class="i">4 5 6</code> und so weiter. n ≤ 0 ergibt „Invalid number!“.</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Äußere Schleife = Zeile, innere Schleife = Spalten. In Zeile z stehen z Zahlen.</li><li>Ein <b>Zähler</b> außerhalb beider Schleifen zählt einfach weiter (1, 2, 3, …).</li><li>Kein Leerzeichen am Zeilenende: nur zwischen den Zahlen ausgeben.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>import java.util.Scanner;
+
+public class Zahlentreppe {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("n: ");
+        int n = sc.nextInt();
+        if (n &lt;= 0) {
+            System.out.println("Invalid number!");
+            return;
+        }
+        int zahl = 1;
+        for (int zeile = 1; zeile &lt;= n; zeile++) {
+            for (int i = 1; i &lt;= zeile; i++) {
+                System.out.print(zahl);
+                if (i &lt; zeile) {
+                    System.out.print(" ");    // kein Leerzeichen am Zeilenende
+                }
+                zahl++;
+            }
+            System.out.println();
+        }
+    }
+}</code></pre><p><b>Ablauf</b> 1 (Eingabe: 4)</p><pre data-lang="out"><code>n: 4
+1
+2 3
+4 5 6
+7 8 9 10</code></pre><p><b>Ablauf</b> 2 (Eingabe: -1)</p><pre data-lang="out"><code>n: -1
+Invalid number!</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Das Muster ist ein typischer Fall für „zwei verschachtelte Schleifen plus Zähler“. Die innere Schleife läuft bis zur Zeilennummer; danach <code class="i">println()</code> für den Umbruch.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-2-2"> erledigt</label></div>
+<div class="blk wide ex-card" id="a2-3"><h3>Aufgabe 2.3 · Pyramide</h3>
+<p>Geben Sie mit Schleifen eine Pyramide aus Sternen aus (siehe Bild). Die Zeilenzahl steht in einer int-Konstanten mit dem Wert 6.</p>
+<p><b>Gewünschte Ausgabe:</b></p><pre data-lang="out"><code>     *
+    ***
+   *****
+  *******
+ *********
+***********</code></pre>
+<details><summary>Hinweise</summary><ul class="list"><li>Konstante: <code class="i">final int ROWS = 6;</code></li><li>In Zeile z (ab 1): <code class="i">ROWS - z</code> Leerzeichen, dann <code class="i">2 * z - 1</code> Sterne.</li><li>Probe: z=1 → 5 Leerzeichen, 1 Stern. z=6 → 0 Leerzeichen, 11 Sterne.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>public class Pyramide {
+    public static void main(String[] args) {
+        final int ROWS = 6;
+        for (int zeile = 1; zeile &lt;= ROWS; zeile++) {
+            for (int i = 0; i &lt; ROWS - zeile; i++) {
+                System.out.print(" ");
+            }
+            for (int i = 0; i &lt; 2 * zeile - 1; i++) {
+                System.out.print("*");
+            }
+            System.out.println();
+        }
+    }
+}</code></pre><p><b>Ausgabe</b></p><pre data-lang="out"><code>     *
+    ***
+   *****
+  *******
+ *********
+***********</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Schreiben Sie sich pro Zeile die Anzahl Leerzeichen und Sterne auf, das ergibt die beiden Formeln. Das Muster „Leerzeichen, dann Zeichen“ kehrt in der Raute wieder.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-2-3"> erledigt</label></div>
+<div class="blk wide ex-card" id="a2-4"><h3>Aufgabe 2.4 · Raute</h3>
+<p>Geben Sie eine Raute aus, gesteuert von <code class="i">int h</code> (Höhe, nur ungerade, sonst „Invalid number!“) und <code class="i">char c</code>. In der Mitte steht c, links und rechts davon jeweils das nächst kleinere ASCII-Zeichen.</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Beide Werte zuerst einlesen, dann prüfen (so zeigt es das Beispiel).</li><li>Zeichen einlesen: <code class="i">sc.next().charAt(0)</code></li><li><code class="i">mitte = h / 2</code>. Für Zeile z ist <code class="i">k = mitte - Math.abs(mitte - z)</code> der „Abstand zum Rand“: 0, 1, …, mitte, …, 1, 0.</li><li>Zeile: <code class="i">mitte - k</code> Leerzeichen, dann Zeichen <code class="i">c-k … c</code> aufsteigend, dann <code class="i">c-1 … c-k</code> absteigend.</li><li>Mit <code class="i">(char) (c - i)</code> erhalten Sie das i-te kleinere Zeichen.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>import java.util.Scanner;
+
+public class Raute {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("h: ");
+        int h = sc.nextInt();
+        System.out.print("c: ");
+        char c = sc.next().charAt(0);
+
+        if (h % 2 == 0) {
+            System.out.println("Invalid number!");
+            return;
+        }
+        int mitte = h / 2;
+        for (int zeile = 0; zeile &lt; h; zeile++) {
+            int k = mitte - Math.abs(mitte - zeile);   // Abstand zum Rand: 0..mitte..0
+            for (int i = 0; i &lt; mitte - k; i++) {
+                System.out.print(" ");
+            }
+            for (int i = k; i &gt;= 0; i--) {             // aufsteigend bis c
+                System.out.print((char) (c - i));
+            }
+            for (int i = 1; i &lt;= k; i++) {             // wieder absteigend
+                System.out.print((char) (c - i));
+            }
+            System.out.println();
+        }
+    }
+}</code></pre><p><b>Ablauf</b> 1 (Eingabe: 9, H)</p><pre data-lang="out"><code>h: 9
+c: H
+    H
+   GHG
+  FGHGF
+ EFGHGFE
+DEFGHGFED
+ EFGHGFE
+  FGHGF
+   GHG
+    H</code></pre><p><b>Ablauf</b> 2 (Eingabe: 7, a)</p><pre data-lang="out"><code>h: 7
+c: a
+   a
+  `a`
+ _`a`_
+^_`a`_^
+ _`a`_
+  `a`
+   a</code></pre><p><b>Ablauf</b> 3 (Eingabe: 6, a)</p><pre data-lang="out"><code>h: 6
+c: a
+Invalid number!</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Ein <code class="i">char</code> ist eine Zahl (ASCII-Code). Mit <code class="i">c - i</code> rechnen Sie (Ergebnis <code class="i">int</code>), mit <code class="i">(char)</code> machen Sie wieder ein Zeichen daraus. <code class="i">'H' - 4</code> ist <code class="i">'D'</code>, <code class="i">'a' - 1</code> ist der Akzent <code class="i">`</code>.</li><li>Der Trick mit <code class="i">Math.abs</code> vermeidet zwei getrennte Teile (oberer/unterer Teil). Der Ansatz mit zwei Blöcken ist aber genauso richtig und für manche einfacher.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-2-4"> erledigt</label></div>
+<div class="blk wide ex-card" id="a2-5"><h3>Aufgabe 2.5 · Notendurchschnitt</h3>
+<p>Lesen Sie Noten von 1 bis 5 ein, bis 0 eingegeben wird. Ungültige Note → „Invalid mark!“, wird nicht gezählt, und die Nummer der Eingabeaufforderung rückt nicht vor. Am Ende: Durchschnitt mit 2 Nachkommastellen und die Anzahl der Fünfer („Negative marks“).</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Variablen: Summe, Anzahl gültiger Noten, Anzahl Fünfer, Nummer der Eingabe.</li><li>Die Prüfung „ungültig“ ist <code class="i">note &lt; 1 || note &gt; 5</code> (0 ist das Endezeichen und wird vorher von der Schleife erkannt).</li><li>Durchschnitt: <code class="i">(double) summe / anzahl</code>. Ohne Cast wäre es eine Ganzzahldivision!</li><li>Sonderfall ohne gültige Note: Division durch 0 vermeiden (die Aufgabe nennt das nicht, ein Schutz schadet nicht).</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>import java.util.Scanner;
+
+public class Notendurchschnitt {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int nr = 1;
+        int summe = 0;
+        int anzahl = 0;
+        int fuenfer = 0;
+
+        System.out.print("Mark " + nr + ": ");
+        int note = sc.nextInt();
+        while (note != 0) {
+            if (note &lt; 1 || note &gt; 5) {
+                System.out.println("Invalid mark!");      // nr bleibt gleich
+            } else {
+                summe += note;
+                anzahl++;
+                if (note == 5) {
+                    fuenfer++;
+                }
+                nr++;
+            }
+            System.out.print("Mark " + nr + ": ");
+            note = sc.nextInt();
+        }
+        double schnitt = anzahl == 0 ? 0 : (double) summe / anzahl;   // Division durch 0 vermeiden
+        System.out.println("Average: " + String.format("%.2f", schnitt));
+        System.out.println("Negative marks: " + fuenfer);
+    }
+}</code></pre><p><b>Ablauf</b></p><pre data-lang="out"><code>Mark 1: 5
+Mark 2: 3
+Mark 3: 10
+Invalid mark!
+Mark 3: 1
+Mark 4: 5
+Mark 5: 0
+Average: 3.50
+Negative marks: 2</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Hier: gültig sind 5, 3, 1, 5 → Summe 14, Anzahl 4, Durchschnitt 3.50, zwei Fünfer. Die 10 ist ungültig und zählt nirgends mit.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-2-5"> erledigt</label></div>
+<div class="blk wide ex-card" id="a2-6"><h3>Aufgabe 2.6 · Happy Numbers</h3>
+<p>Prüfen Sie, ob eine positive Zahl „happy“ ist: Quadrieren und addieren Sie wiederholt ihre Ziffern. Erreicht man 1, ist sie happy. Landet man in der Schleife 4 → 16 → 37 → 58 → 89 → 145 → 42 → 20 → 4, ist sie „sad“.</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Äußere Schleife: <code class="i">while (n != 1 &amp;&amp; n != 4)</code>. Jeder Durchlauf berechnet die Quadratsumme der Ziffern.</li><li>Innere Schleife: <code class="i">ziffer = n % 10; summe += ziffer * ziffer; n /= 10;</code> bis n = 0.</li><li>Danach <code class="i">n = summe</code>.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>import java.util.Scanner;
+
+public class HappyNumbers {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("n: ");
+        int n = sc.nextInt();
+
+        while (n != 1 &amp;&amp; n != 4) {          // 1 = happy, 4 = Zyklus (sad)
+            int summe = 0;
+            while (n &gt; 0) {
+                int ziffer = n % 10;
+                summe += ziffer * ziffer;
+                n /= 10;
+            }
+            n = summe;
+        }
+        if (n == 1) {
+            System.out.println("Happy number!");
+        } else {
+            System.out.println("Sad number!");
+        }
+    }
+}</code></pre><p><b>Ablauf</b> 1 (Eingabe: 310)</p><pre data-lang="out"><code>n: 310
+Happy number!</code></pre><p><b>Ablauf</b> 2 (Eingabe: 99)</p><pre data-lang="out"><code>n: 99
+Sad number!</code></pre><p><b>Ablauf</b> 3 (Eingabe: 19)</p><pre data-lang="out"><code>n: 19
+Happy number!</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Jede „sad“-Zahl landet irgendwann bei 4 (siehe Zyklus), deshalb reicht die Abbruchbedingung „1 oder 4“. So gibt es keine Endlosschleife. Das „Ziffern abspalten“ mit <code class="i">% 10</code> und <code class="i">/ 10</code> kennen Sie schon aus dem Zahlendreher.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-2-6"> erledigt</label></div>
+</div></section>
+<section id="uebung3" data-grp="Aufgaben"><h2>Übung 3 <small>Methoden, Arrays, Strings</small></h2><div class="grid">
+<div class="blk wide"><p class="ex">Sechs Aufgaben als <b>Methoden</b> in einer Klasse <code class="i">App</code> (alle <code class="i">public static</code>). Die komplette Klasse steht am Ende dieses Abschnitts. Die Namen und Parametertypen dürfen Sie in der Prüfung nicht ändern.</p></div>
+<div class="blk wide ex-card" id="a3-1"><h3>Aufgabe 3.1 · One Month Calendar</h3>
+<p>Schreiben Sie <code class="i">public static void oneMonthCalendar(int days, int firstDay)</code>. Spalte 1 = Montag … Spalte 7 = Sonntag. <code class="i">days</code> = Tage des Monats, <code class="i">firstDay</code> = Wochentag des Ersten (1 = Montag bis 7 = Sonntag). Jede Zahl zweistellig mit einem Leerzeichen dahinter, am Ende eine zusätzliche Leerzeile.</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Vor dem 1. Tag <code class="i">firstDay - 1</code> leere Zellen mit je 3 Leerzeichen ausgeben.</li><li>Zahl ausgeben: <code class="i">System.out.printf("%2d ", tag)</code> (zwei Stellen, rechtsbündig, danach ein Leerzeichen).</li><li>Eine Variable <code class="i">spalte</code> (1 bis 7) mitzählen. Nach Spalte 7 → <code class="i">println()</code> und zurück auf 1.</li><li>Am Ende die unvollständige letzte Zeile mit <code class="i">println()</code> beenden (nur wenn <code class="i">spalte != 1</code>), danach die Leerzeile.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>// Aufgabe 1: Monatskalender
+public static void oneMonthCalendar(int days, int firstDay) {
+    for (int i = 1; i &lt; firstDay; i++) {
+        System.out.print("   ");                  // leere Zellen vor dem 1.
+    }
+    int spalte = firstDay;                        // 1 = Montag ... 7 = Sonntag
+    for (int tag = 1; tag &lt;= days; tag++) {
+        System.out.printf("%2d ", tag);
+        if (spalte == 7) {
+            System.out.println();
+            spalte = 1;
+        } else {
+            spalte++;
+        }
+    }
+    if (spalte != 1) {
+        System.out.println();                     // letzte (unvollstaendige) Zeile beenden
+    }
+    System.out.println();                         // Leerzeile am Ende
+}</code></pre><p><b>Test in main:</b></p><pre data-lang="out"><code>       1  2  3  4  5 
+ 6  7  8  9 10 11 12 
+13 14 15 16 17 18 19 
+20 21 22 23 24 25 26 
+27 28 29 30 31 
+
+ 1  2  3  4  5  6  7 
+ 8  9 10 11 12 13 14 
+15 16 17 18 19 20 21 
+22 23 24 25 26 27 28 
+
+(am Ende jeweils eine Leerzeile)</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Das <b>Muster „Zähler läuft mit“</b> kommt immer wieder vor: eine Variable läuft modulo 7 durch die Wochentage, die Schleife läuft über die Tage. Ausgabe der ganzen App-Klasse unten.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-3-1"> erledigt</label></div>
+<div class="blk wide ex-card" id="a3-2"><h3>Aufgabe 3.2 · Pseudo Random Numbers (lcg)</h3>
+<p>Schreiben Sie <code class="i">lcg(long seed)</code>, das 10 Zufallszahlen in einem <code class="i">long[]</code> zurückgibt. Berechnung: X<sub>i+1</sub> = (a · X<sub>i</sub> + c) mod m mit m = 2<sup>31</sup>, a = 1103515245, c = 12345. Testen Sie in <code class="i">main</code>.</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Konstanten als <code class="i">long</code>: <code class="i">1L &lt;&lt; 31</code> (= 2147483648) und <code class="i">1103515245L</code>. Mit <code class="i">int</code> käme es zum Überlauf.</li><li>Schleife über das Array: <code class="i">x = (A * x + C) % M; zahlen[i] = x;</code></li><li><code class="i">Math.pow(2, 31)</code> liefert double, also besser den Schiebeoperator oder den Wert 2147483648L direkt.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>// Aufgabe 2: linearer Kongruenzgenerator
+public static long[] lcg(long seed) {
+    final long M = 1L &lt;&lt; 31;                      // 2^31
+    final long A = 1103515245L;
+    final long C = 12345L;
+    long[] zahlen = new long[10];
+    long x = seed;
+    for (int i = 0; i &lt; zahlen.length; i++) {
+        x = (A * x + C) % M;
+        zahlen[i] = x;
+    }
+    return zahlen;
+}</code></pre><p><b>Test in main:</b></p><pre data-lang="out"><code>[1250496027, 1116302264, 1000676753, 1668674806, 908095735, 71666532, 896336333, 1736731266, 1314989459, 1535244752]</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Das Produkt aus <code class="i">A</code> und einem Wert unter 2<sup>31</sup> liegt bei rund 2,4 · 10<sup>18</sup> und passt noch in ein <code class="i">long</code> (max. 9,2 · 10<sup>18</sup>). In einem <code class="i">int</code> würde es überlaufen und falsche Werte liefern.</li><li>Die Methode liefert die Werte X<sub>1</sub> bis X<sub>10</sub>. Prüfen Sie in der Prüfung, ob die Tests den Seed selbst als erstes Element erwarten.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-3-2"> erledigt</label></div>
+<div class="blk wide ex-card" id="a3-3"><h3>Aufgabe 3.3 · Guessing Game</h3>
+<p>Schreiben Sie <code class="i">void guessingGame(int numberToGuess)</code>: In einer Schleife werden Tipps eingelesen. Hinweis „The number AI picked is lower/higher than your guess.“ Ende nach 10 Versuchen („You lost! Have you ever heard of divide &amp; conquer?“) oder beim Erraten („You won wisenheimer!“). Zusätzlich <code class="i">int randomNumberBetweenOneAndHundred()</code>, die in <code class="i">main</code> den Wert für <code class="i">guessingGame</code> liefert.</p>
+<details><summary>Hinweise</summary><ul class="list"><li><code class="i">for (int versuch = 1; versuch &lt;= 10; versuch++)</code> und bei Treffer <code class="i">return</code>.</li><li>Zufallszahl 1 bis 100: <code class="i">1 + (int) (Math.random() * 100)</code> oder <code class="i">new Random().nextInt(100) + 1</code>.</li><li>Ist die gesuchte Zahl <b>kleiner</b> als der Tipp, ist sie „lower than your guess“.</li><li>Nach dem 10. falschen Tipp erscheint direkt die Verlierer-Meldung (so zeigt es das Beispiel).</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>public static void guessingGame(int numberToGuess) {
+    Scanner sc = new Scanner(System.in);
+    for (int versuch = 1; versuch &lt;= 10; versuch++) {
+        System.out.print("Guess number " + versuch + ": ");
+        int tipp = sc.nextInt();
+        if (tipp == numberToGuess) {
+            System.out.println("You won wisenheimer!");
+            return;
+        }
+        if (versuch == 10) {
+            System.out.println("You lost! Have you ever heard of divide &amp; conquer?");
+        } else if (numberToGuess &lt; tipp) {
+            System.out.println("The number AI picked is lower than your guess.");
+        } else {
+            System.out.println("The number AI picked is higher than your guess.");
+        }
+    }
+}</code></pre><pre><code>// Aufgabe 3: Zahlenraten
+public static int randomNumberBetweenOneAndHundred() {
+    return 1 + (int) (Math.random() * 100);
+}</code></pre><p><b>Beispiel 1</b> (Zahl 15, Eingaben 20, 10, 15)</p><pre data-lang="out"><code>Guess number 1: 20
+The number AI picked is lower than your guess.
+Guess number 2: 10
+The number AI picked is higher than your guess.
+Guess number 3: 15
+You won wisenheimer!</code></pre><p><b>Beispiel 2</b> (Zahl 50, zehn falsche Tipps)</p><pre data-lang="out"><code>Guess number 1: 100
+The number AI picked is lower than your guess.
+Guess number 2: 99
+The number AI picked is lower than your guess.
+Guess number 3: 98
+The number AI picked is lower than your guess.
+Guess number 4: 97
+The number AI picked is lower than your guess.
+Guess number 5: 96
+The number AI picked is lower than your guess.
+Guess number 6: 95
+The number AI picked is lower than your guess.
+Guess number 7: 94
+The number AI picked is lower than your guess.
+Guess number 8: 93
+The number AI picked is lower than your guess.
+Guess number 9: 92
+The number AI picked is lower than your guess.
+Guess number 10: 91
+You lost! Have you ever heard of divide &amp; conquer?</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li><code class="i">Math.random()</code> liefert eine Zahl von 0.0 bis unter 1.0. Mal 100 und mit <code class="i">(int)</code> abgeschnitten ergibt 0 bis 99, mit +1 dann 1 bis 100.</li><li>Zum Testen übergeben Sie in <code class="i">main</code> zuerst eine feste Zahl, später den Zufallswert.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-3-3"> erledigt</label></div>
+<div class="blk wide ex-card" id="a3-4"><h3>Aufgabe 3.4 · Swap Arrays</h3>
+<p>Schreiben Sie <code class="i">boolean swapArrays(int[] a, int[] b)</code>: Sind die Längen verschieden, <code class="i">false</code> zurück. Sonst Inhalte vertauschen und <code class="i">true</code> zurückgeben. Keine API-Klassen verwenden.</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Zuerst die Länge prüfen: <code class="i">a.length != b.length</code>.</li><li>Elementweise tauschen mit einer Hilfsvariablen: <code class="i">int tmp = a[i]; a[i] = b[i]; b[i] = tmp;</code></li><li>Die Referenzen selbst zu tauschen (<code class="i">a = b</code>) würde nur die lokalen Parameter ändern, nicht die Arrays des Aufrufers.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>// Aufgabe 4: Arrays tauschen (ohne API-Klassen)
+public static boolean swapArrays(int[] a, int[] b) {
+    if (a.length != b.length) {
+        return false;
+    }
+    for (int i = 0; i &lt; a.length; i++) {
+        int tmp = a[i];
+        a[i] = b[i];
+        b[i] = tmp;
+    }
+    return true;
+}</code></pre><p><b>Test in main:</b></p><pre data-lang="out"><code>true
+[100, 99, 60, 44, 2] [1, 2, 3, 4, 5]
+false</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Arrays werden als Referenz übergeben. Änderungen <i>an den Elementen</i> sind für den Aufrufer sichtbar, eine neue Zuweisung der Parametervariable dagegen nicht.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-3-4"> erledigt</label></div>
+<div class="blk wide ex-card" id="a3-5"><h3>Aufgabe 3.5 · CamelCase</h3>
+<p>Schreiben Sie <code class="i">String camelCase(String satz)</code>: Leerzeichen entfernen, jedes Wort beginnt groß, Großbuchstaben mitten im Wort werden klein, Satzzeichen werden entfernt (nur a–z, A–Z zählen). Verwenden Sie <code class="i">toCharArray()</code> und rechnen Sie manuell mit <code class="i">char</code>. <code class="i">toUpperCase()</code>, <code class="i">replace()</code> usw. sind verboten.</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Merken Sie sich mit einem <code class="i">boolean wortAnfang</code>, ob der nächste Buchstabe ein Wortanfang ist.</li><li>Klein → groß: <code class="i">(char) (c - 'a' + 'A')</code>. Groß → klein: <code class="i">(char) (c - 'A' + 'a')</code> (oder jeweils <code class="i">± 32</code>).</li><li>Buchstabe prüfen: <code class="i">c &gt;= 'a' &amp;&amp; c &lt;= 'z'</code>.</li><li>Ein Leerzeichen setzt <code class="i">wortAnfang = true</code>. Andere Zeichen (Apostroph, Punkt) werden einfach übersprungen.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>// Aufgabe 5: CamelCase (nur mit char-Rechnung, ohne toUpperCase/replace)
+public static String camelCase(String satz) {
+    StringBuilder sb = new StringBuilder();
+    boolean wortAnfang = true;
+    for (char c : satz.toCharArray()) {
+        boolean klein = c &gt;= 'a' &amp;&amp; c &lt;= 'z';
+        boolean gross = c &gt;= 'A' &amp;&amp; c &lt;= 'Z';
+        if (c == ' ') {
+            wortAnfang = true;                    // naechster Buchstabe wird gross
+        } else if (klein || gross) {
+            if (wortAnfang &amp;&amp; klein) {
+                c = (char) (c - 'a' + 'A');       // klein -&gt; gross
+            } else if (!wortAnfang &amp;&amp; gross) {
+                c = (char) (c - 'A' + 'a');       // gross -&gt; klein
+            }
+            sb.append(c);
+            wortAnfang = false;
+        }                                         // Satzzeichen: ignorieren
+    }
+    return sb.toString();
+}</code></pre><p><b>Test in main:</b></p><pre data-lang="out"><code>MyNameIsntAlice
+AnyNoiseAnnoysAnOysterButANoisyNoiseAnnoysAnOysterMore</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Der Abstand zwischen Groß- und Kleinbuchstaben im ASCII-Code ist immer 32 (<code class="i">'a' − 'A' = 32</code>). Deshalb funktioniert die Umrechnung ohne API.</li><li>Das Ergebnis wird mit <code class="i">StringBuilder.append</code> aufgebaut (das ist in der Aufgabe ausdrücklich erlaubt).</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-3-5"> erledigt</label></div>
+<div class="blk wide ex-card" id="a3-6"><h3>Aufgabe 3.6 · Check Digit (Modulo 11)</h3>
+<p>Schreiben Sie <code class="i">int checkDigit(int[] code)</code> für ein Array aus Ziffern: Gewicht = Position + 2, Produkte summieren, Rest durch 11, Prüfziffer = 11 − Rest. Ergibt die Differenz 10, ist die Prüfziffer 0; ergibt sie 11, ist die Prüfziffer 5.</p>
+<details><summary>Hinweise</summary><ul class="list"><li>Summe: <code class="i">summe += code[i] * (i + 2);</code></li><li>Dann <code class="i">pruef = 11 - summe % 11;</code></li><li>Die zwei Ausnahmen mit <code class="i">if</code> abfangen (10 → 0, 11 → 5).</li><li>Beispiel aus der Aufgabe: {3, 9, 1, 5, 8} → Summe 110, Rest 0, Differenz 11 → <b>5</b>.</li></ul></details>
+<details><summary>Lösung anzeigen (erst nach dem eigenen Versuch)</summary><pre><code>// Aufgabe 6: Pruefziffer Modulo 11
+public static int checkDigit(int[] code) {
+    int summe = 0;
+    for (int i = 0; i &lt; code.length; i++) {
+        summe += code[i] * (i + 2);               // Gewicht = Position + 2
+    }
+    int pruef = 11 - summe % 11;
+    if (pruef == 10) {
+        return 0;
+    }
+    if (pruef == 11) {
+        return 5;
+    }
+    return pruef;
+}</code></pre><p><b>Test in main:</b></p><pre data-lang="out"><code>5</code></pre></details>
+<div class="why"><b>Warum so?</b><ul class="list"><li>Die Gewichtung ergibt sich aus dem Schleifenindex: Index 0 hat Gewicht 2, Index 4 hat Gewicht 6. Prüfen Sie Ihre Methode immer mit dem Beispiel der Aufgabe.</li></ul></div>
+<label class="done"><input type="checkbox" data-key="a-3-6"> erledigt</label></div>
+<div class="blk wide"><h3>Die komplette Klasse App</h3><details><summary>Alle sechs Methoden mit main</summary><pre><code>import java.util.Scanner;
+
+public class App {
+
+    // Aufgabe 1: Monatskalender
+    public static void oneMonthCalendar(int days, int firstDay) {
+        for (int i = 1; i &lt; firstDay; i++) {
+            System.out.print("   ");                  // leere Zellen vor dem 1.
+        }
+        int spalte = firstDay;                        // 1 = Montag ... 7 = Sonntag
+        for (int tag = 1; tag &lt;= days; tag++) {
+            System.out.printf("%2d ", tag);
+            if (spalte == 7) {
+                System.out.println();
+                spalte = 1;
+            } else {
+                spalte++;
+            }
+        }
+        if (spalte != 1) {
+            System.out.println();                     // letzte (unvollstaendige) Zeile beenden
+        }
+        System.out.println();                         // Leerzeile am Ende
+    }
+
+    // Aufgabe 2: linearer Kongruenzgenerator
+    public static long[] lcg(long seed) {
+        final long M = 1L &lt;&lt; 31;                      // 2^31
+        final long A = 1103515245L;
+        final long C = 12345L;
+        long[] zahlen = new long[10];
+        long x = seed;
+        for (int i = 0; i &lt; zahlen.length; i++) {
+            x = (A * x + C) % M;
+            zahlen[i] = x;
+        }
+        return zahlen;
+    }
+
+    // Aufgabe 3: Zahlenraten
+    public static int randomNumberBetweenOneAndHundred() {
+        return 1 + (int) (Math.random() * 100);
+    }
+
+    public static void guessingGame(int numberToGuess) {
+        Scanner sc = new Scanner(System.in);
+        for (int versuch = 1; versuch &lt;= 10; versuch++) {
+            System.out.print("Guess number " + versuch + ": ");
+            int tipp = sc.nextInt();
+            if (tipp == numberToGuess) {
+                System.out.println("You won wisenheimer!");
+                return;
+            }
+            if (versuch == 10) {
+                System.out.println("You lost! Have you ever heard of divide &amp; conquer?");
+            } else if (numberToGuess &lt; tipp) {
+                System.out.println("The number AI picked is lower than your guess.");
+            } else {
+                System.out.println("The number AI picked is higher than your guess.");
+            }
+        }
+    }
+
+    // Aufgabe 4: Arrays tauschen (ohne API-Klassen)
+    public static boolean swapArrays(int[] a, int[] b) {
+        if (a.length != b.length) {
+            return false;
+        }
+        for (int i = 0; i &lt; a.length; i++) {
+            int tmp = a[i];
+            a[i] = b[i];
+            b[i] = tmp;
+        }
+        return true;
+    }
+
+    // Aufgabe 5: CamelCase (nur mit char-Rechnung, ohne toUpperCase/replace)
+    public static String camelCase(String satz) {
+        StringBuilder sb = new StringBuilder();
+        boolean wortAnfang = true;
+        for (char c : satz.toCharArray()) {
+            boolean klein = c &gt;= 'a' &amp;&amp; c &lt;= 'z';
+            boolean gross = c &gt;= 'A' &amp;&amp; c &lt;= 'Z';
+            if (c == ' ') {
+                wortAnfang = true;                    // naechster Buchstabe wird gross
+            } else if (klein || gross) {
+                if (wortAnfang &amp;&amp; klein) {
+                    c = (char) (c - 'a' + 'A');       // klein -&gt; gross
+                } else if (!wortAnfang &amp;&amp; gross) {
+                    c = (char) (c - 'A' + 'a');       // gross -&gt; klein
+                }
+                sb.append(c);
+                wortAnfang = false;
+            }                                         // Satzzeichen: ignorieren
+        }
+        return sb.toString();
+    }
+
+    // Aufgabe 6: Pruefziffer Modulo 11
+    public static int checkDigit(int[] code) {
+        int summe = 0;
+        for (int i = 0; i &lt; code.length; i++) {
+            summe += code[i] * (i + 2);               // Gewicht = Position + 2
+        }
+        int pruef = 11 - summe % 11;
+        if (pruef == 10) {
+            return 0;
+        }
+        if (pruef == 11) {
+            return 5;
+        }
+        return pruef;
+    }
+
+    public static void main(String[] args) {
+        oneMonthCalendar(31, 3);
+        oneMonthCalendar(28, 1);
+
+        for (long z : lcg(42)) {
+            System.out.println(z);
+        }
+
+        int[] a1 = {1, 2, 3, 4, 5};
+        int[] a2 = {100, 99, 60, 44, 2};
+        System.out.println(swapArrays(a1, a2) + " " + java.util.Arrays.toString(a1) + " " + java.util.Arrays.toString(a2));
+        System.out.println(swapArrays(a1, new int[3]));
+
+        System.out.println(camelCase("my name isn't Alice"));
+        System.out.println(camelCase("AnY noise annoYs an oYster but a noisY noise annoYs an oYster more."));
+
+        System.out.println(checkDigit(new int[]{3, 9, 1, 5, 8}));
+
+        guessingGame(randomNumberBetweenOneAndHundred());
+    }
+}</code></pre></details></div></div></section>
+<section id="varianten" data-grp="Aufgaben"><h2>Zusatzaufgaben <small>Varianten</small></h2><div class="grid"><div class="blk wide"><p class="ex">Die Prüfung enthält vermutlich <b>ähnliche, aber nicht identische</b> Aufgaben. Diese sechs üben dieselben Muster in neuer Verpackung. Lösen Sie sie zuerst ohne Lösung.</p></div>
+<div class="blk wide ex-card" id="v1"><h3>Hohles Rechteck</h3><p>Lesen Sie Breite und Höhe ein und zeichnen Sie ein Rechteck aus <code class="i">#</code>, nur der Rand soll gezeichnet werden.</p><details><summary>Hinweise</summary><ul class="list"><li>Ein Zeichen gehört zum Rand, wenn Zeile oder Spalte die erste oder letzte ist.</li></ul></details>
+<details><summary>Lösung anzeigen</summary><pre><code>import java.util.Scanner;
+
+public class Rechteck {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Breite: ");
+        int b = sc.nextInt();
+        System.out.print("Hoehe: ");
+        int h = sc.nextInt();
+
+        for (int zeile = 1; zeile &lt;= h; zeile++) {
+            for (int spalte = 1; spalte &lt;= b; spalte++) {
+                boolean rand = zeile == 1 || zeile == h || spalte == 1 || spalte == b;
+                System.out.print(rand ? "#" : " ");
+            }
+            System.out.println();
+        }
+    }
+}</code></pre><p><b>Ablauf</b></p><pre data-lang="out"><code>Breite: 6
+Hoehe: 4
+######
+#    #
+#    #
+######</code></pre></details>
+<label class="done"><input type="checkbox" data-key="a-v1"> erledigt</label></div>
+<div class="blk wide ex-card" id="v2"><h3>Einmaleins</h3><p>Geben Sie das kleine Einmaleins (1 bis 5) als Tabelle aus, jede Zahl rechtsbündig in 4 Zeichen.</p><details><summary>Hinweise</summary><ul class="list"><li><code class="i">printf("%4d", …)</code> und nach jeder Zeile <code class="i">println()</code>.</li></ul></details>
+<details><summary>Lösung anzeigen</summary><pre><code>public class Einmaleins {
+    public static void main(String[] args) {
+        for (int a = 1; a &lt;= 5; a++) {
+            for (int b = 1; b &lt;= 5; b++) {
+                System.out.printf("%4d", a * b);     // rechtsbuendig, 4 Zeichen breit
+            }
+            System.out.println();
+        }
+    }
+}</code></pre><p><b>Ablauf</b></p><pre data-lang="out"><code>   1   2   3   4   5
+   2   4   6   8  10
+   3   6   9  12  15
+   4   8  12  16  20
+   5  10  15  20  25</code></pre></details>
+<label class="done"><input type="checkbox" data-key="a-v2"> erledigt</label></div>
+<div class="blk wide ex-card" id="v3"><h3>Primzahlen bis n</h3><p>Lesen Sie eine Obergrenze ein und geben Sie alle Primzahlen bis dahin aus. Verwenden Sie eine Hilfsmethode <code class="i">istPrim</code>.</p><details><summary>Hinweise</summary><ul class="list"><li>Teiler nur bis zur Wurzel prüfen: <code class="i">i * i &lt;= n</code>.</li><li>Eine Methode, die <code class="i">boolean</code> liefert, macht die Schleife in <code class="i">main</code> kurz.</li></ul></details>
+<details><summary>Lösung anzeigen</summary><pre><code>import java.util.Scanner;
+
+public class Primzahlen {
+    static boolean istPrim(int n) {
+        if (n &lt; 2) {
+            return false;
+        }
+        for (int i = 2; i * i &lt;= n; i++) {
+            if (n % i == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Obergrenze: ");
+        int max = sc.nextInt();
+        for (int n = 2; n &lt;= max; n++) {
+            if (istPrim(n)) {
+                System.out.print(n + " ");
+            }
+        }
+        System.out.println();
+    }
+}</code></pre><p><b>Ablauf</b></p><pre data-lang="out"><code>Obergrenze: 30
+2 3 5 7 11 13 17 19 23 29 </code></pre></details>
+<label class="done"><input type="checkbox" data-key="a-v3"> erledigt</label></div>
+<div class="blk wide ex-card" id="v4"><h3>Array-Methoden</h3><p>Schreiben Sie <code class="i">maximum</code>, <code class="i">durchschnitt</code>, <code class="i">indexVon</code> (-1 wenn nicht gefunden) und <code class="i">umdrehen</code> (in place) für ein <code class="i">int[]</code>.</p><details><summary>Hinweise</summary><ul class="list"><li>Beim Umdrehen nur bis <code class="i">a.length / 2</code> laufen, sonst drehen Sie alles zweimal zurück.</li></ul></details>
+<details><summary>Lösung anzeigen</summary><pre><code>public class ArrayStatistik {
+    static int maximum(int[] a) {
+        int max = a[0];
+        for (int i = 1; i &lt; a.length; i++) {
+            if (a[i] &gt; max) {
+                max = a[i];
+            }
+        }
+        return max;
+    }
+
+    static double durchschnitt(int[] a) {
+        int summe = 0;
+        for (int x : a) {
+            summe += x;
+        }
+        return (double) summe / a.length;
+    }
+
+    static int indexVon(int[] a, int ziel) {
+        for (int i = 0; i &lt; a.length; i++) {
+            if (a[i] == ziel) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    static void umdrehen(int[] a) {
+        for (int i = 0; i &lt; a.length / 2; i++) {
+            int tmp = a[i];
+            a[i] = a[a.length - 1 - i];
+            a[a.length - 1 - i] = tmp;
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] z = {4, 8, 15, 16, 23, 42};
+        System.out.println("max=" + maximum(z));
+        System.out.println("schnitt=" + String.format("%.2f", durchschnitt(z)));
+        System.out.println("index von 16: " + indexVon(z, 16) + ", von 99: " + indexVon(z, 99));
+        umdrehen(z);
+        System.out.println(java.util.Arrays.toString(z));
+    }
+}</code></pre><p><b>Ablauf</b></p><pre data-lang="out"><code>max=42
+schnitt=18.00
+index von 16: 3, von 99: -1
+[42, 23, 16, 15, 8, 4]</code></pre></details>
+<label class="done"><input type="checkbox" data-key="a-v4"> erledigt</label></div>
+<div class="blk wide ex-card" id="v5"><h3>Caesar-Verschlüsselung</h3><p>Lesen Sie einen Text und eine Verschiebung ein. Buchstaben werden um <code class="i">shift</code> im Alphabet verschoben (am Ende wieder von vorn), alles andere bleibt. Zählen Sie außerdem die Vokale. Ohne <code class="i">toUpperCase</code>.</p><details><summary>Hinweise</summary><ul class="list"><li><code class="i">(char) ('a' + (c - 'a' + shift) % 26)</code></li><li>Groß- und Kleinbuchstaben getrennt behandeln.</li><li>Text mit Leerzeichen: <code class="i">nextLine()</code>. Die Zahl danach: <code class="i">Integer.parseInt(sc.nextLine().trim())</code>.</li></ul></details>
+<details><summary>Lösung anzeigen</summary><pre><code>import java.util.Scanner;
+
+public class Caesar {
+    static String verschluesseln(String text, int shift) {
+        StringBuilder sb = new StringBuilder();
+        for (char c : text.toCharArray()) {
+            if (c &gt;= 'a' &amp;&amp; c &lt;= 'z') {
+                sb.append((char) ('a' + (c - 'a' + shift) % 26));
+            } else if (c &gt;= 'A' &amp;&amp; c &lt;= 'Z') {
+                sb.append((char) ('A' + (c - 'A' + shift) % 26));
+            } else {
+                sb.append(c);                          // Leerzeichen etc. bleiben
+            }
+        }
+        return sb.toString();
+    }
+
+    static int zaehleVokale(String text) {
+        int n = 0;
+        for (char c : text.toCharArray()) {
+            if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u'
+                    || c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U') {
+                n++;
+            }
+        }
+        return n;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Text: ");
+        String text = sc.nextLine();
+        System.out.print("Shift: ");
+        int shift = Integer.parseInt(sc.nextLine().trim());
+        System.out.println(verschluesseln(text, shift));
+        System.out.println("Vokale: " + zaehleVokale(text));
+    }
+}</code></pre><p><b>Ablauf</b></p><pre data-lang="out"><code>Text: Hello, World
+Shift: 3
+Khoor, Zruog
+Vokale: 3</code></pre></details>
+<label class="done"><input type="checkbox" data-key="a-v5"> erledigt</label></div>
+<div class="blk wide ex-card" id="v6"><h3>Dezimal zu Binär</h3><p>Lesen Sie eine positive Zahl ein und geben Sie sie im Binärsystem aus, nur mit Schleife und <code class="i">%</code>, <code class="i">/</code>.</p><details><summary>Hinweise</summary><ul class="list"><li>Rest durch 2 ergibt die niedrigste Stelle. Hängen Sie jeden Rest <b>vorn</b> an den Ergebnis-String.</li></ul></details>
+<details><summary>Lösung anzeigen</summary><pre><code>import java.util.Scanner;
+
+public class Binaer {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Zahl: ");
+        int n = sc.nextInt();
+        if (n == 0) {
+            System.out.println("0");
+            return;
+        }
+        String bin = "";
+        while (n &gt; 0) {
+            bin = (n % 2) + bin;     // Rest vorne anhaengen
+            n = n / 2;
+        }
+        System.out.println(bin);
+    }
+}</code></pre><p><b>Ablauf</b></p><pre data-lang="out"><code>Zahl: 37
+100101</code></pre></details>
+<label class="done"><input type="checkbox" data-key="a-v6"> erledigt</label></div>
+</div></section>
+<section id="api" data-grp="Nachschlagen"><h2>Methoden auf einen Blick</h2><div class="grid">
+
+<div class="blk"><h3>String</h3><div class="tw"><table>
+<tr><th>Aufruf</th><th>Bedeutung</th></tr>
+<tr><td class="nw"><code>s.length()</code></td><td>Länge</td></tr>
+<tr><td class="nw"><code>s.charAt(i)</code></td><td>Zeichen an Position i (ab 0)</td></tr>
+<tr><td class="nw"><code>s.substring(a, b)</code></td><td>von a bis <i>vor</i> b; <code>substring(a)</code> bis Ende</td></tr>
+<tr><td class="nw"><code>s.indexOf("x")</code></td><td>erste Position oder -1; <code>lastIndexOf</code></td></tr>
+<tr><td class="nw"><code>s.contains("x")</code></td><td>enthält?</td></tr>
+<tr><td class="nw"><code>s.startsWith / endsWith</code></td><td>Anfang / Ende prüfen</td></tr>
+<tr><td class="nw"><code>s.equals(t)</code>, <code>equalsIgnoreCase</code></td><td>Inhalt vergleichen (nie <code>==</code>)</td></tr>
+<tr><td class="nw"><code>s.compareTo(t)</code></td><td>&lt; 0, 0, &gt; 0 (alphabetisch)</td></tr>
+<tr><td class="nw"><code>s.toUpperCase() / toLowerCase()</code></td><td>liefert <b>neuen</b> String</td></tr>
+<tr><td class="nw"><code>s.trim()</code>, <code>strip()</code></td><td>Leerraum an den Rändern entfernen</td></tr>
+<tr><td class="nw"><code>s.replace("a", "b")</code></td><td>alle Vorkommen ersetzen (ohne Regex)</td></tr>
+<tr><td class="nw"><code>s.split(",")</code></td><td>String[]; <code>split("\\s+")</code> an Leerraum</td></tr>
+<tr><td class="nw"><code>s.isEmpty()</code>, <code>isBlank()</code></td><td>leer? / nur Leerzeichen?</td></tr>
+<tr><td class="nw"><code>s.toCharArray()</code></td><td>char[]</td></tr>
+<tr><td class="nw"><code>String.valueOf(x)</code></td><td>Zahl/Zeichen zu String</td></tr>
+<tr><td class="nw"><code>String.join(", ", liste)</code></td><td>Liste verbinden</td></tr>
+<tr><td class="nw"><code>"ab".repeat(3)</code></td><td>"ababab"</td></tr>
+<tr><td class="nw"><code>String.format("%5.2f", x)</code></td><td>formatieren (<code>%d %s %f %n</code>)</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>StringBuilder, Character, Math</h3><div class="tw"><table>
+<tr><th>Aufruf</th><th>Bedeutung</th></tr>
+<tr><td class="nw"><code>sb.append(x)</code></td><td>anhängen (verkettbar)</td></tr>
+<tr><td class="nw"><code>sb.insert(i, x)</code>, <code>reverse()</code></td><td>einfügen, umkehren</td></tr>
+<tr><td class="nw"><code>sb.setCharAt(i, c)</code>, <code>deleteCharAt(i)</code></td><td>Zeichen ändern / löschen</td></tr>
+<tr><td class="nw"><code>sb.toString()</code>, <code>length()</code></td><td>zurück zu String, Länge</td></tr>
+<tr><td class="nw"><code>Character.isDigit(c)</code></td><td>Ziffer? (auch <code>isLetter</code>, <code>isUpperCase</code>, <code>isWhitespace</code>)</td></tr>
+<tr><td class="nw"><code>Character.toUpperCase(c)</code></td><td>Großbuchstabe</td></tr>
+<tr><td class="nw"><code>c - '0'</code></td><td>Ziffernzeichen als Zahl ('7' wird 7)</td></tr>
+<tr><td class="nw"><code>(char) ('a' + 1)</code></td><td>'b'</td></tr>
+<tr><td class="nw"><code>Math.max / min / abs</code></td><td>Maximum, Minimum, Betrag</td></tr>
+<tr><td class="nw"><code>Math.pow(2, 3)</code>, <code>sqrt(x)</code></td><td>Potenz (double), Wurzel</td></tr>
+<tr><td class="nw"><code>Math.round / floor / ceil</code></td><td>runden, abrunden, aufrunden</td></tr>
+<tr><td class="nw"><code>Math.floorMod(a, b)</code></td><td>Modulo ohne negatives Ergebnis</td></tr>
+<tr><td class="nw"><code>Integer.parseInt("12")</code></td><td>String zu int (<code>NumberFormatException</code>)</td></tr>
+<tr><td class="nw"><code>Integer.MAX_VALUE</code>, <code>MIN_VALUE</code></td><td>Grenzen</td></tr>
+<tr><td class="nw"><code>Integer.toBinaryString(n)</code></td><td>Binärdarstellung</td></tr>
+<tr><td class="nw"><code>new Random().nextInt(n)</code></td><td>Zufall 0 bis n-1</td></tr>
+</table></div></div>
+
+<div class="blk"><h3>Arrays und Arrays-Hilfsklasse</h3><div class="tw"><table>
+<tr><th>Aufruf</th><th>Bedeutung</th></tr>
+<tr><td class="nw"><code>a.length</code></td><td>Länge (ohne Klammern!)</td></tr>
+<tr><td class="nw"><code>new int[5]</code></td><td>5 Nullen</td></tr>
+<tr><td class="nw"><code>int[] a = {1, 2, 3}</code></td><td>Array-Literal</td></tr>
+<tr><td class="nw"><code>Arrays.toString(a)</code></td><td>lesbar ausgeben</td></tr>
+<tr><td class="nw"><code>Arrays.deepToString(m)</code></td><td>2D-Array ausgeben</td></tr>
+<tr><td class="nw"><code>Arrays.sort(a)</code></td><td>sortieren (in place)</td></tr>
+<tr><td class="nw"><code>Arrays.copyOf(a, n)</code></td><td>Kopie mit neuer Länge</td></tr>
+<tr><td class="nw"><code>Arrays.fill(a, 0)</code></td><td>füllen</td></tr>
+<tr><td class="nw"><code>Arrays.equals(a, b)</code></td><td>Inhalt vergleichen</td></tr>
+<tr><td class="nw"><code>Arrays.binarySearch(a, x)</code></td><td>Index (sortiertes Array)</td></tr>
+<tr><td class="nw"><code>Arrays.asList(...)</code></td><td>Liste mit fester Größe</td></tr>
+<tr><td class="nw"><code>Arrays.stream(a).sum()</code></td><td>Summe, <code>max()</code>, <code>average()</code></td></tr>
+</table></div></div>
+
+</div></section>
+<section id="fehler" data-grp="Nachschlagen"><h2>Fehlermeldungen <small>Nachschlagen</small></h2><div class="grid">
+<div class="blk wide"><h3>So lesen Sie eine Fehlermeldung</h3><p class="ex">Lesen Sie immer die <b>erste</b> Meldung zuerst: Folgefehler verschwinden oft von selbst. Die Zeile <code class="i">T.java:3</code> nennt Datei und Zeilennummer, darunter steht die betroffene Zeile mit einem Pfeil <code class="i">^</code> an der Stelle. Die Meldungen unten stammen aus echten Läufen mit Java 21.</p></div>
+<div class="blk wide"><h3>Compilerfehler (javac)</h3>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T {
+    public static void main(String[] args) {
+        int summe = 5;
+        System.out.println(sume);
+    }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:4: error: cannot find symbol
+        System.out.println(sume);
+                           ^
+  symbol:   variable sume
+  location: class T
+1 error</code></pre>
+<p><b>Ursache:</b> Name falsch geschrieben, Variable nicht deklariert oder außerhalb des Gültigkeitsbereichs, Import fehlt.</p><p><b>Lösung:</b> Schreibweise prüfen (Groß/Klein!), Variable vor der Benutzung deklarieren, passenden <code>import</code> ergänzen.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T {
+    public static void main(String[] args) {
+        double d = 3.7;
+        int i = d;
+    }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:4: error: incompatible types: possible lossy conversion from double to int
+        int i = d;
+                ^
+1 error</code></pre>
+<p><b>Ursache:</b> Ein <code>double</code> passt nicht in ein <code>int</code>. Java verlangt hier einen ausdrücklichen Cast.</p><p><b>Lösung:</b> <code>int i = (int) d;</code> (schneidet ab) oder <code>Math.round(d)</code>; oder den Typ der Variable ändern.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T {
+    static int zwei(int x) {
+        if (x &gt; 0) {
+            return 2;
+        }
+    }
+    public static void main(String[] args) { }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:6: error: missing return statement
+    }
+    ^
+1 error</code></pre>
+<p><b>Ursache:</b> Nicht jeder Pfad der Methode gibt etwas zurück (hier fehlt der Fall <code>x &lt;= 0</code>).</p><p><b>Lösung:</b> Am Ende ein <code>return</code> ergänzen oder <code>else</code> verwenden.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T {
+    public static void main(String[] args) {
+        int x = 5
+        System.out.println(x);
+    }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:3: error: ';' expected
+        int x = 5
+                 ^
+1 error</code></pre>
+<p><b>Ursache:</b> Semikolon am Zeilenende vergessen. Die Meldung zeigt auf das Ende der <i>vorherigen</i> Zeile.</p><p><b>Lösung:</b> Semikolon ergänzen. Oft fehlt es in der Zeile <i>über</i> der markierten.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class Anders {
+    public static void main(String[] args) { }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Falsch.java:1: error: class Anders is public, should be declared in a file named Anders.java
+public class Anders {
+       ^
+1 error</code></pre>
+<p><b>Ursache:</b> Der Dateiname passt nicht zum Namen der <code>public</code>-Klasse.</p><p><b>Lösung:</b> Datei in <code>Anders.java</code> umbenennen oder die Klasse umbenennen.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T {
+    void hallo() { }
+    public static void main(String[] args) {
+        hallo();
+    }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:4: error: non-static method hallo() cannot be referenced from a static context
+        hallo();
+        ^
+1 error</code></pre>
+<p><b>Ursache:</b> Aus der statischen <code>main</code> wird eine Instanzmethode ohne Objekt aufgerufen.</p><p><b>Lösung:</b> Methode <code>static</code> machen oder ein Objekt erzeugen: <code>new T().hallo();</code></p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T {
+    public static void main(String[] args) {
+        int x;
+        System.out.println(x);
+    }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:4: error: variable x might not have been initialized
+        System.out.println(x);
+                           ^
+1 error</code></pre>
+<p><b>Ursache:</b> Lokale Variable wird gelesen, bevor sie einen Wert hat.</p><p><b>Lösung:</b> Beim Deklarieren initialisieren: <code>int x = 0;</code>, oder auf allen Pfaden vorher zuweisen.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T {
+    static int f() {
+        return 1;
+        System.out.println("nie");
+    }
+    public static void main(String[] args) { }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:4: error: unreachable statement
+        System.out.println("nie");
+        ^
+1 error</code></pre>
+<p><b>Ursache:</b> Nach <code>return</code>, <code>break</code> oder <code>throw</code> steht noch Code.</p><p><b>Lösung:</b> Den Code löschen oder vor das <code>return</code> verschieben.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>import java.nio.file.*;
+public class T {
+    public static void main(String[] args) {
+        Files.readAllLines(Path.of("a.txt"));
+    }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:4: error: unreported exception IOException; must be caught or declared to be thrown
+        Files.readAllLines(Path.of("a.txt"));
+                          ^
+1 error</code></pre>
+<p><b>Ursache:</b> Eine Methode wirft eine geprüfte Exception (checked), die nicht behandelt wird.</p><p><b>Lösung:</b> <code>try/catch</code> um den Aufruf oder <code>throws IOException</code> an die Methode.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T {
+    public static void main(String[] args) {
+        int zahl = "42";
+    }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:3: error: incompatible types: String cannot be converted to int
+        int zahl = "42";
+                   ^
+1 error</code></pre>
+<p><b>Ursache:</b> Ein <code>String</code> kann nicht direkt einer <code>int</code>-Variable zugewiesen werden.</p><p><b>Lösung:</b> <code>Integer.parseInt("42")</code> benutzen.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T {
+    public static void main(String[] args) {
+        final int x = 1;
+        x = 2;
+    }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:4: error: cannot assign a value to final variable x
+        x = 2;
+        ^
+1 error</code></pre>
+<p><b>Ursache:</b> Zuweisung an eine <code>final</code>-Variable.</p><p><b>Lösung:</b> <code>final</code> entfernen oder die Variable nur einmal zuweisen.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T {
+    public static void main(String[] args) {
+        int x = 1;
+        int x = 2;
+    }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:4: error: variable x is already defined in method main(String[])
+        int x = 2;
+            ^
+1 error</code></pre>
+<p><b>Ursache:</b> Zweimal dieselbe Variable im selben Gültigkeitsbereich deklariert.</p><p><b>Lösung:</b> Zweite Deklaration zur Zuweisung machen: <code>x = 2;</code></p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T {
+    static int addiere(int a, int b) { return a + b; }
+    public static void main(String[] args) {
+        addiere(1);
+    }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:4: error: method addiere in class T cannot be applied to given types;
+        addiere(1);
+        ^
+  required: int,int
+  found:    int
+  reason: actual and formal argument lists differ in length
+1 error</code></pre>
+<p><b>Ursache:</b> Falsche Anzahl oder falsche Typen der Argumente beim Aufruf.</p><p><b>Lösung:</b> Signatur der Methode prüfen und Argumente anpassen.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>abstract class Tier { abstract void laut(); }
+public class T {
+    public static void main(String[] args) {
+        Tier t = new Tier();
+    }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:4: error: Tier is abstract; cannot be instantiated
+        Tier t = new Tier();
+                 ^
+1 error</code></pre>
+<p><b>Ursache:</b> Eine abstrakte Klasse (oder ein Interface) kann nicht mit <code>new</code> erzeugt werden.</p><p><b>Lösung:</b> Eine konkrete Unterklasse instanziieren: <code>new Hund()</code>.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>abstract class Tier { abstract void laut(); }
+class Hund extends Tier { }
+public class T { public static void main(String[] args) { } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:2: error: Hund is not abstract and does not override abstract method laut() in Tier
+class Hund extends Tier { }
+^
+1 error</code></pre>
+<p><b>Ursache:</b> Eine konkrete Klasse erbt eine abstrakte Methode, ohne sie zu implementieren.</p><p><b>Lösung:</b> Die Methode mit <code>@Override</code> implementieren oder die Klasse <code>abstract</code> machen.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T {
+    public static void main(String[] args) {
+        System.out.println("hallo");
+    }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:4: error: reached end of file while parsing
+    }
+     ^
+1 error</code></pre>
+<p><b>Ursache:</b> Eine schließende Klammer <code>}</code> fehlt.</p><p><b>Lösung:</b> Klammern zählen, Einrückung prüfen (die Entwicklungsumgebung hilft).</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T {
+    public static void main(String[] args) {
+        String s = "abc";
+        if (s.equals("abc")) {
+            System.out.println("ja");
+        };
+        else {
+            System.out.println("nein");
+        }
+    }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:7: error: 'else' without 'if'
+        else {
+        ^
+1 error</code></pre>
+<p><b>Ursache:</b> Ein Semikolon direkt nach der <code>if</code>-Klammer beendet das <code>if</code>.</p><p><b>Lösung:</b> Das überflüssige Semikolon vor <code>else</code> löschen.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>import java.util.*;
+public class T {
+    public static void main(String[] args) {
+        List&lt;int&gt; liste = new ArrayList&lt;&gt;();
+    }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:4: error: unexpected type
+        List&lt;int&gt; liste = new ArrayList&lt;&gt;();
+             ^
+  required: reference
+  found:    int
+1 error</code></pre>
+<p><b>Ursache:</b> Generics nehmen nur Klassen, keine primitiven Typen.</p><p><b>Lösung:</b> Wrapper nehmen: <code>List&lt;Integer&gt;</code>.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T {
+    public static void main(String[] args) {
+        String s = "abc";
+        char c = s[0];
+    }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:4: error: array required, but String found
+        char c = s[0];
+                  ^
+1 error</code></pre>
+<p><b>Ursache:</b> Strings werden mit <code>charAt(i)</code> gelesen, nicht mit eckigen Klammern.</p><p><b>Lösung:</b> <code>s.charAt(0)</code>.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T {
+    public static void main(String[] args) {
+        String s = "a";
+        if (s == 'a') { }
+    }
+}</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+T.java:4: error: bad operand types for binary operator '=='
+        if (s == 'a') { }
+              ^
+  first type:  String
+  second type: char
+1 error</code></pre>
+<p><b>Ursache:</b> Ein <code>String</code> kann nicht mit einem <code>char</code> mit <code>==</code> verglichen werden.</p><p><b>Lösung:</b> <code>s.equals("a")</code> oder <code>s.charAt(0) == 'a'</code>.</p></details>
+</div>
+<div class="blk wide"><h3>Laufzeitfehler (Exceptions)</h3>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T { public static void main(String[] a) { String s = null; System.out.println(s.length()); } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Exception in thread "main" java.lang.NullPointerException: Cannot invoke "String.length()" because "&lt;local1&gt;" is null
+	at T.main(T.java:1)</code></pre>
+<p><b>Ursache:</b> Zugriff auf ein Objekt, das <code>null</code> ist.</p><p><b>Lösung:</b> Vorher prüfen (<code>if (s != null)</code>), Variable initialisieren, bei <code>Map.get</code> mit <code>getOrDefault</code> arbeiten.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T { public static void main(String[] a) { int[] z = new int[3]; z[3] = 1; } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3
+	at T.main(T.java:1)</code></pre>
+<p><b>Ursache:</b> Index außerhalb von 0 bis length-1 (häufig <code>i &lt;= a.length</code> in der Schleife).</p><p><b>Lösung:</b> Bedingung <code>i &lt; a.length</code>. Das letzte Element hat den Index <code>length - 1</code>.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T { public static void main(String[] a) { Integer.parseInt("12a"); } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Exception in thread "main" java.lang.NumberFormatException: For input string: "12a"
+	at java.base/java.lang.NumberFormatException.forInputString(NumberFormatException.java:67)</code></pre>
+<p><b>Ursache:</b> Der Text ist keine gültige Zahl (Leerzeichen, Buchstaben, Komma).</p><p><b>Lösung:</b> <code>trim()</code>, Eingabe prüfen oder <code>try/catch</code>.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T { public static void main(String[] a) { Object o = "text"; Integer i = (Integer) o; } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Exception in thread "main" java.lang.ClassCastException: class java.lang.String cannot be cast to class java.lang.Integer (java.lang.String and java.lang.Integer are in module java.base of loader 'bootstrap')
+	at T.main(T.java:1)</code></pre>
+<p><b>Ursache:</b> Falscher Cast: das Objekt ist von einem anderen Typ.</p><p><b>Lösung:</b> Erst mit <code>instanceof</code> prüfen.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T { public static void main(String[] a) { int x = 5 / 0; } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Exception in thread "main" java.lang.ArithmeticException: / by zero
+	at T.main(T.java:1)</code></pre>
+<p><b>Ursache:</b> Ganzzahl durch 0 geteilt.</p><p><b>Lösung:</b> Divisor vorher prüfen. (Bei <code>double</code> ergibt sich <code>Infinity</code>, keine Exception.)</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T { public static void main(String[] a) { "abc".substring(5); } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Exception in thread "main" java.lang.StringIndexOutOfBoundsException: Range [5, 3) out of bounds for length 3
+	at java.base/jdk.internal.util.Preconditions$1.apply(Preconditions.java:55)</code></pre>
+<p><b>Ursache:</b> Ungültige Indizes bei <code>substring</code> oder <code>charAt</code>.</p><p><b>Lösung:</b> Länge prüfen. Bei <code>substring(a, b)</code> gilt <code>0 &lt;= a &lt;= b &lt;= length</code>.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>import java.util.*;
+public class T { public static void main(String[] a) {
+    List&lt;Integer&gt; l = new ArrayList&lt;&gt;(List.of(1, 2, 3));
+    for (Integer x : l) { if (x == 2) l.remove(x); if (x == 1) l.add(9); } } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Exception in thread "main" java.util.ConcurrentModificationException
+	at java.base/java.util.ArrayList$Itr.checkForComodification(ArrayList.java:1095)</code></pre>
+<p><b>Ursache:</b> Eine Liste wird in der for-each-Schleife verändert.</p><p><b>Lösung:</b> Mit <code>Iterator.remove()</code> oder <code>list.removeIf(...)</code> arbeiten, oder über eine Kopie laufen.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>import java.util.*;
+public class T { public static void main(String[] a) { new Scanner("abc").nextInt(); } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Exception in thread "main" java.util.InputMismatchException
+	at java.base/java.util.Scanner.throwFor(Scanner.java:947)</code></pre>
+<p><b>Ursache:</b> <code>nextInt()</code> findet keine Zahl.</p><p><b>Lösung:</b> Ganze Zeile mit <code>nextLine()</code> lesen und mit <code>parseInt</code> umwandeln.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T { static int f(int n) { return f(n + 1); } public static void main(String[] a) { f(0); } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Exception in thread "main" java.lang.StackOverflowError
+	at T.f(T.java:1)</code></pre>
+<p><b>Ursache:</b> Rekursion ohne Abbruch (oder zu tief).</p><p><b>Lösung:</b> Abbruchbedingung prüfen: kommt jeder Schritt dem Abbruch näher?</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T { public static void main(String[] a) { int[] z = new int[-1]; } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Exception in thread "main" java.lang.NegativeArraySizeException: -1
+	at T.main(T.java:1)</code></pre>
+<p><b>Ursache:</b> Array mit negativer Länge angelegt.</p><p><b>Lösung:</b> Länge prüfen.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>import java.util.*;
+public class T { public static void main(String[] a) { List.of(1, 2).add(3); } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Exception in thread "main" java.lang.UnsupportedOperationException
+	at java.base/java.util.ImmutableCollections.uoe(ImmutableCollections.java:142)</code></pre>
+<p><b>Ursache:</b> Eine unveränderliche Liste (<code>List.of</code>, <code>toList()</code>) wird verändert.</p><p><b>Lösung:</b> Kopie nehmen: <code>new ArrayList&lt;&gt;(List.of(...))</code>.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>import java.util.*;
+public class T { public static void main(String[] a) { new ArrayList&lt;String&gt;().get(0); } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Exception in thread "main" java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
+	at java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:100)</code></pre>
+<p><b>Ursache:</b> <code>get(i)</code> auf eine leere oder zu kurze Liste.</p><p><b>Lösung:</b> <code>size()</code> prüfen.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>import java.util.*;
+public class T { public static void main(String[] a) { Optional.empty().get(); } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Exception in thread "main" java.util.NoSuchElementException: No value present
+	at java.base/java.util.Optional.get(Optional.java:143)</code></pre>
+<p><b>Ursache:</b> <code>Optional.get()</code> ohne Wert.</p><p><b>Lösung:</b> <code>orElse(...)</code>, <code>isPresent()</code> oder <code>ifPresent</code>.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>import java.util.*;
+public class T { public static void main(String[] a) { new ArrayDeque&lt;Integer&gt;().pop(); } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Exception in thread "main" java.util.NoSuchElementException
+	at java.base/java.util.ArrayDeque.removeFirst(ArrayDeque.java:361)</code></pre>
+<p><b>Ursache:</b> <code>pop()</code>/<code>remove()</code> auf eine leere Struktur.</p><p><b>Lösung:</b> <code>isEmpty()</code> prüfen oder <code>poll()</code> (liefert <code>null</code>) verwenden.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>public class T { public static void main(String[] a) { throw new IllegalStateException("Zustand falsch"); } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Exception in thread "main" java.lang.IllegalStateException: Zustand falsch
+	at T.main(T.java:1)</code></pre>
+<p><b>Ursache:</b> Eigene oder bewusst geworfene Exception (Beispiel).</p><p><b>Lösung:</b> Zustand vor der Operation prüfen und die Ursache beheben.</p></details>
+<details class="fx"><summary><code class="i">Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></summary>
+<pre><code>import java.util.*;
+public class T { public static void main(String[] a) { Map&lt;String,Integer&gt; m = new HashMap&lt;&gt;(); int x = m.get("nix"); } }</code></pre>
+<pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Exception in thread "main" java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because the return value of "java.util.Map.get(Object)" is null
+	at T.main(T.java:2)</code></pre>
+<p><b>Ursache:</b> <code>map.get(...)</code> liefert <code>null</code> und wird in ein <code>int</code> entpackt.</p><p><b>Lösung:</b> <code>getOrDefault(k, 0)</code> oder auf <code>null</code> prüfen.</p></details>
+</div></div></section>
+<section id="fallen" data-grp="Nachschlagen"><h2>Typische Denkfehler <small>Fallen</small></h2><div class="grid">
+<div class="blk wide"><h3>20 Fallen, die Punkte kosten</h3><p class="ex">Diese Fälle kompilieren, liefern aber ein anderes Ergebnis als erwartet. Unten steht das Programm mit der echten Ausgabe.</p><div class="tw"><table><tr><th>Nr</th><th>Falle</th><th>Warum</th><th>Richtig</th></tr>
+<tr><td>1</td><td><code>==</code> bei Strings</td><td><code>==</code> vergleicht Referenzen, <code>equals</code> den Inhalt.</td><td>Immer <code>a.equals(b)</code>.</td></tr>
+<tr><td>2</td><td>Ganzzahldivision</td><td><code>int / int</code> schneidet ab.</td><td>Mindestens einen Operanden zu <code>double</code> machen.</td></tr>
+<tr><td>3</td><td>Cast an der falschen Stelle</td><td><code>(double) (s / n)</code> teilt erst, dann wird gecastet.</td><td><code>(double) s / n</code></td></tr>
+<tr><td>4</td><td>Kommazahlen vergleichen</td><td>Gleitkommazahlen sind ungenau.</td><td><code>Math.abs(a - b) &lt; 1e-9</code>, Geld mit <code>BigDecimal</code> oder in Cent als <code>long</code>.</td></tr>
+<tr><td>5</td><td><code>char</code> und Zahlen</td><td><code>'a' + 1</code> ist ein <code>int</code>. In Text eingebettet wird <code>"" + c + 1</code> zu "a1".</td><td><code>(char) ('a' + 1)</code></td></tr>
+<tr><td>6</td><td>Überlauf</td><td><code>int</code> läuft ohne Fehlermeldung über.</td><td><code>long</code> verwenden (mit <code>1L</code>) oder <code>Math.addExact</code>.</td></tr>
+<tr><td>7</td><td>Strings sind unveränderlich</td><td><code>toUpperCase()</code> ändert nichts am Original.</td><td>Ergebnis zuweisen: <code>s = s.toUpperCase();</code></td></tr>
+<tr><td>8</td><td>Arrays und Objekte sind Referenzen</td><td><code>y = x</code> kopiert nur die Referenz. Beide zeigen auf dasselbe Array.</td><td>Kopie mit <code>Arrays.copyOf</code> oder <code>clone()</code>.</td></tr>
+<tr><td>9</td><td>Parameterübergabe</td><td>Primitive und Strings kommen als Kopie an, bei Arrays/Objekten kann die Methode den <i>Inhalt</i> ändern.</td><td>Ergebnis zurückgeben oder bewusst das Objekt verändern.</td></tr>
+<tr><td>10</td><td>Modulo mit negativen Zahlen</td><td><code>-7 % 3</code> ergibt -1.</td><td><code>Math.floorMod(-7, 3)</code></td></tr>
+<tr><td>11</td><td>Wrapper vergleichen</td><td><code>Integer</code> mit <code>==</code> klappt nur im Bereich -128 bis 127.</td><td><code>equals</code> verwenden.</td></tr>
+<tr><td>12</td><td>Semikolon hinter <code>for</code>/<code>if</code></td><td><code>for (...);</code> macht die Schleife leer, der Block danach läuft einmal.</td><td>Kein Semikolon vor dem Block.</td></tr>
+<tr><td>13</td><td><code>i++</code> und <code>++i</code></td><td>Postfix liefert den alten, Präfix den neuen Wert.</td><td>In Ausdrücken vermeiden, <code>i++</code> als eigene Anweisung.</td></tr>
+<tr><td>14</td><td><code>substring(a, b)</code></td><td>Das Ende ist exklusiv.</td><td>Länge = <code>b - a</code>.</td></tr>
+<tr><td>15</td><td>Null-Prüfung</td><td><code>&amp;&amp;</code> wertet den rechten Teil nur aus, wenn nötig.</td><td>Erst auf <code>null</code> prüfen, dann benutzen.</td></tr>
+<tr><td>16</td><td><code>List.remove</code></td><td><code>remove(1)</code> löscht <i>Index</i> 1, <code>remove(Integer.valueOf(30))</code> den Wert 30.</td><td>Bei <code>List&lt;Integer&gt;</code> genau hinsehen.</td></tr>
+<tr><td>17</td><td>Runden</td><td><code>(int) 3.9</code> schneidet ab, <code>Math.round(-3.5)</code> ergibt -3.</td><td><code>Math.round</code> zum Runden, <code>Math.floor/ceil</code> zum Ab-/Aufrunden.</td></tr>
+<tr><td>18</td><td><code>switch</code> ohne <code>break</code></td><td>Im alten Stil laufen alle folgenden Fälle durch.</td><td><code>break</code> setzen oder die neue Schreibweise <code>case X -&gt;</code> verwenden.</td></tr>
+<tr><td>19</td><td>Zeichen und Text vergleichen</td><td><code>charAt(0) == 'a'</code> geht, <code>compareTo</code> liefert eine Zahl.</td><td>Für Text <code>equals</code>, für Reihenfolge <code>compareTo</code>.</td></tr>
+<tr><td>20</td><td>Division durch 0 bei <code>double</code></td><td>Liefert <code>Infinity</code> oder <code>NaN</code>, keine Exception.</td><td>Divisor prüfen.</td></tr>
+</table></div></div>
+<div class="blk wide"><h3>Alle Fälle als Programm</h3><pre><code>import java.util.*;
+
+public class Fallen {
+    static void aendere(int[] a, int x, String s) { a[0] = 99; x = 99; s = s + "!"; }
+
+    public static void main(String[] args) {
+        // 1. == bei Strings
+        String a = new String("hallo"), b = new String("hallo");
+        System.out.println("1  a == b:        " + (a == b) + "   a.equals(b): " + a.equals(b));
+        // 2. Integer-Division
+        System.out.println("2  7 / 2 =         " + (7 / 2) + "   7 / 2.0 = " + (7 / 2.0));
+        // 3. Cast zu spät
+        int summe = 7, anzahl = 2;
+        System.out.println("3  (double)(s/n) = " + (double) (summe / anzahl) + "   (double) s / n = " + (double) summe / anzahl);
+        // 4. Gleitkomma
+        System.out.println("4  0.1 + 0.2 =     " + (0.1 + 0.2) + "   gleich 0.3? " + (0.1 + 0.2 == 0.3));
+        // 5. char-Rechnung
+        char c = 'a';
+        System.out.println("5  'a' + 1 =       " + ('a' + 1) + "   (char)('a' + 1) = " + (char) ('a' + 1) + "   \"\" + c + 1 = " + ("" + c + 1));
+        // 6. Überlauf
+        int max = Integer.MAX_VALUE;
+        System.out.println("6  MAX + 1 =       " + (max + 1) + "   long: " + (max + 1L));
+        // 7. Strings sind unveränderlich
+        String s = "Java";
+        s.toUpperCase();
+        System.out.println("7  s nach toUpperCase() ohne Zuweisung: " + s);
+        // 8. Arrays sind Referenzen
+        int[] x = {1, 2, 3};
+        int[] y = x;
+        y[0] = 99;
+        int[] z = Arrays.copyOf(x, x.length);
+        z[1] = 77;
+        System.out.println("8  x[0] = " + x[0] + " (y teilt sich das Array)   x[1] = " + x[1] + " (z ist eine Kopie)");
+        // 9. Parameter
+        int[] arr = {1};
+        int zahl = 1;
+        String str = "a";
+        aendere(arr, zahl, str);
+        System.out.println("9  arr[0] = " + arr[0] + ", zahl = " + zahl + ", str = " + str);
+        // 10. Modulo negativ
+        System.out.println("10 -7 % 3 =        " + (-7 % 3) + "   Math.floorMod(-7, 3) = " + Math.floorMod(-7, 3));
+        // 11. Integer-Cache
+        Integer i1 = 127, i2 = 127, i3 = 1000, i4 = 1000;
+        System.out.println("11 127 == 127: " + (i1 == i2) + "   1000 == 1000: " + (i3 == i4) + "   equals: " + i3.equals(i4));
+        // 12. Semikolon nach for
+        int n = 0;
+        for (int i = 0; i &lt; 3; i++); { n++; }
+        System.out.println("12 n = " + n + "   (Schleife leer wegen ';' )");
+        // 13. i++ vs ++i
+        int k = 5;
+        int p = k++ + ++k;
+        System.out.println("13 k = " + k + ", p = " + p);
+        // 14. substring Indizes
+        System.out.println("14 \"Hallo\".substring(1, 3) = " + "Hallo".substring(1, 3) + "   (Ende exklusiv)");
+        // 15. Short-Circuit
+        String t = null;
+        boolean ok = t != null &amp;&amp; t.length() &gt; 0;
+        System.out.println("15 null-sicher mit &amp;&amp;: " + ok);
+        // 16. List.remove(int) vs remove(Object)
+        List&lt;Integer&gt; l = new ArrayList&lt;&gt;(List.of(10, 20, 30));
+        l.remove(1);
+        l.remove(Integer.valueOf(30));
+        System.out.println("16 Liste: " + l);
+        // 17. Math.round / Cast
+        System.out.println("17 (int) 3.9 = " + (int) 3.9 + "   Math.round(3.5) = " + Math.round(3.5) + "   Math.round(-3.5) = " + Math.round(-3.5));
+        // 18. switch ohne break (altes Syntax)
+        int tag = 1;
+        StringBuilder sb = new StringBuilder();
+        switch (tag) {
+            case 1: sb.append("Mo ");
+            case 2: sb.append("Di ");
+            default: sb.append("... ");
+        }
+        System.out.println("18 switch ohne break: " + sb);
+        // 19. Zeichen vergleichen
+        String w = "abc";
+        System.out.println("19 w.charAt(0) == 'a': " + (w.charAt(0) == 'a') + "   w.compareTo(\"abd\") = " + w.compareTo("abd"));
+        // 20. Division double durch 0
+        System.out.println("20 1.0 / 0 = " + (1.0 / 0) + "   0.0 / 0 = " + (0.0 / 0));
+    }
+}</code></pre><details><summary>Ausgabe</summary><pre data-lang="out"><code>Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+1  a == b:        false   a.equals(b): true
+2  7 / 2 =         3   7 / 2.0 = 3.5
+3  (double)(s/n) = 3.0   (double) s / n = 3.5
+4  0.1 + 0.2 =     0.30000000000000004   gleich 0.3? false
+5  'a' + 1 =       98   (char)('a' + 1) = b   "" + c + 1 = a1
+6  MAX + 1 =       -2147483648   long: 2147483648
+7  s nach toUpperCase() ohne Zuweisung: Java
+8  x[0] = 99 (y teilt sich das Array)   x[1] = 2 (z ist eine Kopie)
+9  arr[0] = 99, zahl = 1, str = a
+10 -7 % 3 =        -1   Math.floorMod(-7, 3) = 2
+11 127 == 127: true   1000 == 1000: false   equals: true
+12 n = 1   (Schleife leer wegen ';' )
+13 k = 7, p = 12
+14 "Hallo".substring(1, 3) = al   (Ende exklusiv)
+15 null-sicher mit &amp;&amp;: false
+16 Liste: [10]
+17 (int) 3.9 = 3   Math.round(3.5) = 4   Math.round(-3.5) = -3
+18 switch ohne break: Mo Di ... 
+19 w.charAt(0) == 'a': true   w.compareTo("abd") = -1
+20 1.0 / 0 = Infinity   0.0 / 0 = NaN</code></pre></details></div>
+<div class="blk wide"><h3>Scanner: nextInt() und nextLine()</h3><p class="ex">Nach <code class="i">nextInt()</code> bleibt der Zeilenumbruch im Puffer; das folgende <code class="i">nextLine()</code> liest die leere Rest-Zeile. Eingabe: <code class="i">25</code>, Enter, <code class="i">Anna</code>.</p>
+<p><b>Fehlerhaft</b></p><pre><code>import java.util.Scanner;
+
+public class Eingabe {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Alter: ");
+        int alter = sc.nextInt();
+        System.out.print("Name: ");
+        String name = sc.nextLine();          // liest nur den Rest der ersten Zeile!
+        System.out.println("alter=" + alter + ", name='" + name + "'");
+    }
+}</code></pre>
+<pre data-lang="out"><code>Alter: Name: alter=25, name=''
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></pre>
+<p><b>Richtig</b> (immer Zeile lesen und parsen)</p><pre><code>import java.util.Scanner;
+
+public class Eingabe2 {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Alter: ");
+        int alter = Integer.parseInt(sc.nextLine().trim());   // immer ganze Zeilen lesen
+        System.out.print("Name: ");
+        String name = sc.nextLine();
+        System.out.println("alter=" + alter + ", name='" + name + "'");
+    }
+}</code></pre>
+<pre data-lang="out"><code>Alter: Name: alter=25, name='Anna'
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=32931 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=</code></pre>
+</div></div></section>
+<div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
+</main>
+<footer>Alle Lösungen wurden mit Java 21 kompiliert und mit den Beispielen des Übungsblatts getestet.</footer>
+</div>
+<script>
+(function(){
+  var KW = /\b(?:abstract|assert|boolean|break|byte|case|catch|char|class|continue|default|do|double|else|enum|extends|final|finally|float|for|if|implements|import|instanceof|int|interface|long|new|null|package|private|protected|public|record|return|sealed|permits|short|static|super|switch|this|throw|throws|try|var|void|while|true|false|yield|when)\b/;
+  var TOK = new RegExp([
+    '(\\/\\/[^\\n]*|\\/\\*[\\s\\S]*?\\*\\/)',                 // 1 comment
+    '("""[\\s\\S]*?"""|"(?:\\\\.|[^"\\\\\\n])*"|\'(?:\\\\.|[^\'\\\\\\n])\')', // 2 string
+    '(@[A-Za-z_][\\w.]*)',                                   // 3 annotation
+    '(' + KW.source + ')',                                    // 4 keyword
+    '(\\b\\d[\\d_]*(?:\\.\\d+)?[LlFfDd]?\\b)'                // 5 number
+  ].join('|'), 'g');
+  var TOK_SH = /(#[^\n]*|\/\/[^\n]*)|("(?:\\.|[^"\\\n])*")/g;
+  function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function hl(code, lang){
+    var src = code.textContent, out = '', last = 0, m;
+    if (lang === 'sh') {
+      TOK_SH.lastIndex = 0;
+      while ((m = TOK_SH.exec(src))) {
+        out += esc(src.slice(last, m.index));
+        out += '<span class="' + (m[1] ? 'c' : 's') + '">' + esc(m[0]) + '</span>';
+        last = m.index + m[0].length;
+      }
+    } else {
+      TOK.lastIndex = 0;
+      while ((m = TOK.exec(src))) {
+        out += esc(src.slice(last, m.index));
+        var cls = m[1] ? 'c' : m[2] ? 's' : m[3] ? 'a' : m[4] ? 'k' : 'n';
+        out += '<span class="' + cls + '">' + esc(m[0]) + '</span>';
+        last = m.index + m[0].length;
+      }
+    }
+    code.innerHTML = out + esc(src.slice(last));
+  }
+
+  document.querySelectorAll('pre').forEach(function(pre){
+    var code = pre.querySelector('code');
+    var raw = code.textContent;
+    if (pre.getAttribute('data-lang') !== 'out') hl(code, pre.getAttribute('data-lang') || 'java');
+    var wrap = document.createElement('div'); wrap.className = 'code';
+    pre.parentNode.insertBefore(wrap, pre); wrap.appendChild(pre);
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'cp'; b.textContent = 'Kopieren';
+    b.addEventListener('click', function(){
+      function done(){ b.textContent = 'Kopiert'; setTimeout(function(){ b.textContent = 'Kopieren'; }, 1200); }
+      function fallback(){
+        var r = document.createRange(); r.selectNodeContents(code);
+        var s = getSelection(); s.removeAllRanges(); s.addRange(r);
+        b.textContent = 'Markiert';
+        setTimeout(function(){ b.textContent = 'Kopieren'; }, 1200);
+      }
+      try { navigator.clipboard.writeText(raw).then(done, fallback); } catch (e) { fallback(); }
+    });
+    wrap.appendChild(b);
+  });
+
+  // Navigation
+  var nav = document.getElementById('nav'), lastGrp = '';
+  document.querySelectorAll('main > section').forEach(function(sec){
+    var g = sec.getAttribute('data-grp');
+    if (g !== lastGrp) {
+      lastGrp = g;
+      var gi = document.createElement('li'); gi.className = 'grp'; gi.textContent = g; nav.appendChild(gi);
+    }
+    var li = document.createElement('li'), a = document.createElement('a');
+    a.href = '#' + sec.id;
+    a.textContent = sec.querySelector('h2').childNodes[0].textContent.trim();
+    li.appendChild(a); nav.appendChild(li);
+  });
+
+  // Suche
+  var q = document.getElementById('q'), empty = document.getElementById('empty');
+  var blocks = Array.prototype.slice.call(document.querySelectorAll('.blk'));
+  var texts = blocks.map(function(b){ return b.textContent.toLowerCase(); });
+  function filter(){
+    var term = q.value.trim().toLowerCase(), any = false;
+    document.querySelectorAll('main > section').forEach(function(sec){
+      var shown = 0;
+      sec.querySelectorAll('.blk').forEach(function(b){
+        var hit = !term || texts[blocks.indexOf(b)].indexOf(term) !== -1;
+        b.classList.toggle('hide', !hit);
+        if (hit) shown++;
+      });
+      sec.classList.toggle('hide', shown === 0);
+      if (shown) any = true;
+    });
+    empty.classList.toggle('hide', any);
+  }
+  q.addEventListener('input', filter);
+
+
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type=checkbox][data-key]'));
+  function store(k, v){ try { if (v) localStorage.setItem('jp-' + k, '1'); else localStorage.removeItem('jp-' + k); } catch (e) {} }
+  function load(k){ try { return localStorage.getItem('jp-' + k) === '1'; } catch (e) { return false; } }
+  function cnt(pfx){ var l = boxes.filter(function(b){ return b.getAttribute('data-key').indexOf(pfx) === 0; }); return [l.filter(function(b){ return b.checked; }).length, l.length]; }
+  function upd(){
+    var p = document.getElementById('plan-progress'), t = document.getElementById('task-progress'), a, c;
+    if (p) { a = cnt('p-'); p.textContent = a[0] + ' von ' + a[1] + ' Schritten erledigt'; }
+    if (t) { c = cnt('a-'); t.textContent = c[0] + ' von ' + c[1] + ' Aufgaben gelöst'; }
+  }
+  boxes.forEach(function(b){
+    b.checked = load(b.getAttribute('data-key'));
+    b.addEventListener('change', function(){ store(b.getAttribute('data-key'), b.checked); upd(); });
+  });
+  upd();
+  document.addEventListener('keydown', function(e){
+    var ae = document.activeElement, typing = ae && /INPUT|TEXTAREA/.test(ae.tagName) && ae.type !== 'checkbox';
+    if (e.key === '/' && !typing) { e.preventDefault(); q.focus(); }
+    if (e.key === 'Escape' && ae === q) { q.value = ''; filter(); q.blur(); }
+  });
+  var topBtn = document.createElement('button'); topBtn.id = 'top'; topBtn.type = 'button'; topBtn.textContent = 'Nach oben';
+  topBtn.addEventListener('click', function(){ scrollTo({top: 0}); });
+  document.body.appendChild(topBtn);
+
+  // Theme
+  var root = document.documentElement;
+  document.getElementById('theme').addEventListener('click', function(){
+    var dark = root.getAttribute('data-theme') === 'dark' ||
+      (!root.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+    root.setAttribute('data-theme', dark ? 'light' : 'dark');
+  });
+})();
+</script>
+
+</body>
+</html>
