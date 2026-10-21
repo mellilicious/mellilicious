@@ -1,0 +1,571 @@
+<title>Java Übungsaufgaben</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky Themen-Navigation links, Snippet-Karten in mehrspaltigem Fluss rechts */
+:root{
+  --bg:#f3f6f7; --surface:#ffffff; --fg:#13222b; --muted:#566a75; --line:#d5dee3;
+  --accent:#c2410c; --accent-soft:#fde9dc; --code-bg:#12232d; --code-fg:#dbe7ec;
+  --k:#ff9e64; --s:#9ece6a; --c:#6f8794; --a:#7dcfff; --n:#e0af68; --tbl:#eaf0f3;
+  --f-display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --f-body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1a21; --surface:#14252e; --fg:#e4edf1; --muted:#93a7b2; --line:#26404c;
+    --accent:#ff8a4c; --accent-soft:#3a2418; --code-bg:#0a141a; --code-fg:#d3e1e8;
+    --tbl:#1a2f3a; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1a21; --surface:#14252e; --fg:#e4edf1; --muted:#93a7b2; --line:#26404c;
+  --accent:#ff8a4c; --accent-soft:#3a2418; --code-bg:#0a141a; --code-fg:#d3e1e8;
+  --tbl:#1a2f3a; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1320px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+@media(min-width:960px){.wrap{grid-template-columns:200px minmax(0,1fr);gap:32px}}
+header.top{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px}
+h1{font-family:var(--f-display);font-size:clamp(2rem,5vw,3rem);line-height:1.05;margin:0;letter-spacing:-.02em;text-wrap:balance}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);margin:6px 0 0;max-width:60ch}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+input[type=search]{font:inherit;padding:9px 12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:6px;width:min(100%,260px)}
+button{font:inherit;cursor:pointer}
+.btn{padding:9px 12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:6px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+nav{min-width:0}
+nav ul{list-style:none;margin:0;padding:0;display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
+nav a{display:block;white-space:nowrap;padding:5px 10px;border:1px solid var(--line);border-radius:999px;color:var(--fg);text-decoration:none;font-size:13px;background:var(--surface)}
+nav a:hover{border-color:var(--accent);color:var(--accent)}
+@media(min-width:960px){
+  nav{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);overflow-y:auto}
+  nav ul{flex-direction:column;gap:0;overflow:visible}
+  nav a{border:0;border-radius:4px;border-left:2px solid var(--line);border-top-left-radius:0;border-bottom-left-radius:0;background:transparent;padding:5px 10px}
+  nav a:hover{border-left-color:var(--accent);background:var(--accent-soft)}
+  nav .grp{margin:14px 0 4px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+}
+nav .grp{display:none}
+@media(min-width:960px){nav .grp{display:block}}
+main{min-width:0}
+section{margin-bottom:40px;scroll-margin-top:16px}
+h2{font-family:var(--f-display);font-size:1.6rem;margin:0 0 14px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h2 small{font-family:var(--f-body);font-size:12px;font-weight:500;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:4px;letter-spacing:.04em;text-transform:uppercase}
+.grid{columns:2 380px;column-gap:16px}
+.blk{break-inside:avoid;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px;margin:0 0 16px;min-width:0}
+.blk.wide{column-span:all}
+.blk h3{margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.blk p{margin:0 0 8px}
+.blk p:last-child{margin-bottom:0}
+.blk p.ex{color:var(--muted);font-size:13.5px}
+.code{position:relative;margin:0 0 8px}
+.code:last-child{margin-bottom:0}
+pre{margin:0;background:var(--code-bg);color:var(--code-fg);border-radius:6px;padding:12px 14px;overflow-x:auto;font-family:var(--f-mono);font-size:12.5px;line-height:1.6;tab-size:4}
+pre code{font:inherit}
+.cp{position:absolute;top:6px;right:6px;font-size:11px;padding:2px 8px;border-radius:4px;border:1px solid #3a5564;background:#1b3340;color:#cfe0e8;opacity:0}
+.code:hover .cp,.cp:focus-visible{opacity:1}
+@media(hover:none){.cp{opacity:.85}}
+.k{color:var(--k)}.s{color:var(--s)}.c{color:var(--c);font-style:italic}.a{color:var(--a)}.n{color:var(--n)}
+code.i{font-family:var(--f-mono);font-size:.88em;background:var(--tbl);padding:1px 5px;border-radius:4px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--tbl);font-weight:600;white-space:nowrap}
+.wide td:nth-child(4){min-width:240px}
+.wide td:nth-child(5){white-space:nowrap}
+td code{font-family:var(--f-mono);font-size:12px}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:8px 12px;border-radius:0 6px 6px 0;font-size:13.5px;margin:0 0 8px}
+.empty{color:var(--muted);padding:24px 0}
+.hide{display:none!important}
+footer{grid-column:1/-1;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+
+details.sol{margin-top:8px;border-top:1px dashed var(--line);padding-top:8px}
+details.sol>summary{cursor:pointer;font-weight:600;color:var(--accent);font-size:13.5px}
+.tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:1px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent);margin-bottom:6px}
+.opts{list-style:none;margin:6px 0 4px;padding:0}
+.opts li{padding:3px 0;display:flex;gap:8px}
+.opts b{font-family:var(--f-mono);color:var(--muted);flex:none}
+.opts li.ok{color:var(--fg)}
+.opts li.ok b{color:var(--accent)}
+.why{margin:6px 0 0}
+.why ul{margin:6px 0 0;padding-left:20px}
+.why li{margin:2px 0}
+.out{margin:6px 0 0}
+.q{margin:0 0 6px;white-space:pre-line}
+</style>
+<div class="wrap">
+<header class="top">
+  <div>
+    <h1>Java <span>Übungsaufgaben</span></h1>
+    <p class="sub">Prüfungsübungen zu den Skripten 01–04 (Programmierung 1). Zu jeder Aufgabe gibt es Code und die Erklärung, warum man es so macht. Lösungen sind aufklappbar, Code lässt sich per Klick kopieren.</p>
+  </div>
+  <div class="tools">
+    <input type="search" id="q" placeholder="Suchen, z. B. switch, Scanner, return" aria-label="Cheatsheet durchsuchen">
+    <button class="btn" id="alle" type="button">Alle Lösungen auf/zu</button>
+    <button class="btn" id="theme" type="button" aria-label="Farbschema wechseln">Hell / Dunkel</button>
+  </div>
+</header>
+<nav aria-label="Themen"><ul id="nav"></ul></nav>
+<main id="main">
+
+<section id="s01" data-grp="Übungen"><h2>Skript 01 – Einführung <small>Binärdarstellung, Compiler/JVM, Computational Thinking, Aufbau eines Java-Programms</small></h2><div class="grid">
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Wie wird das Zeichen „A“ in ASCII gespeichert?</p><ul class="opts"><li class="ok"><b>a</b><span>65 dezimal = 01000001 binär</span></li><li class=""><b>b</b><span>64 dezimal = 01000000 binär</span></li><li class=""><b>c</b><span>97 dezimal = 01100001 binär</span></li><li class=""><b>d</b><span>1 dezimal = 00000001 binär</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: a.</b> Eine Codetabelle (ASCII) ordnet jedem Zeichen eine Zahl zu, und der Computer speichert diese Zahl binär. „A“ ist 65, „a“ ist 97.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Wie wird im RGB-Modell reines Rot gespeichert (8 Bit pro Kanal)?</p><ul class="opts"><li class=""><b>a</b><span>00000000 11111111 00000000</span></li><li class="ok"><b>b</b><span>11111111 00000000 00000000</span></li><li class=""><b>c</b><span>11111111 11111111 11111111</span></li><li class=""><b>d</b><span>00000000 00000000 11111111</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> Die Reihenfolge ist Rot, Grün, Blau. Rot voll (255 = 11111111), die anderen Kanäle aus (0). Alles voll ergäbe Weiß.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Was unterscheidet Syntax und Semantik?</p><ul class="opts"><li class=""><b>a</b><span>Syntax = Bedeutung, Semantik = Grammatik</span></li><li class="ok"><b>b</b><span>Syntax = Grammatikregeln, Semantik = Bedeutung; ein semantischer Fehler ist ein Bug</span></li><li class=""><b>c</b><span>Beides ist dasselbe</span></li><li class=""><b>d</b><span>Semantik betrifft nur Kommentare</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> Der Compiler meldet Syntaxfehler. Ein Programm, das fehlerfrei kompiliert, aber nicht tut, was du willst, hat einen Semantikfehler (Bug). Den findet nur Testen.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Was gilt für Compiler und Interpreter?</p><ul class="opts"><li class=""><b>a</b><span>Interpretiert ist meist schneller</span></li><li class=""><b>b</b><span>Kompiliert: Fehler erst zur Laufzeit</span></li><li class="ok"><b>c</b><span>Kompilierter Code ist meist schneller, Fehler fallen schon beim Kompilieren auf</span></li><li class=""><b>d</b><span>Java interpretiert ausschließlich</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: c.</b> Beim Kompilieren wird vorab in Maschinencode übersetzt (schnell, Fehler früh). Interpreter führen Zeile für Zeile aus. Java nutzt beides: javac → Bytecode, JVM interpretiert und kompiliert per JIT.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Was erzeugt <code class="i">javac HelloWorld.java</code>?</p><ul class="opts"><li class=""><b>a</b><span>HelloWorld.exe</span></li><li class="ok"><b>b</b><span>HelloWorld.class (Bytecode)</span></li><li class=""><b>c</b><span>HelloWorld.txt</span></li><li class=""><b>d</b><span>Nichts, es startet das Programm</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> <code class="i">javac</code> ist der Compiler und liefert Bytecode in einer <code class="i">.class</code>-Datei. Gestartet wird danach mit <code class="i">java HelloWorld</code> (ohne Endung).</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Wie startest du das kompilierte Programm?</p><ul class="opts"><li class=""><b>a</b><span>javac HelloWorld</span></li><li class=""><b>b</b><span>java HelloWorld.java</span></li><li class="ok"><b>c</b><span>java HelloWorld</span></li><li class=""><b>d</b><span>run HelloWorld.class</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: c.</b> <code class="i">java</code> startet die JVM mit dem Klassennamen, nicht mit dem Dateinamen.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Was ist die Aufgabe der JVM?</p><ul class="opts"><li class=""><b>a</b><span>Quellcode in Bytecode übersetzen</span></li><li class="ok"><b>b</b><span>Bytecode plattformunabhängig ausführen (Interpreter + JIT-Compiler)</span></li><li class=""><b>c</b><span>Syntaxfehler im Editor anzeigen</span></li><li class=""><b>d</b><span>Pakete organisieren</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> Das Übersetzen macht <code class="i">javac</code>. Die JVM führt den Bytecode aus und versteckt das Betriebssystem. Häufig benutzten Code übersetzt der JIT-Compiler in Maschinencode.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Welche vier Techniken gehören zum Computational Thinking?</p><ul class="opts"><li class="ok"><b>a</b><span>Decomposition, Pattern Recognition, Abstraction, Algorithms</span></li><li class=""><b>b</b><span>Compilation, Interpretation, Execution, Debugging</span></li><li class=""><b>c</b><span>Input, Output, Storage, Processing</span></li><li class=""><b>d</b><span>Syntax, Semantik, Pragmatik, Grammatik</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: a.</b> Problem zerlegen, Muster erkennen, aufs Wesentliche abstrahieren, Schritte als Algorithmus formulieren.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Welche Aussage zur Struktur eines Java-Programms stimmt?</p><ul class="opts"><li class="ok"><b>a</b><span>Klassenname = Dateiname (<code class="i">HelloWorld</code> in <code class="i">HelloWorld.java</code>)</span></li><li class=""><b>b</b><span>Java unterscheidet nicht zwischen Groß- und Kleinschreibung</span></li><li class=""><b>c</b><span>Jede Zeile endet mit einem Doppelpunkt</span></li><li class=""><b>d</b><span><code class="i">main</code> ist optional für eigenständige Programme</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: a.</b> Java ist case-sensitive, Anweisungen enden mit <code class="i">;</code>. Eine eigenständige Anwendung braucht die <code class="i">main</code>-Methode als Einstiegspunkt.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Welche Namenskonvention ist laut Skript korrekt?</p><ul class="opts"><li class=""><b>a</b><span>Klasse <code class="i">circleArea</code>, Methode <code class="i">CircleArea</code></span></li><li class="ok"><b>b</b><span>Klasse <code class="i">CircleArea</code>, Methode <code class="i">circleArea</code>, Konstante <code class="i">PI</code></span></li><li class=""><b>c</b><span>Klasse <code class="i">circle_area</code>, Konstante <code class="i">pi</code></span></li><li class=""><b>d</b><span>Alles in Großbuchstaben</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> Klassen: UpperCamelCase. Methoden und Variablen: lowerCamelCase. Konstanten: GROSSBUCHSTABEN. Pakete: nur Kleinbuchstaben.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Welche Signatur hat die Einstiegsmethode?</p><ul class="opts"><li class=""><b>a</b><span>public void main(String args)</span></li><li class=""><b>b</b><span>static public main(String[] args)</span></li><li class="ok"><b>c</b><span>public static void main(String[] args)</span></li><li class=""><b>d</b><span>public static int main()</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: c.</b> <code class="i">public</code>, damit die JVM sie aufrufen darf. <code class="i">static</code>, damit kein Objekt nötig ist. <code class="i">void</code>, weil nichts zurückkommt. <code class="i">String[] args</code> nimmt Kommandozeilenparameter.</p></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>Händeschütteln in Sillyville</h3><p class="ex">50 Bürger schütteln sich gegenseitig genau einmal die Hand. Schreibe Pseudocode und eine Methode <code class="i">handshakes(int people)</code>.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>public class Handshakes {
+    public static int handshakes(int people) {
+        return people * (people - 1) / 2;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(handshakes(50));   // 1225
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Pseudocode: <code class="i">INPUT people</code> → <code class="i">STORE people * (people - 1) / 2 in handshakes</code> → <code class="i">OUTPUT handshakes</code>.</li><li>Zerlegen: Jede der n Personen schüttelt n−1 andere Hände. Muster: Dabei wird jedes Paar doppelt gezählt (A–B und B–A), also durch 2 teilen.</li><li>Abstraktion: Die Formel gilt für beliebiges n, nicht nur für 50. Genau das ist der Gauß-Trick aus der Vorlesung (1+2+…+49).</li><li>Erst multiplizieren, dann teilen: <code class="i">n*(n-1)</code> ist immer gerade, die Ganzzahldivision <code class="i">/2</code> verliert also nichts.</li></ul><p class="note"><b>Typische Fehler:</b> <code class="i">people * (people - 1) / 2</code> darf man nicht zu <code class="i">people / 2 * (people - 1)</code> umstellen: bei ungeradem <code class="i">people</code> rundet <code class="i">people / 2</code> ab und das Ergebnis stimmt nicht.</p></details></div>
+</div></section>
+
+<section id="s02" data-grp="Übungen"><h2>Skript 02 – Datentypen, Operatoren, Verzweigungen <small>Typen, Casting, Konstanten, Ein-/Ausgabe, Operatoren, if, switch</small></h2><div class="grid">
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Welcher Typ hat den größten Wertebereich?</p><ul class="opts"><li class=""><b>a</b><span>int</span></li><li class=""><b>b</b><span>short</span></li><li class="ok"><b>c</b><span>long</span></li><li class=""><b>d</b><span>byte</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: c.</b> <code class="i">byte</code> 8 Bit, <code class="i">short</code> 16, <code class="i">int</code> 32, <code class="i">long</code> 64 Bit.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Wie viele Bit belegen <code class="i">int</code> und <code class="i">char</code> in Java?</p><ul class="opts"><li class=""><b>a</b><span>int 16, char 8</span></li><li class="ok"><b>b</b><span>int 32, char 16</span></li><li class=""><b>c</b><span>int 32, char 8</span></li><li class=""><b>d</b><span>int 64, char 16</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> <code class="i">int</code> hat 32 Bit, <code class="i">char</code> hat 16 Bit (Unicode), nicht 8 wie in C.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Welcher Bezeichner ist ungültig?</p><ul class="opts"><li class=""><b>a</b><span>_total</span></li><li class=""><b>b</b><span>value2</span></li><li class="ok"><b>c</b><span>2ndValue</span></li><li class=""><b>d</b><span>myCounter</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: c.</b> Das erste Zeichen darf keine Ziffer sein. Erlaubt sind Buchstaben, Ziffern und <code class="i">_</code>.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Warum ist <code class="i">int class = 5;</code> ungültig?</p><ul class="opts"><li class="ok"><b>a</b><span><code class="i">class</code> ist ein reserviertes Schlüsselwort</span></li><li class=""><b>b</b><span>Namen brauchen mindestens 6 Zeichen</span></li><li class=""><b>c</b><span><code class="i">int</code> gilt nur für negative Zahlen</span></li><li class=""><b>d</b><span><code class="i">class</code> muss groß geschrieben werden</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: a.</b> Schlüsselwörter wie <code class="i">class</code>, <code class="i">for</code>, <code class="i">int</code> sind für die Sprache reserviert.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Was bedeutet „Java ist statisch typisiert“?</p><ul class="opts"><li class=""><b>a</b><span>Variablen wechseln zur Laufzeit ihren Typ</span></li><li class="ok"><b>b</b><span>Jede Variable und jeder Ausdruck hat schon zur Compile-Zeit einen festen Typ</span></li><li class=""><b>c</b><span>Es gibt nur Konstanten</span></li><li class=""><b>d</b><span>Es gibt nur Zahlentypen</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> Anders als in Python kann eine <code class="i">int</code>-Variable nicht plötzlich einen String halten. Typfehler fallen schon beim Kompilieren auf.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Welche Zeile kompiliert nicht?</p><ul class="opts"><li class=""><b>a</b><span><code class="i">long big = 3456789L;</code></span></li><li class=""><b>b</b><span><code class="i">float f = 32.5f;</code></span></li><li class="ok"><b>c</b><span><code class="i">float g = 32.5;</code></span></li><li class=""><b>d</b><span><code class="i">double d = 3456.98;</code></span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: c.</b> <code class="i">32.5</code> ist ein <code class="i">double</code>-Literal. Ein <code class="i">double</code> passt nicht ohne Informationsverlust in ein <code class="i">float</code>, deshalb braucht man das Suffix <code class="i">f</code>. Bei <code class="i">long</code> braucht man <code class="i">L</code> für große Literale.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Welche Zuweisung geht ohne Cast?</p><ul class="opts"><li class="ok"><b>a</b><span><code class="i">int y = someByte;</code></span></li><li class=""><b>b</b><span><code class="i">byte b = someInt;</code></span></li><li class=""><b>c</b><span><code class="i">int i = 3.5;</code></span></li><li class=""><b>d</b><span><code class="i">short s = someLong;</code></span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: a.</b> Von klein nach groß (byte → int) geht automatisch, weil nichts verloren geht. Von groß nach klein oder von <code class="i">double</code> nach <code class="i">int</code> braucht einen expliziten Cast.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Wie deklariert man eine Konstante?</p><ul class="opts"><li class=""><b>a</b><span><code class="i">const int MAX = 10;</code></span></li><li class="ok"><b>b</b><span><code class="i">final int MAX = 10;</code></span></li><li class=""><b>c</b><span><code class="i">static int max = 10;</code></span></li><li class=""><b>d</b><span><code class="i">constant int MAX = 10;</code></span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> <code class="i">final</code> verbietet spätere Zuweisungen. <code class="i">const</code> ist in Java zwar reserviert, aber nicht benutzbar.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Wert von <code class="i">int z = 4 + 2 / 3 - 1;</code>?</p><ul class="opts"><li class="ok"><b>a</b><span>3</span></li><li class=""><b>b</b><span>3.67</span></li><li class=""><b>c</b><span>1</span></li><li class=""><b>d</b><span>4</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: a.</b> Punkt vor Strich: <code class="i">2 / 3</code> ist Ganzzahldivision = 0, also 4 + 0 − 1 = 3.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Was gibt <code class="i">System.out.println(7 % 2);</code> aus?</p><ul class="opts"><li class=""><b>a</b><span>3</span></li><li class=""><b>b</b><span>3.5</span></li><li class="ok"><b>c</b><span>1</span></li><li class=""><b>d</b><span>0</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: c.</b> <code class="i">%</code> liefert den Rest der Ganzzahldivision: 7 = 3·2 + 1.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Unterschied zwischen <code class="i">print</code> und <code class="i">println</code>?</p><ul class="opts"><li class=""><b>a</b><span><code class="i">println</code> gibt nichts aus</span></li><li class="ok"><b>b</b><span><code class="i">println</code> hängt einen Zeilenumbruch an, <code class="i">print</code> nicht</span></li><li class=""><b>c</b><span><code class="i">print</code> kann nur Strings</span></li><li class=""><b>d</b><span>Kein Unterschied</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> <code class="i">System.out.println()</code> ohne Argument gibt eine leere Zeile aus.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Wie vergleicht man zwei Strings auf gleichen Inhalt?</p><ul class="opts"><li class=""><b>a</b><span><code class="i">a == b</code></span></li><li class=""><b>b</b><span><code class="i">a = b</code></span></li><li class="ok"><b>c</b><span><code class="i">a.equals(b)</code></span></li><li class=""><b>d</b><span><code class="i">a.same(b)</code></span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: c.</b> <code class="i">==</code> vergleicht bei Objekten die Referenzen (ob es dasselbe Objekt ist), <code class="i">equals</code> den Inhalt. <code class="i">=</code> ist eine Zuweisung.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Was ist in einem <code class="i">switch</code> erlaubt?</p><ul class="opts"><li class=""><b>a</b><span><code class="i">case x &gt; 5:</code></span></li><li class="ok"><b>b</b><span><code class="i">case 5:</code> bei einem <code class="i">int</code>-Ausdruck</span></li><li class=""><b>c</b><span><code class="i">case 1.5:</code> bei <code class="i">double</code></span></li><li class=""><b>d</b><span><code class="i">case x &amp;&amp; y:</code></span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> Ein <code class="i">case</code> braucht einen einzelnen konstanten Wert, keine Vergleiche oder logischen Ausdrücke. Das <code class="i">switch</code> selbst akzeptiert <code class="i">int</code>, <code class="i">char</code>, <code class="i">short</code>, <code class="i">byte</code>, Enums und Strings, aber kein <code class="i">double</code>.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Was passiert, wenn in einem <code class="i">switch</code> das <code class="i">break</code> fehlt?</p><ul class="opts"><li class=""><b>a</b><span>Compilerfehler</span></li><li class="ok"><b>b</b><span>Die folgenden <code class="i">case</code>-Zweige laufen weiter (Fall-through)</span></li><li class=""><b>c</b><span>Programmabbruch</span></li><li class=""><b>d</b><span>Nur der erste Zweig läuft</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> Ohne <code class="i">break</code> wird in den nächsten Zweig durchgefallen, bis ein <code class="i">break</code> oder das Ende kommt (siehe Aufgabe „switch mit Fall-through“).</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Wozu dient <code class="i">new Scanner(System.in)</code> und was muss importiert werden?</p><ul class="opts"><li class="ok"><b>a</b><span>Tastatureingabe lesen; <code class="i">import java.util.Scanner;</code></span></li><li class=""><b>b</b><span>Auf die Konsole schreiben; <code class="i">import java.io.Print;</code></span></li><li class=""><b>c</b><span>Strings vergleichen; kein Import</span></li><li class=""><b>d</b><span>Kompilieren; <code class="i">import java.lang.Compiler;</code></span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: a.</b> <code class="i">System.in</code> ist der Standard-Eingabestrom. <code class="i">Scanner</code> liegt im Paket <code class="i">java.util</code> und muss importiert werden.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Ergebnis von <code class="i">String r = (grade &gt;= 50) ? "Pass" : "Fail";</code> bei <code class="i">grade = 49</code>?</p><ul class="opts"><li class=""><b>a</b><span>"Pass"</span></li><li class="ok"><b>b</b><span>"Fail"</span></li><li class=""><b>c</b><span>Compilerfehler</span></li><li class=""><b>d</b><span>null</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> Der ternäre Operator wählt <code class="i">Fail</code>, wenn die Bedingung falsch ist (49 ≥ 50 ist falsch).</p></details></div>
+<div class="blk"><span class="tag">Was wird ausgegeben?</span><h3>Ganzzahldivision in einer Formel</h3><pre><code>int gross = 234;
+final int TAXRATE = 20;
+System.out.println(gross * (1 - TAXRATE / 100));</code></pre><details class="sol"><summary>Lösung</summary><p class="out"><b>Ausgabe:</b></p><pre><code>234</code></pre><p class="why"><b>Warum:</b> <code class="i">TAXRATE / 100</code> sind zwei <code class="i">int</code>, also Ganzzahldivision: 20/100 = 0. Dann ist es <code class="i">gross * (1 - 0)</code> = 234. Richtig wäre <code class="i">TAXRATE / 100.0</code>. Das ist ein Beispiel aus dem Skript.</p></details></div>
+<div class="blk"><span class="tag">Was wird ausgegeben?</span><h3>int + String</h3><pre><code>System.out.println(1 + 2 + "3" + 4 + 5);</code></pre><details class="sol"><summary>Lösung</summary><p class="out"><b>Ausgabe:</b></p><pre><code>3345</code></pre><p class="why"><b>Warum:</b> Es wird von links nach rechts ausgewertet. <code class="i">1 + 2</code> ist noch Zahl 3. Sobald ein String beteiligt ist, wird verkettet: <code class="i">"3"</code> + <code class="i">4</code> + <code class="i">5</code> ergibt <code class="i">"3345"</code>.</p></details></div>
+<div class="blk"><span class="tag">Was wird ausgegeben?</span><h3>char-Arithmetik</h3><pre><code>System.out.println('A' + 1);
+System.out.println((char) ('A' + 1));</code></pre><details class="sol"><summary>Lösung</summary><p class="out"><b>Ausgabe:</b></p><pre><code>66
+B</code></pre><p class="why"><b>Warum:</b> <code class="i">char</code> wird beim Rechnen zu <code class="i">int</code> (A = 65). Mit dem Cast <code class="i">(char)</code> wird das Ergebnis wieder als Zeichen interpretiert.</p></details></div>
+<div class="blk"><span class="tag">Was wird ausgegeben?</span><h3>Prä- und Postinkrement</h3><pre><code>int x = 5;
+int y = x++ + ++x;
+System.out.println(y + " " + x);</code></pre><details class="sol"><summary>Lösung</summary><p class="out"><b>Ausgabe:</b></p><pre><code>12 7</code></pre><p class="why"><b>Warum:</b> <code class="i">x++</code> liefert den alten Wert 5 und erhöht x auf 6. <code class="i">++x</code> erhöht erst auf 7 und liefert 7. Also 5 + 7 = 12, und x ist am Ende 7.</p></details></div>
+<div class="blk"><span class="tag">Was wird ausgegeben?</span><h3>Zusammengesetzte Zuweisung</h3><pre><code>int i = 10;
+i += 5;
+i -= 3;
+i *= 2;
+System.out.println(i);</code></pre><details class="sol"><summary>Lösung</summary><p class="out"><b>Ausgabe:</b></p><pre><code>24</code></pre><p class="why"><b>Warum:</b> Schritt für Schritt: 10 → 15 → 12 → 24. <code class="i">i *= 2</code> bedeutet <code class="i">i = i * 2</code>.</p></details></div>
+<div class="blk"><span class="tag">Was wird ausgegeben?</span><h3>Cast und Ganzzahldivision</h3><pre><code>double d = 10 / 4;
+System.out.println(d);
+System.out.println((int) 3.99 + " " + (int) -3.99);</code></pre><details class="sol"><summary>Lösung</summary><p class="out"><b>Ausgabe:</b></p><pre><code>2.0
+3 -3</code></pre><p class="why"><b>Warum:</b> <code class="i">10 / 4</code> wird zuerst als <code class="i">int</code> gerechnet (2) und erst danach in <code class="i">double</code> umgewandelt (2.0). Der Cast nach <code class="i">int</code> schneidet ab (Richtung 0), er rundet nicht.</p></details></div>
+<div class="blk"><span class="tag">Was wird ausgegeben?</span><h3>switch mit Fall-through</h3><pre><code>int sw = 2;
+switch (sw) {
+    case 1: System.out.print("A");
+    case 2: System.out.print("B");
+    case 3: System.out.print("C"); break;
+    default: System.out.print("D");
+}</code></pre><details class="sol"><summary>Lösung</summary><p class="out"><b>Ausgabe:</b></p><pre><code>BC</code></pre><p class="why"><b>Warum:</b> Der Sprung geht zu <code class="i">case 2</code>. Dort fehlt <code class="i">break</code>, deshalb läuft <code class="i">case 3</code> auch noch und endet dann am <code class="i">break</code>.</p></details></div>
+<div class="blk"><span class="tag">Was wird ausgegeben?</span><h3>Operatorpriorität bei booleschen Ausdrücken</h3><pre><code>boolean bb = 5 &gt; 3 &amp;&amp; 2 &gt; 4 || true;
+System.out.println(bb);</code></pre><details class="sol"><summary>Lösung</summary><p class="out"><b>Ausgabe:</b></p><pre><code>true</code></pre><p class="why"><b>Warum:</b> <code class="i">&amp;&amp;</code> bindet stärker als <code class="i">||</code>: <code class="i">(true &amp;&amp; false) || true</code> = <code class="i">false || true</code> = <code class="i">true</code>.</p></details></div>
+<div class="blk"><span class="tag">Was wird ausgegeben?</span><h3>Überlauf bei int</h3><pre><code>System.out.println(Integer.MAX_VALUE + 1);</code></pre><details class="sol"><summary>Lösung</summary><p class="out"><b>Ausgabe:</b></p><pre><code>-2147483648</code></pre><p class="why"><b>Warum:</b> Beim Überlauf geht Java nicht auf Fehler, sondern „läuft rund“: auf den größten int-Wert folgt der kleinste.</p></details></div>
+<div class="blk"><span class="tag">Was wird ausgegeben?</span><h3>Cast mit Überlauf</h3><pre><code>byte b = (byte) 130;
+System.out.println(b);</code></pre><details class="sol"><summary>Lösung</summary><p class="out"><b>Ausgabe:</b></p><pre><code>-126</code></pre><p class="why"><b>Warum:</b> Ein <code class="i">byte</code> reicht nur von −128 bis 127. 130 liegt 3 über 127, es geht bei −128 weiter. Rechnerisch 130 − 256 = −126.</p></details></div>
+<div class="blk wide"><span class="tag">Fehlersuche</span><h3>Fehlersuche: Was ist falsch?</h3><details class="sol" open><summary>Aufgaben und Lösungen</summary><p><b>a)</b></p><pre><code>byte b = 24;
+int x = 24;
+byte c = x;</code></pre><p class="why"><b>Fehler:</b> Kompilierfehler. <code class="i">int</code> → <code class="i">byte</code> braucht einen expliziten Cast: <code class="i">byte c = (byte) x;</code>. Der Compiler prüft nur den Typ, nicht ob der Wert zufällig passt.</p><p><b>b)</b></p><pre><code>public static void main(String[] args) {
+    int x = 10;
+    show();
+}
+public static void show() {
+    System.out.println(x);
+}</code></pre><p class="why"><b>Fehler:</b> <code class="i">x</code> ist lokal in <code class="i">main</code> und in <code class="i">show()</code> nicht sichtbar (Function Scope). Lösung: <code class="i">x</code> als Parameter übergeben.</p><p><b>c)</b></p><pre><code>String a = new String("hi");
+String b = new String("hi");
+if (a == b) { System.out.println("gleich"); }</code></pre><p class="why"><b>Fehler:</b> Läuft, gibt aber nichts aus: <code class="i">==</code> vergleicht Referenzen, hier zwei verschiedene Objekte. Richtig: <code class="i">a.equals(b)</code>.</p></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>Notenbewertung</h3><p class="ex">Name und Punkte (0–40) einlesen. Gerade oder ungerade? Prozentsatz berechnen. ≥ 90 „Excellent“, ≥ 75 „Good job“, ≥ 60 „Passed“, sonst „Needs improvement“.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Scanner;
+
+public class Grade {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Welcome!");
+        System.out.println("Enter your name:");
+        String name = scanner.next();
+        System.out.println("Enter your exam points (0-40):");
+        int points = scanner.nextInt();
+
+        if (points % 2 == 0) {
+            System.out.println(points + " is even");
+        } else {
+            System.out.println(points + " is odd");
+        }
+
+        double percentage = points / 40.0 * 100;
+        System.out.println(name + ", you achieved " + percentage + "%");
+
+        if (percentage &gt;= 90) {
+            System.out.println("Excellent");
+        } else if (percentage &gt;= 75) {
+            System.out.println("Good job");
+        } else if (percentage &gt;= 60) {
+            System.out.println("Passed");
+        } else {
+            System.out.println("Needs improvement");
+        }
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li><code class="i">points % 2 == 0</code> ist der Standardtest für „gerade“: Rest 0 bei Division durch 2.</li><li><code class="i">40.0</code> statt <code class="i">40</code>: Mit <code class="i">points / 40</code> wäre es Ganzzahldivision und das Ergebnis meistens 0.</li><li>Die <code class="i">else if</code>-Kette läuft von der strengsten Bedingung zur schwächsten. Sobald ein Zweig passt, werden die anderen übersprungen. Deshalb muss man nicht „≥ 75 und &lt; 90“ schreiben.</li><li><code class="i">scanner.next()</code> liest ein Wort (bis zum Leerzeichen), <code class="i">nextInt()</code> eine ganze Zahl.</li></ul><p class="note"><b>Typische Fehler:</b> Reihenfolge umdrehen (<code class="i">&gt;= 60</code> zuerst) ergibt für 95 % fälschlich „Passed“. Wer nach <code class="i">nextInt()</code> mit <code class="i">nextLine()</code> weiterliest, bekommt oft nur den Rest der alten Zeile (leerer String).</p></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>Menü mit switch und do-while</h3><p class="ex">Auswahl 1 = Sales, 2 = Stock, 3 = Admin, 0 = Ende. Bei ungültiger Eingabe „invalid selection“, am Ende „goodbye“.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Scanner;
+
+public class Menu {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int selection;
+        do {
+            System.out.println("1 - sales");
+            System.out.println("2 - stock");
+            System.out.println("3 - admin");
+            System.out.println("Select (0 to exit):");
+            selection = scanner.nextInt();
+
+            switch (selection) {
+                case 1:
+                    System.out.println("sales things");
+                    break;
+                case 2:
+                    System.out.println("stock things");
+                    break;
+                case 3:
+                    System.out.println("admin things");
+                    break;
+                case 0:
+                    break;
+                default:
+                    System.out.println("invalid selection");
+            }
+        } while (selection != 0);
+        System.out.println("goodbye");
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li><code class="i">do-while</code>, weil das Menü mindestens einmal erscheinen muss, bevor man prüfen kann, ob der Benutzer beenden will.</li><li><code class="i">selection</code> wird vor der Schleife deklariert, damit die Bedingung nach dem Block sie noch sieht (Block-Scope).</li><li><code class="i">switch</code> passt hier gut: Es gibt feste Einzelwerte (1, 2, 3, 0). Bei Bereichen wie „≥ 75“ nimmt man <code class="i">if</code>.</li><li><code class="i">case 0: break;</code> fängt die Ende-Eingabe ab, damit sie nicht in <code class="i">default</code> landet.</li></ul><p class="note"><b>Typische Fehler:</b> Ohne <code class="i">break</code> am Ende jedes <code class="i">case</code> fällt die Ausführung in den nächsten Zweig durch.</p></details></div>
+</div></section>
+
+<section id="s03" data-grp="Übungen"><h2>Skript 03 – Schleifen <small>while, for, do-while, break, continue, verschachtelte Schleifen</small></h2><div class="grid">
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Welche Schleife läuft mindestens einmal?</p><ul class="opts"><li class=""><b>a</b><span>while</span></li><li class=""><b>b</b><span>for</span></li><li class="ok"><b>c</b><span>do-while</span></li><li class=""><b>d</b><span>keine</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: c.</b> <code class="i">do-while</code> prüft die Bedingung erst nach dem Block. <code class="i">while</code> und <code class="i">for</code> prüfen davor.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Welche Schleife ist endlos?</p><ul class="opts"><li class=""><b>a</b><span><code class="i">for (int i = 0; i &lt; 5; i++) { }</code></span></li><li class=""><b>b</b><span><code class="i">int i = 0; while (i &lt; 5) { i++; }</code></span></li><li class="ok"><b>c</b><span><code class="i">int i = 0; while (i &lt; 5) { }</code></span></li><li class=""><b>d</b><span><code class="i">do { } while (false);</code></span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: c.</b> In c) wird <code class="i">i</code> nie verändert, die Bedingung bleibt für immer wahr. Die Bedingung muss durch Updates falsch werden können.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Was macht <code class="i">continue</code>?</p><ul class="opts"><li class=""><b>a</b><span>Beendet die ganze Schleife</span></li><li class="ok"><b>b</b><span>Überspringt den Rest des Durchlaufs und springt zum nächsten</span></li><li class=""><b>c</b><span>Beendet das Programm</span></li><li class=""><b>d</b><span>Setzt den Zähler auf 0</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> <code class="i">break</code> beendet die Schleife, <code class="i">continue</code> nur den aktuellen Durchlauf.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">In einer verschachtelten Schleife wird <code class="i">break</code> ausgeführt. Was passiert?</p><ul class="opts"><li class=""><b>a</b><span>Alle Schleifen enden</span></li><li class="ok"><b>b</b><span>Nur die innerste Schleife endet</span></li><li class=""><b>c</b><span>Nur die äußerste Schleife endet</span></li><li class=""><b>d</b><span>Compilerfehler</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> <code class="i">break</code> und <code class="i">continue</code> wirken immer nur auf die innerste Schleife.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Welche Schleife eignet sich für Datenvalidierung („so lange fragen, bis gültig“)?</p><ul class="opts"><li class="ok"><b>a</b><span>do-while</span></li><li class=""><b>b</b><span>switch</span></li><li class=""><b>c</b><span>if-else</span></li><li class=""><b>d</b><span>final</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: a.</b> Man muss mindestens einmal fragen, bevor man prüfen kann.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Wie oft wird „Hi“ ausgegeben?
+<code class="i">for (int i = 0; i &lt; 10; i += 3) { System.out.println("Hi"); }</code></p><ul class="opts"><li class=""><b>a</b><span>3</span></li><li class="ok"><b>b</b><span>4</span></li><li class=""><b>c</b><span>10</span></li><li class=""><b>d</b><span>9</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> i nimmt die Werte 0, 3, 6, 9 an. Bei 12 ist die Bedingung falsch, also 4 Durchläufe.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Terminiert die Schleife?
+<code class="i">int i = 1; while (i != 50) { i = i + 2; }</code></p><ul class="opts"><li class=""><b>a</b><span>Ja, nach 25 Durchläufen</span></li><li class=""><b>b</b><span>Ja, nach 50 Durchläufen</span></li><li class="ok"><b>c</b><span>Nein, i ist immer ungerade und wird nie 50</span></li><li class=""><b>d</b><span>Compilerfehler</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: c.</b> Start 1, Schritt 2: es entstehen nur ungerade Zahlen, 50 wird übersprungen. Sicherer ist <code class="i">i &lt; 50</code>.</p></details></div>
+<div class="blk"><span class="tag">Was wird ausgegeben?</span><h3>continue und break zusammen</h3><pre><code>for (int p = 0; p &lt; 10; p++) {
+    if (p % 2 == 0) continue;
+    if (p &gt; 7) break;
+    System.out.print(p + " ");
+}</code></pre><details class="sol"><summary>Lösung</summary><p class="out"><b>Ausgabe:</b></p><pre><code>1 3 5 7 </code></pre><p class="why"><b>Warum:</b> Gerade Zahlen werden mit <code class="i">continue</code> übersprungen. Bei p = 9 greift <code class="i">break</code>, davor wird nichts mehr ausgegeben.</p></details></div>
+<div class="blk"><span class="tag">Was wird ausgegeben?</span><h3>Verschachtelte Schleifen zählen</h3><pre><code>int s = 0;
+for (int p = 1; p &lt;= 3; p++) {
+    for (int q = 1; q &lt;= p; q++) {
+        s++;
+    }
+}
+System.out.println(s);</code></pre><details class="sol"><summary>Lösung</summary><p class="out"><b>Ausgabe:</b></p><pre><code>6</code></pre><p class="why"><b>Warum:</b> Die innere Schleife läuft 1, 2 und 3 Mal: 1 + 2 + 3 = 6.</p></details></div>
+<div class="blk"><span class="tag">Was wird ausgegeben?</span><h3>do-while mit falscher Bedingung</h3><pre><code>int c = 0;
+do { c++; } while (c &lt; 0);
+System.out.println(c);</code></pre><details class="sol"><summary>Lösung</summary><p class="out"><b>Ausgabe:</b></p><pre><code>1</code></pre><p class="why"><b>Warum:</b> Der Block läuft einmal (c = 1), danach ist die Bedingung falsch.</p></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>Countdown</h3><p class="ex">Startzahl einlesen und bis 0 herunterzählen. Beispiel: 5 → <code class="i">5 4 3 2 1 0</code>.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Scanner;
+
+public class Countdown {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        while (n &gt;= 0) {
+            System.out.print(n + " ");
+            n--;
+        }
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Der Zähler (<code class="i">n</code>) wird bei jedem Durchlauf verändert (<code class="i">n--</code>). Sonst wäre die Schleife endlos.</li><li>Die Bedingung <code class="i">n &gt;= 0</code> (nicht <code class="i">&gt; 0</code>) gibt die 0 noch mit aus.</li><li><code class="i">print</code> statt <code class="i">println</code>, damit alle Zahlen in einer Zeile stehen.</li></ul><p class="note"><b>Typische Fehler:</b> Wer <code class="i">n--</code> vergisst, hat eine Endlosschleife (Abbruch mit Strg-C).</p></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>Fakultät</h3><p class="ex"><code class="i">n!</code> berechnen. Beispiel: 4! = 4·3·2·1 = 24.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Scanner;
+
+public class Factorial {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        int result = 1;
+        for (int i = 2; i &lt;= n; i++) {
+            result = result * i;
+        }
+        System.out.println(n + "! = " + result);
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Das Ergebnis startet bei 1 (neutrales Element der Multiplikation). Mit 0 wäre alles 0.</li><li>Die Zählschleife <code class="i">for</code> passt, weil die Anzahl der Wiederholungen bekannt ist (2 bis n).</li><li>Für n = 0 und n = 1 läuft die Schleife nicht und das Ergebnis bleibt 1. Das ist mathematisch richtig (0! = 1).</li></ul><p class="note"><b>Typische Fehler:</b> <code class="i">int</code> läuft bei 13! über (12! = 479001600 passt noch). Für größere n bräuchte man <code class="i">long</code> oder <code class="i">BigInteger</code>.</p></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>Passwort mit drei Versuchen</h3><p class="ex">Höchstens 3 Versuche. Richtig: „Access granted“, sonst nach 3 Fehlversuchen „Access denied“.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Scanner;
+
+public class PasswordRetry {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        final String PASSWORD = "secret";
+        int attempts = 0;
+        boolean granted = false;
+
+        while (attempts &lt; 3 &amp;&amp; !granted) {
+            System.out.println("Enter password:");
+            String input = scanner.next();
+            if (input.equals(PASSWORD)) {
+                granted = true;
+            }
+            attempts++;
+        }
+
+        if (granted) {
+            System.out.println("Access granted");
+        } else {
+            System.out.println("Access denied");
+        }
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Zwei Abbruchgründe: Versuche aufgebraucht oder Passwort richtig. Beides steckt in der Bedingung <code class="i">attempts &lt; 3 &amp;&amp; !granted</code>.</li><li>Die boolesche Variable <code class="i">granted</code> merkt sich das Ergebnis über die Schleife hinaus. Die Ausgabe passiert erst danach.</li><li><code class="i">equals</code> statt <code class="i">==</code>, weil Strings Objekte sind und <code class="i">==</code> nur Referenzen vergleicht.</li><li>Das Passwort als <code class="i">final</code>-Konstante: Der Wert ändert sich nie.</li></ul><p class="note"><b>Typische Fehler:</b> <code class="i">attempts++</code> nicht vergessen, sonst gibt es unendlich viele Versuche.</p></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>Umgekehrte Treppe</h3><p class="ex"><code class="i">n</code> Zeilen mit Sternen ausgeben, erste Zeile n Sterne, dann n−1 und so weiter. Beispiel n = 4: <code class="i">****</code>, <code class="i">***</code>, <code class="i">**</code>, <code class="i">*</code>.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Scanner;
+
+public class ReversedStairs {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        for (int row = n; row &gt;= 1; row--) {
+            for (int j = 0; j &lt; row; j++) {
+                System.out.print("*");
+            }
+            System.out.println();
+        }
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Muster: Äußere Schleife = Zeilen, innere Schleife = Sterne in dieser Zeile.</li><li>Die äußere Schleife zählt rückwärts (<code class="i">row</code> von n bis 1), die Anzahl der Sterne entspricht <code class="i">row</code>.</li><li><code class="i">println()</code> nach der inneren Schleife beginnt die nächste Zeile. Es steht in der äußeren Schleife, nicht in der inneren.</li></ul><p class="note"><b>Typische Fehler:</b> <code class="i">println</code> statt <code class="i">print</code> in der inneren Schleife gibt jeden Stern in eine eigene Zeile.</p></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>Ziffern zählen</h3><p class="ex">Eine positive ganze Zahl einlesen und die Anzahl der Ziffern ausgeben. Beispiel: 12345 → <code class="i">5 digits</code>.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Scanner;
+
+public class CountDigits {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int number = scanner.nextInt();
+        int digits = 0;
+        if (number == 0) {
+            digits = 1;
+        }
+        while (number &gt; 0) {
+            number = number / 10;
+            digits++;
+        }
+        System.out.println(digits + " digits");
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Mit <code class="i">/ 10</code> schneidet man die letzte Ziffer ab (Ganzzahldivision): 12345 → 1234 → 123 → … → 0.</li><li>Jeder Durchlauf entspricht einer Ziffer, daher <code class="i">digits++</code>.</li><li>Sonderfall 0: Die Schleife läuft nicht, aber 0 hat eine Ziffer. Daher der Extra-<code class="i">if</code>.</li></ul><p class="note"><b>Typische Fehler:</b> Der Test <code class="i">number &gt; 0</code> stoppt bei 0. Mit <code class="i">number != 0</code> würden negative Eingaben endlos laufen.</p></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>Eingabe validieren</h3><p class="ex">So lange nach einer Zahl fragen, bis sie positiv ist.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Scanner;
+
+public class Validate {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int value;
+        do {
+            System.out.println("Enter a positive value:");
+            value = scanner.nextInt();
+        } while (value &lt;= 0);
+        System.out.println("Your value: " + value);
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li><code class="i">do-while</code>, weil man vor der ersten Prüfung eine Eingabe braucht.</li><li><code class="i">value</code> steht außerhalb der Schleife, damit es nach der Schleife noch sichtbar ist.</li><li>Die Bedingung beschreibt den Fehlerfall (<code class="i">&lt;= 0</code>): wiederholen, solange die Eingabe ungültig ist.</li></ul></details></div>
+</div></section>
+
+<section id="s04" data-grp="Übungen"><h2>Skript 04 – Methoden <small>Deklaration, Parameter, Rückgabewerte, Scope, static, Modifier</small></h2><div class="grid">
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Was bedeutet <code class="i">void</code> als Rückgabetyp?</p><ul class="opts"><li class=""><b>a</b><span>Die Methode gibt 0 zurück</span></li><li class="ok"><b>b</b><span>Die Methode gibt keinen Wert zurück</span></li><li class=""><b>c</b><span>Die Methode darf keine Parameter haben</span></li><li class=""><b>d</b><span>Die Methode ist privat</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> <code class="i">void</code> heißt „leer“. Die Methode führt etwas aus, liefert aber nichts zurück (wie <code class="i">println</code>).</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Warum verwendet man Methoden? (zwei richtig)</p><ul class="opts"><li class="ok"><b>a</b><span>Wiederverwendbarkeit (DRY)</span></li><li class=""><b>b</b><span>Um Variablen global zu machen</span></li><li class="ok"><b>c</b><span>Bessere Wartbarkeit und Lesbarkeit</span></li><li class=""><b>d</b><span>Damit der Code langsamer wird</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: a und c.</b> Code einmal schreiben und mehrfach nutzen, Änderungen an einer Stelle machen, Programm in sinnvolle Teile gliedern (Abstraktion).</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Was bedeutet pass-by-value bei primitiven Typen?</p><ul class="opts"><li class=""><b>a</b><span>Die Methode ändert die Variable des Aufrufers direkt</span></li><li class="ok"><b>b</b><span>Der Wert wird kopiert; Änderungen am Parameter wirken nicht auf den Aufrufer</span></li><li class=""><b>c</b><span>Nur Strings dürfen übergeben werden</span></li><li class=""><b>d</b><span>Die Variable wird gelöscht</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> Der Parameter ist eine eigene Variable mit einer Kopie des Werts. Siehe Aufgabe „Parameter sind Kopien“.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Wo ist eine in <code class="i">greet()</code> deklarierte lokale Variable <code class="i">y</code> sichtbar?</p><ul class="opts"><li class=""><b>a</b><span>In allen Methoden der Klasse</span></li><li class="ok"><b>b</b><span>Nur innerhalb von <code class="i">greet()</code></span></li><li class=""><b>c</b><span>Nur in <code class="i">main</code></span></li><li class=""><b>d</b><span>In allen Klassen des Pakets</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> Eine lokale Variable gilt nur in der Methode (genauer: im Block) mit ihrer Deklaration.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Welche Deklaration ist fehlerhaft?</p><ul class="opts"><li class=""><b>a</b><span><code class="i">public static int sum(int a, int b) { return a + b; }</code></span></li><li class=""><b>b</b><span><code class="i">public static void show(String s) { System.out.println(s); }</code></span></li><li class="ok"><b>c</b><span><code class="i">public static int half(int a) { return a / 2.0; }</code></span></li><li class=""><b>d</b><span><code class="i">public static boolean isEven(int n) { return n % 2 == 0; }</code></span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: c.</b> <code class="i">a / 2.0</code> ist ein <code class="i">double</code>, die Methode verspricht aber <code class="i">int</code>. Der Typ des Rückgabewerts muss zum Rückgabetyp passen (oder ein Cast: <code class="i">(int) (a / 2.0)</code>).</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Was bewirkt <code class="i">private</code>?</p><ul class="opts"><li class=""><b>a</b><span>Überall sichtbar</span></li><li class="ok"><b>b</b><span>Nur innerhalb der deklarierenden Klasse nutzbar</span></li><li class=""><b>c</b><span>Nur im selben Paket sichtbar</span></li><li class=""><b>d</b><span>Macht die Methode zur Konstante</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> <code class="i">public</code> &gt; <code class="i">protected</code> &gt; (ohne Modifier, Paket) &gt; <code class="i">private</code>.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Was bedeutet <code class="i">static</code> bei einer Methode?</p><ul class="opts"><li class="ok"><b>a</b><span>Gehört zur Klasse, aufrufbar über den Klassennamen</span></li><li class=""><b>b</b><span>Wert nicht änderbar</span></li><li class=""><b>c</b><span>Immer <code class="i">void</code></span></li><li class=""><b>d</b><span>Nur im Paket sichtbar</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: a.</b> Ohne <code class="i">static</code> bräuchte man erst ein Objekt. <code class="i">main</code> ist <code class="i">static</code>, weil beim Start noch kein Objekt existiert.</p></details></div>
+<div class="blk"><span class="tag">Multiple Choice</span><p class="q">Was passiert bei einem <code class="i">return</code>?</p><ul class="opts"><li class=""><b>a</b><span>Die Methode läuft weiter, der Wert wird gemerkt</span></li><li class="ok"><b>b</b><span>Die Methode endet sofort und der Wert geht an den Aufrufer</span></li><li class=""><b>c</b><span>Das Programm endet</span></li><li class=""><b>d</b><span>Die Methode startet neu</span></li></ul><details class="sol"><summary>Lösung</summary><p class="why"><b>Richtig: b.</b> Alles nach dem <code class="i">return</code> im selben Zweig wird nicht mehr ausgeführt.</p></details></div>
+<div class="blk"><span class="tag">Was wird ausgegeben?</span><h3>Parameter sind Kopien</h3><pre><code>public static int f(int x) {
+    x++;
+    return x * 2;
+}
+public static void main(String[] args) {
+    int v = 3;
+    System.out.println(f(v));
+    System.out.println(v);
+}</code></pre><details class="sol"><summary>Lösung</summary><p class="out"><b>Ausgabe:</b></p><pre><code>8
+3</code></pre><p class="why"><b>Warum:</b> <code class="i">f</code> bekommt eine Kopie von v. <code class="i">x++</code> ändert nur die Kopie (4), zurück kommt 4·2 = 8. <code class="i">v</code> in <code class="i">main</code> bleibt 3.</p></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>isEven mit Rückgabewert boolean</h3><p class="ex">Methode <code class="i">isEven(int number)</code>: <code class="i">true</code> für gerade Zahlen. Teste mit 7 und 12.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>public class EvenCheck {
+    public static boolean isEven(int number) {
+        return number % 2 == 0;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(isEven(7));    // false
+        System.out.println(isEven(12));   // true
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Der Ausdruck <code class="i">number % 2 == 0</code> ist selbst schon ein <code class="i">boolean</code>, man kann ihn direkt zurückgeben.</li><li>Die längere Variante mit <code class="i">if (...) return true; else return false;</code> macht dasselbe, ist aber umständlicher.</li><li>Methoden mit Rückgabe <code class="i">boolean</code> heißen üblicherweise <code class="i">isXxx</code> oder <code class="i">hasXxx</code>.</li></ul></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>Maximum von drei Zahlen</h3><p class="ex"><code class="i">max3(int a, int b, int c)</code> ohne <code class="i">Math.max</code>.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>public class Max3 {
+    public static int max3(int a, int b, int c) {
+        int max = a;
+        if (b &gt; max) {
+            max = b;
+        }
+        if (c &gt; max) {
+            max = c;
+        }
+        return max;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(max3(4, 9, 2));   // 9
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Muster „Zwischenergebnis mitführen“: <code class="i">max</code> startet mit dem ersten Wert und wird verbessert, wenn ein anderer größer ist.</li><li>Die Lösung lässt sich auf beliebig viele Werte verallgemeinern, das ist die Idee aus dem Skript (min von drei Werten).</li><li>Mit zwei getrennten <code class="i">if</code> (nicht <code class="i">else if</code>) werden beide Vergleiche immer geprüft, das ist hier korrekt.</li></ul></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>Summe von … bis …</h3><p class="ex"><code class="i">sumOfNumbers(start, end)</code>: Summe aller ganzen Zahlen von start bis end (inklusive). <code class="i">sumOfNumbers(2, 4)</code> → 9.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>public class SumOfNumbers {
+    public static int sumOfNumbers(int start, int end) {
+        int sum = 0;
+        for (int i = start; i &lt;= end; i++) {
+            sum = sum + i;
+        }
+        return sum;
+    }
+
+    public static void main(String[] args) {
+        int sum = sumOfNumbers(2, 4);
+        System.out.println(sum);   // 9
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li><code class="i">sum</code> startet bei 0 (neutrales Element der Addition) und sammelt in der Schleife auf.</li><li><code class="i">i &lt;= end</code> schließt das Ende ein. Mit <code class="i">&lt;</code> wäre das Ergebnis 5 statt 9.</li><li><code class="i">return</code> steht nach der Schleife. Ein <code class="i">return</code> in der Schleife würde schon im ersten Durchlauf beenden.</li><li>Alternativ per Formel: <code class="i">(start + end) * (end - start + 1) / 2</code>. Das ist der Gauß-Trick aus Skript 01.</li></ul></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>Hypotenuse</h3><p class="ex"><code class="i">hypotenuse(double side1, double side2)</code> mit <code class="i">Math.sqrt</code>. <code class="i">hypotenuse(3, 4)</code> → 5.0.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>public class Hypotenuse {
+    public static double hypotenuse(double side1, double side2) {
+        return Math.sqrt(side1 * side1 + side2 * side2);
+    }
+
+    public static void main(String[] args) {
+        double z = hypotenuse(3, 4);
+        System.out.println("hypotenuse is " + z);   // 5.0
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Satz des Pythagoras: c = √(a² + b²).</li><li>Der Rückgabetyp ist <code class="i">double</code>, weil <code class="i">Math.sqrt</code> ein <code class="i">double</code> liefert.</li><li><code class="i">hypotenuse(3, 4)</code> funktioniert, obwohl die Parameter <code class="i">double</code> sind: <code class="i">int</code> wird automatisch zu <code class="i">double</code> erweitert.</li></ul></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>printUntilNumber</h3><p class="ex">Methode <code class="i">printUntilNumber(int number)</code>: gibt 1 bis number aus, je eine Zahl pro Zeile.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>public class PrintUntil {
+    public static void printUntilNumber(int number) {
+        for (int i = 1; i &lt;= number; i++) {
+            System.out.println(i);
+        }
+    }
+
+    public static void main(String[] args) {
+        printUntilNumber(5);
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Rückgabetyp <code class="i">void</code>, weil die Methode nur ausgibt und nichts zurückliefert.</li><li>Die Methode wird aus <code class="i">main</code> mit verschiedenen Argumenten aufgerufen: Die Schleife steht einmal, wiederverwendet wird sie überall.</li></ul></details></div>
+</div></section>
+
+<div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
+</main>
+<footer>Alle Code-Lösungen und Ausgaben wurden mit Java kompiliert und ausgeführt. Basis: Skripte 01–04, Programmierung 1.</footer>
+</div>
+<script>
+(function(){
+  var KW = /\b(?:abstract|assert|boolean|break|byte|case|catch|char|class|continue|default|do|double|else|enum|extends|final|finally|float|for|if|implements|import|instanceof|int|interface|long|new|null|package|private|protected|public|record|return|sealed|permits|short|static|super|switch|this|throw|throws|try|var|void|while|true|false|yield|when)\b/;
+  var TOK = new RegExp([
+    '(\\/\\/[^\\n]*|\\/\\*[\\s\\S]*?\\*\\/)',                 // 1 comment
+    '("""[\\s\\S]*?"""|"(?:\\\\.|[^"\\\\\\n])*"|\'(?:\\\\.|[^\'\\\\\\n])\')', // 2 string
+    '(@[A-Za-z_][\\w.]*)',                                   // 3 annotation
+    '(' + KW.source + ')',                                    // 4 keyword
+    '(\\b\\d[\\d_]*(?:\\.\\d+)?[LlFfDd]?\\b)'                // 5 number
+  ].join('|'), 'g');
+  var TOK_SH = /(#[^\n]*|\/\/[^\n]*)|("(?:\\.|[^"\\\n])*")/g;
+  function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function hl(code, lang){
+    var src = code.textContent, out = '', last = 0, m;
+    if (lang === 'sh') {
+      TOK_SH.lastIndex = 0;
+      while ((m = TOK_SH.exec(src))) {
+        out += esc(src.slice(last, m.index));
+        out += '<span class="' + (m[1] ? 'c' : 's') + '">' + esc(m[0]) + '</span>';
+        last = m.index + m[0].length;
+      }
+    } else {
+      TOK.lastIndex = 0;
+      while ((m = TOK.exec(src))) {
+        out += esc(src.slice(last, m.index));
+        var cls = m[1] ? 'c' : m[2] ? 's' : m[3] ? 'a' : m[4] ? 'k' : 'n';
+        out += '<span class="' + cls + '">' + esc(m[0]) + '</span>';
+        last = m.index + m[0].length;
+      }
+    }
+    code.innerHTML = out + esc(src.slice(last));
+  }
+
+  document.querySelectorAll('pre').forEach(function(pre){
+    var code = pre.querySelector('code');
+    var raw = code.textContent;
+    hl(code, pre.getAttribute('data-lang') || 'java');
+    var wrap = document.createElement('div'); wrap.className = 'code';
+    pre.parentNode.insertBefore(wrap, pre); wrap.appendChild(pre);
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'cp'; b.textContent = 'Kopieren';
+    b.addEventListener('click', function(){
+      function done(){ b.textContent = 'Kopiert'; setTimeout(function(){ b.textContent = 'Kopieren'; }, 1200); }
+      function fallback(){
+        var r = document.createRange(); r.selectNodeContents(code);
+        var s = getSelection(); s.removeAllRanges(); s.addRange(r);
+        b.textContent = 'Markiert';
+        setTimeout(function(){ b.textContent = 'Kopieren'; }, 1200);
+      }
+      try { navigator.clipboard.writeText(raw).then(done, fallback); } catch (e) { fallback(); }
+    });
+    wrap.appendChild(b);
+  });
+
+  // Navigation
+  var nav = document.getElementById('nav'), lastGrp = '';
+  document.querySelectorAll('main > section').forEach(function(sec){
+    var g = sec.getAttribute('data-grp');
+    if (g !== lastGrp) {
+      lastGrp = g;
+      var gi = document.createElement('li'); gi.className = 'grp'; gi.textContent = g; nav.appendChild(gi);
+    }
+    var li = document.createElement('li'), a = document.createElement('a');
+    a.href = '#' + sec.id;
+    a.textContent = sec.querySelector('h2').childNodes[0].textContent.trim();
+    li.appendChild(a); nav.appendChild(li);
+  });
+
+  // Suche
+  var q = document.getElementById('q'), empty = document.getElementById('empty');
+  var blocks = Array.prototype.slice.call(document.querySelectorAll('.blk'));
+  var texts = blocks.map(function(b){ return b.textContent.toLowerCase(); });
+  function filter(){
+    var term = q.value.trim().toLowerCase(), any = false;
+    document.querySelectorAll('main > section').forEach(function(sec){
+      var shown = 0;
+      sec.querySelectorAll('.blk').forEach(function(b){
+        var hit = !term || texts[blocks.indexOf(b)].indexOf(term) !== -1;
+        b.classList.toggle('hide', !hit);
+        if (hit) shown++;
+      });
+      sec.classList.toggle('hide', shown === 0);
+      if (shown) any = true;
+    });
+    empty.classList.toggle('hide', any);
+  }
+  q.addEventListener('input', filter);
+
+  // Lösungen
+  var alle = document.getElementById('alle'), openAll = false;
+  alle.addEventListener('click', function(){
+    openAll = !openAll;
+    document.querySelectorAll('details.sol').forEach(function(d){ d.open = openAll; });
+  });
+  // Theme
+  var root = document.documentElement;
+  document.getElementById('theme').addEventListener('click', function(){
+    var dark = root.getAttribute('data-theme') === 'dark' ||
+      (!root.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+    root.setAttribute('data-theme', dark ? 'light' : 'dark');
+  });
+})();
+</script>
