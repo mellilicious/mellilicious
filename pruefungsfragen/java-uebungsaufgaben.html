@@ -102,7 +102,7 @@ details.sol>summary{cursor:pointer;font-weight:600;color:var(--accent);font-size
 <header class="top">
   <div>
     <h1>Java <span>Übungsaufgaben</span></h1>
-    <p class="sub">Prüfungsübungen zu den Skripten 01–04 (Programmierung 1). Zu jeder Aufgabe gibt es Code und die Erklärung, warum man es so macht. Lösungen sind aufklappbar, Code lässt sich per Klick kopieren.</p>
+    <p class="sub">Prüfungsübungen zu den Skripten 01–04 und die Zwischentest-Aufgaben 2021 (A–E) für Programmierung 1. Zu jeder Aufgabe gibt es Code und die Erklärung, warum man es so macht. Lösungen sind aufklappbar, Code lässt sich per Klick kopieren.</p>
   </div>
   <div class="tools">
     <input type="search" id="q" placeholder="Suchen, z. B. switch, Scanner, return" aria-label="Cheatsheet durchsuchen">
@@ -461,6 +461,349 @@ public static void main(String[] args) {
         printUntilNumber(5);
     }
 }</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Rückgabetyp <code class="i">void</code>, weil die Methode nur ausgibt und nichts zurückliefert.</li><li>Die Methode wird aus <code class="i">main</code> mit verschiedenen Argumenten aufgerufen: Die Schleife steht einmal, wiederverwendet wird sie überall.</li></ul></details></div>
+</div></section>
+
+<section id="zt-info" data-grp="Zwischentest 2021"><h2>Zwischentest – Werkzeugkasten <small>Was du für die Midterm-Aufgaben zusätzlich zu Skript 01–04 brauchst</small></h2><div class="grid">
+<div class="blk"><span class="tag">Hintergrund</span><h3>So laufen die Zwischentests ab</h3><div class="why"><ul><li>90 Minuten, OpenBook. Abgabe per GitHub-Push, getestet wird automatisch mit <code class="i">AppTest.java</code>.</li><li>Alle Methoden stehen in <code class="i">App.java</code> und sind <code class="i">public static</code>. Namen (Methoden, Klassen, Dateien) nie ändern, sonst findet der Test sie nicht.</li><li><code class="i">AppTest.java</code> und der <code class="i">.github</code>-Ordner dürfen nicht verändert werden (K.O.-Kriterium, 0 Punkte).</li><li>Getestet wird der **Rückgabewert** der Methode, die Konsolenausgabe ist meist egal. Halte dich trotzdem an die Formate aus der Angabe.</li></ul></div></div>
+<div class="blk wide"><span class="tag">Hintergrund</span><h3>Arrays in 60 Sekunden</h3><div class="why"><ul><li>Ein Array hat eine feste Länge und Index ab 0. Das letzte Element hat den Index <code class="i">length - 1</code>.</li><li>Neue int-Arrays sind mit 0 gefüllt, String-Arrays mit <code class="i">null</code>. Ein Array lässt sich nicht verlängern: Man legt ein größeres an und kopiert die Werte.</li><li><code class="i">array.length</code> hat keine Klammern (bei Strings dagegen <code class="i">s.length()</code>).</li><li>Arrays sind Objekte, ein leeres Array (<code class="i">new int[0]</code>) ist etwas anderes als <code class="i">null</code>.</li></ul></div><pre><code>int[] a = new int[3];            // {0, 0, 0}
+int[] b = {4, 8, 15};            // direkt befüllt
+String[] names = new String[2];  // {null, null}
+
+a[0] = 7;                        // Schreiben
+int x = b[b.length - 1];         // Lesen: letztes Element (15)
+
+for (int i = 0; i &lt; b.length; i++) {
+    System.out.println(b[i]);    // Durchlaufen mit Index
+}
+
+int[] bigger = new int[b.length + 1];
+for (int i = 0; i &lt; b.length; i++) {
+    bigger[i] = b[i];            // kopieren, dann neues Element anhängen
+}
+bigger[b.length] = 99;</code></pre></div>
+<div class="blk wide"><span class="tag">Hintergrund</span><h3>Nützliche Methoden aus den Aufgaben</h3><div class="why"><ul><li><code class="i">Math.random()</code> liefert eine Zahl <code class="i">&gt;= 0.0</code> und <code class="i">&lt; 1.0</code>. Mit <code class="i">* 12</code> hat man 0.0 bis 11.999, mit <code class="i">(int)</code> also 0 bis 11, mit <code class="i">+ 1</code> dann 1 bis 12.</li><li><code class="i">Math.abs(x)</code> ist der Betrag. Damit vergleicht man Kommazahlen mit einer Toleranz, weil <code class="i">==</code> bei <code class="i">double</code> wegen Rundungsfehlern unzuverlässig ist.</li><li><code class="i">s.startsWith("th")</code> prüft den Anfang eines Strings und beachtet Groß- und Kleinschreibung.</li><li><code class="i">Integer.parseInt("11")</code> wandelt einen String in eine Zahl um (bei Text wie <code class="i">"abc"</code> gibt es eine <code class="i">NumberFormatException</code>).</li><li><code class="i">scanner.nextLine()</code> liest eine ganze Zeile. Nach <code class="i">nextInt()</code> bleibt der Zeilenumbruch im Puffer, deshalb vor dem String-Lesen ein zusätzliches <code class="i">nextLine()</code>.</li></ul></div><pre><code>int month = (int) (Math.random() * 12) + 1;     // 1..12
+boolean close = Math.abs(1.2 - 1.1) &lt; 0.001;     // false
+boolean t = "Those".startsWith("Th");            // true
+int n = Integer.parseInt("11");                  // 11
+
+int pos = scanner.nextInt();
+scanner.nextLine();                              // Rest der Zeile wegwerfen
+String item = scanner.nextLine();</code></pre></div>
+</div></section>
+
+<section id="zt-a" data-grp="Zwischentest 2021"><h2>Midterm A <small>Zufallsmonat, Monthmapper mit switch, zwei Arrays zusammenführen</small></h2><div class="grid">
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>A1 · Random Month (1 Punkt)</h3><p class="ex">Methode <code class="i">generateRandomMonth()</code>: liefert eine Zufallszahl vom Typ <code class="i">int</code> zwischen 1 und 12.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>public class MidA1 {
+    public static int generateRandomMonth() {
+        return (int) (Math.random() * 12) + 1;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(generateRandomMonth());
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li><code class="i">Math.random()</code> gibt ein <code class="i">double</code> im Bereich 0.0 (inklusive) bis 1.0 (exklusive). Mal 12 ergibt 0.0 bis knapp unter 12.</li><li>Der Cast <code class="i">(int)</code> schneidet die Nachkommastellen ab: 0 bis 11. Das <code class="i">+ 1</code> verschiebt auf 1 bis 12.</li><li>Klammern beachten: <code class="i">(int) (Math.random() * 12) + 1</code> castet nur das Produkt, dann wird 1 addiert.</li></ul><p class="note"><b>Typische Fehler:</b> <code class="i">(int) (Math.random() * 12 + 1)</code> geht auch. Falsch ist <code class="i">(int) Math.random() * 12 + 1</code>, denn der Cast gilt nur für <code class="i">Math.random()</code> und das ist immer 0, also kommt immer 1 heraus.</p></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>A2 · Monthmapper mit switch (4 Punkte)</h3><p class="ex">Methode <code class="i">monthMapper()</code>: Benutzer gibt eine Zahl 1–12 oder <code class="i">r</code> ein. Bei <code class="i">r</code> wird mit <code class="i">generateRandomMonth()</code> ein zufälliger Monat gewählt. Rückgabe ist der englische Monatsname, bei ungültiger Zahl <code class="i">"Invalid month"</code>. Eingabe mit <code class="i">nextLine()</code>, <code class="i">equals("r")</code> und <code class="i">Integer.parseInt()</code>.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Scanner;
+
+public class MidA2 {
+    public static int generateRandomMonth() {
+        return (int) (Math.random() * 12) + 1;
+    }
+
+    public static String monthMapper() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter a number between 1-12 or \"r\" to pick a random month:");
+        String input = scanner.nextLine();
+
+        int month;
+        if (input.equals("r")) {
+            month = generateRandomMonth();
+        } else {
+            month = Integer.parseInt(input);
+        }
+
+        switch (month) {
+            case 1:  return "January";
+            case 2:  return "February";
+            case 3:  return "March";
+            case 4:  return "April";
+            case 5:  return "May";
+            case 6:  return "June";
+            case 7:  return "July";
+            case 8:  return "August";
+            case 9:  return "September";
+            case 10: return "October";
+            case 11: return "November";
+            case 12: return "December";
+            default: return "Invalid month";
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(monthMapper());
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Die Eingabe wird zuerst als <code class="i">String</code> gelesen, weil sie entweder <code class="i">"r"</code> oder eine Zahl sein kann. Strings vergleicht man mit <code class="i">equals</code>, nie mit <code class="i">==</code>.</li><li>Erst wenn es kein <code class="i">"r"</code> ist, wird mit <code class="i">Integer.parseInt</code> in eine Zahl umgewandelt. Die Angabe garantiert, dass sonst eine gültige Ganzzahl kommt.</li><li>Beide Wege (Eingabe oder Zufall) landen in derselben Variable <code class="i">month</code>. So muss man den <code class="i">switch</code> nur einmal schreiben.</li><li>Bei <code class="i">return</code> in jedem <code class="i">case</code> braucht man kein <code class="i">break</code>, weil <code class="i">return</code> die Methode sofort beendet. <code class="i">default</code> fängt 0, 14, −3 usw. ab und liefert <code class="i">"Invalid month"</code>.</li><li>Der Scanner wird in der Methode angelegt. Bei Tests, die <code class="i">System.in</code> ersetzen, bekommt die Methode so die vorbereitete Eingabe.</li></ul><p class="note"><b>Typische Fehler:</b> Wer vergisst, dass <code class="i">default</code> auch einen <code class="i">return</code> braucht, bekommt „missing return statement“. Die Alternative mit <code class="i">if / else if</code> ist auch erlaubt (Titel der Aufgabe), aber 12 Zweige sind mit <code class="i">switch</code> übersichtlicher.</p></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>A3 · Array erweitern (5 Punkte)</h3><p class="ex">Methode <code class="i">extendArray(int[] arrayA, int[] arrayB)</code>: führt beide Arrays in einem neuen Array zusammen. Ist A länger als B, kommen zuerst die Elemente von B, dann die von A. Ist A kürzer als B, zuerst A, dann B. Sind beide gleich lang, wird abwechselnd befüllt, beginnend mit B.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Arrays;
+
+public class MidA3 {
+    public static int[] extendArray(int[] arrayA, int[] arrayB) {
+        int[] result = new int[arrayA.length + arrayB.length];
+        int pos = 0;
+
+        if (arrayA.length == arrayB.length) {
+            for (int i = 0; i &lt; arrayA.length; i++) {
+                result[pos] = arrayB[i];
+                pos++;
+                result[pos] = arrayA[i];
+                pos++;
+            }
+        } else if (arrayA.length &lt; arrayB.length) {
+            for (int i = 0; i &lt; arrayA.length; i++) {
+                result[pos] = arrayA[i];
+                pos++;
+            }
+            for (int i = 0; i &lt; arrayB.length; i++) {
+                result[pos] = arrayB[i];
+                pos++;
+            }
+        } else {
+            for (int i = 0; i &lt; arrayB.length; i++) {
+                result[pos] = arrayB[i];
+                pos++;
+            }
+            for (int i = 0; i &lt; arrayA.length; i++) {
+                result[pos] = arrayA[i];
+                pos++;
+            }
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Arrays.toString(extendArray(new int[]{1, 4, 5, 6}, new int[]{6, 7, 1, 3})));
+        System.out.println(Arrays.toString(extendArray(new int[]{3, 4, 5, 6}, new int[]{1, 5})));
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Die Größe des Ergebnisses steht von Anfang an fest: <code class="i">arrayA.length + arrayB.length</code>. Deshalb kann man das Array gleich in voller Größe anlegen.</li><li><code class="i">pos</code> ist die nächste freie Stelle im Ergebnis und wird nach jedem Schreiben um 1 erhöht. Das ist einfacher als Indizes für drei Arrays gleichzeitig zu rechnen.</li><li>Drei Fälle, wie in der Angabe: gleich lang (abwechselnd, B zuerst), A kürzer (A dann B), A länger (B dann A). Der Fall „kürzeres zuerst“ ist in beiden Richtungen gleich, nur die Rollen tauschen.</li><li>Prüfe mit den Beispielen: A = {1,4,5,6}, B = {6,7,1,3} ergibt {6,1,7,4,1,5,3,6}. A = {3,4,5,6}, B = {1,5} ergibt {1,5,3,4,5,6}.</li><li><code class="i">Arrays.toString(...)</code> (Import <code class="i">java.util.Arrays</code>) gibt ein Array lesbar aus. Ohne das druckt <code class="i">println(array)</code> nur eine Adresse wie <code class="i">[I@1b6d3586</code>.</li></ul><p class="note"><b>Typische Fehler:</b> Den Fall „gleich lang“ zuerst prüfen. Er würde sonst im <code class="i">else</code> landen und nicht abwechselnd befüllen. <code class="i">result[pos++] = ...</code> ist eine übliche Kurzform, aber <code class="i">pos++</code> getrennt ist für Anfänger leichter zu lesen.</p></details></div>
+</div></section>
+
+<section id="zt-b" data-grp="Zwischentest 2021"><h2>Midterm B <small>Kommazahlen vergleichen, Wörter am Anfang zählen</small></h2><div class="grid">
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>B1 · Check Floats (5 Punkte)</h3><p class="ex">Methode <code class="i">compareDoubles()</code>: liest zwei <code class="i">double</code>-Werte ein und gibt <code class="i">true</code> zurück, wenn sie bis zur dritten Nachkommastelle gleich sind, sonst <code class="i">false</code>. Tipp: <code class="i">Math.abs</code> der Differenz mit einem Grenzwert vergleichen.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Scanner;
+
+public class MidB1 {
+    public static boolean compareDoubles() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Number1:");
+        double number1 = scanner.nextDouble();
+        System.out.println("Number2:");
+        double number2 = scanner.nextDouble();
+
+        return Math.abs(number1 - number2) &lt; 0.001;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(compareDoubles());
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Kommazahlen werden im Computer binär gespeichert und sind oft nur angenähert. Darum vergleicht man sie nicht mit <code class="i">==</code>, sondern prüft, ob der Abstand klein genug ist.</li><li>„Bis zur dritten Nachkommastelle gleich“ heißt: Der Abstand ist kleiner als 0,001. Beispiel 22,2227777 und 22,2229999: Abstand 0,0002222, also <code class="i">true</code>.</li><li>Beispiel 1,1 und 1,1234: Abstand 0,0234 ist größer als 0,001, also <code class="i">false</code>.</li><li><code class="i">Math.abs</code> macht den Abstand positiv, damit die Reihenfolge der Zahlen egal ist.</li><li>Der Ausdruck <code class="i">Math.abs(...) &lt; 0.001</code> ist schon ein <code class="i">boolean</code> und wird direkt zurückgegeben.</li><li><code class="i">scanner.nextDouble()</code> erwartet das Dezimalzeichen deiner Systemsprache. In der Angabe steht ein Komma (<code class="i">3,1234567</code>), das passt zur deutschen Einstellung. In einer englischen Umgebung bräuchte man einen Punkt.</li></ul><p class="note"><b>Typische Fehler:</b> Grenzfälle wie 1,0000 und 1,0010 (Abstand genau 0,001) liegen wegen Rundung nicht eindeutig. Die Angabe testet das nicht.</p></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>B2 · Search for String in Array (5 Punkte)</h3><p class="ex">Methode <code class="i">countWordsStartWith(String[] words, String prefix)</code>: zählt, wie viele Elemente mit dem Suchwort beginnen. Groß- und Kleinschreibung zählt. Rückgabe als <code class="i">int</code>. Beispiel mit Satz und <code class="i">"th"</code> ergibt 1.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>public class MidB2 {
+    public static int countWordsStartWith(String[] words, String prefix) {
+        int count = 0;
+        for (int i = 0; i &lt; words.length; i++) {
+            if (words[i].startsWith(prefix)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public static void main(String[] args) {
+        String[] words = {"Those", "who", "do", "not", "remember", "the", "past",
+                          "are", "condemned", "to", "repeat", "it"};
+        System.out.println(countWordsStartWith(words, "th"));   // 1
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Muster „Zähler“: <code class="i">count</code> startet bei 0, geht jedes Element durch und wird bei jedem Treffer um 1 erhöht.</li><li><code class="i">startsWith</code> ist eine fertige String-Methode (laut Angabe erlaubt). Sie unterscheidet Groß- und Kleinschreibung: <code class="i">"Those"</code> beginnt nicht mit <code class="i">"th"</code>, nur <code class="i">"the"</code> trifft. Daher 1.</li><li>Der Rückgabewert kommt erst nach der Schleife, sonst würde die Methode nach dem ersten Element enden.</li></ul><p class="note"><b>Typische Fehler:</b> <code class="i">equals</code> ist hier falsch: Es würde nur komplette Wörter vergleichen. Ein <code class="i">null</code>-Element im Array würde zu einer <code class="i">NullPointerException</code> führen. Die Angabe schließt das aus.</p></details></div>
+</div></section>
+
+<section id="zt-c" data-grp="Zwischentest 2021"><h2>Midterm C <small>Maximum und Minimum im Array, Array per Eingabe befüllen</small></h2><div class="grid">
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>C1 · Array – Maximum und Minimum (5 Punkte)</h3><p class="ex">Methode <code class="i">getMaxAndMin(int[] numbers)</code>: gibt <code class="i">[max, min]</code> zurück. Sind beide gleich, nur einen Wert <code class="i">[x]</code>. Ist das Array leer, <code class="i">null</code>.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Arrays;
+
+public class MidC1 {
+    public static int[] getMaxAndMin(int[] numbers) {
+        if (numbers.length == 0) {
+            return null;
+        }
+
+        int max = numbers[0];
+        int min = numbers[0];
+        for (int i = 1; i &lt; numbers.length; i++) {
+            if (numbers[i] &gt; max) {
+                max = numbers[i];
+            }
+            if (numbers[i] &lt; min) {
+                min = numbers[i];
+            }
+        }
+
+        if (max == min) {
+            return new int[] {max};
+        }
+        return new int[] {max, min};
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Arrays.toString(getMaxAndMin(new int[]{1, 3, 6, -2, 0})));   // [6, -2]
+        System.out.println(Arrays.toString(getMaxAndMin(new int[]{1, 1, 1, 1})));       // [1]
+        System.out.println(Arrays.toString(getMaxAndMin(new int[]{})));                 // null
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Sonderfall zuerst: Bei leerem Array gibt es kein <code class="i">numbers[0]</code>, der Zugriff würde abstürzen. Deshalb vorher <code class="i">null</code> zurückgeben.</li><li>Max und Min starten mit dem ersten Element, nicht mit 0. Sonst wäre bei lauter negativen Zahlen das Maximum fälschlich 0.</li><li>Die Schleife beginnt bei Index 1, weil Index 0 schon als Startwert dient. Dasselbe Muster wie <code class="i">max3</code> aus Skript 04, nur für beliebig viele Werte.</li><li>Max und Min werden in einem Durchlauf mit zwei getrennten <code class="i">if</code> geprüft. Ein Element kann nie beides gleichzeitig verbessern, aber so ist es am einfachsten zu lesen.</li><li><code class="i">new int[] {max, min}</code> legt ein Array direkt mit Werten an. Die Länge des Rückgabe-Arrays hängt vom Ergebnis ab (1 oder 2).</li></ul><p class="note"><b>Typische Fehler:</b> Mit <code class="i">Arrays.sort</code> ginge es auch (erstes und letztes Element), die Angabe will aber das Durchsuchen üben.</p></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>C2 · Array befüllen (5 Punkte)</h3><p class="ex">Methode <code class="i">createArray(int length)</code>: legt ein <code class="i">int</code>-Array dieser Länge an und liest so lange Zahlen ein, bis es voll ist. Wird 0 eingegeben, werden alle restlichen Stellen mit −1 befüllt. Ausgabe vor jeder Eingabe: <code class="i">Enter a number (n left):</code>. Beispiel Länge 6 mit Eingaben 4, 8, 0 ergibt <code class="i">{4, 8, -1, -1, -1, -1}</code>.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Arrays;
+import java.util.Scanner;
+
+public class MidC2 {
+    public static int[] createArray(int length) {
+        Scanner scanner = new Scanner(System.in);
+        int[] result = new int[length];
+
+        for (int i = 0; i &lt; length; i++) {
+            System.out.println("Enter a number (" + (length - i) + " left):");
+            int value = scanner.nextInt();
+
+            if (value == 0) {
+                for (int j = i; j &lt; length; j++) {
+                    result[j] = -1;
+                }
+                break;
+            }
+            result[i] = value;
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Arrays.toString(createArray(6)));
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Das Array wird in voller Länge angelegt. Die Schleife läuft von 0 bis <code class="i">length - 1</code>, jeder Durchlauf füllt eine Stelle.</li><li>Die Anzahl der noch offenen Eingaben ist <code class="i">length - i</code>. Bei <code class="i">i = 0</code> also 6, dann 5 und so weiter, genau wie im Konsolenbeispiel.</li><li>Bei Eingabe 0 füllt eine zweite Schleife ab der aktuellen Stelle <code class="i">i</code> alles mit −1 auf, auch die Stelle, an der die 0 eingegeben wurde. Danach beendet <code class="i">break</code> die äußere Schleife.</li><li>Ohne <code class="i">break</code> würde die Schleife weiter nach Zahlen fragen und die −1 überschreiben.</li><li>Das Array wird nach der Schleife zurückgegeben, egal ob es voll eingegeben oder mit −1 aufgefüllt wurde.</li></ul><p class="note"><b>Typische Fehler:</b> Die 0 selbst darf nie in das Array gespeichert werden. Darum steht <code class="i">result[i] = value;</code> erst nach dem <code class="i">if</code> und wird bei 0 nicht erreicht.</p></details></div>
+</div></section>
+
+<section id="zt-d" data-grp="Zwischentest 2021"><h2>Midterm D <small>Gemüsewaage mit String-Array, Reihenfolge von drei Zahlen</small></h2><div class="grid">
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>D1 · Gemüsewaage Supermarkt (5 Punkte)</h3><p class="ex">Methode <code class="i">veggieScale(int maxItems)</code>: gibt zuerst <code class="i">Verwaltbare Positionen: &lt;maxItems&gt;</code> aus und legt ein String-Array dieser Größe an. Danach wiederholt: Position (<code class="i">P:</code>, 1-basiert) lesen, bei 0 Ende. Außerhalb 1 bis maxItems: „Ungueltige Position eingegeben“. Ist die Stelle belegt: „Speicherstelle bereits belegt“. Sonst Namen (<code class="i">N:</code>) lesen und speichern. Rückgabe ist das Array.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Arrays;
+import java.util.Scanner;
+
+public class MidD1 {
+    public static String[] veggieScale(int maxItems) {
+        Scanner input = new Scanner(System.in);
+        System.out.println("Verwaltbare Positionen: " + maxItems);
+        String[] items = new String[maxItems];
+
+        while (true) {
+            System.out.print("P: ");
+            int pos = input.nextInt();
+            input.nextLine();                 // Zeilenumbruch nach der Zahl verwerfen
+
+            if (pos == 0) {
+                break;
+            }
+
+            if (pos &lt; 1 || pos &gt; maxItems) {
+                System.out.println("Ungueltige Position eingegeben");
+            } else if (items[pos - 1] != null) {
+                System.out.println("Speicherstelle bereits belegt");
+            } else {
+                System.out.print("N: ");
+                items[pos - 1] = input.nextLine();
+            }
+        }
+        return items;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Arrays.toString(veggieScale(10)));
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Endlosschleife <code class="i">while (true)</code> mit <code class="i">break</code> bei 0: Wir wissen vorher nicht, wie viele Eingaben kommen.</li><li>Position und Index: Der Benutzer zählt ab 1, das Array ab 0. Daher <code class="i">items[pos - 1]</code>. Gültig ist <code class="i">1 &lt;= pos &lt;= maxItems</code>, also ist ungültig, was <code class="i">&lt; 1</code> oder <code class="i">&gt; maxItems</code> ist.</li><li>Reihenfolge der Prüfungen: Erst den Bereich prüfen, dann die Belegung. Bei einer Position wie 14 würde <code class="i">items[13]</code> sonst eine <code class="i">ArrayIndexOutOfBoundsException</code> auslösen.</li><li>Neue String-Arrays enthalten <code class="i">null</code>. Eine Stelle ist also frei, solange <code class="i">items[pos - 1] == null</code> ist. Genau das verlangt die Angabe.</li><li><code class="i">nextInt()</code> liest nur die Zahl, der Zeilenumbruch bleibt im Puffer. Ohne das zusätzliche <code class="i">nextLine()</code> würde der Name als leerer String gelesen. Das ist der Hinweis aus der Angabe.</li><li>Annahme: Bei ungültiger oder belegter Position wird kein Name abgefragt (wie im Konsolenbeispiel). Der Name wird nur bei einer freien, gültigen Stelle gelesen.</li></ul><p class="note"><b>Typische Fehler:</b> <code class="i">items[pos]</code> statt <code class="i">items[pos - 1]</code> verschiebt alles um eins und stürzt bei <code class="i">pos == maxItems</code> ab. Strings in Arrays werden mit <code class="i">equals</code> verglichen, aber für den <code class="i">null</code>-Test ist <code class="i">== null</code> richtig und nötig (auf <code class="i">null</code> kann man <code class="i">equals</code> nicht aufrufen).</p></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>D2 · Ordered Number Input (5 Punkte)</h3><p class="ex">Methode <code class="i">ordered()</code>: liest drei ganze Zahlen ein (<code class="i">Number1:</code>, <code class="i">Number2:</code>, <code class="i">Number3:</code> jeweils mit <code class="i">println</code>). Rückgabe: <code class="i">1</code> bei aufsteigend, <code class="i">-1</code> bei absteigend, sonst <code class="i">0</code>.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Scanner;
+
+public class MidD2 {
+    public static int ordered() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Number1:");
+        int a = scanner.nextInt();
+        System.out.println("Number2:");
+        int b = scanner.nextInt();
+        System.out.println("Number3:");
+        int c = scanner.nextInt();
+
+        if (a &lt; b &amp;&amp; b &lt; c) {
+            return 1;
+        }
+        if (a &gt; b &amp;&amp; b &gt; c) {
+            return -1;
+        }
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(ordered());
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>„Aufsteigend“ heißt <code class="i">a &lt; b</code> **und** <code class="i">b &lt; c</code>. Beide Vergleiche müssen gelten, deshalb <code class="i">&amp;&amp;</code>.</li><li>Wer nur <code class="i">a &lt; c</code> prüft, liegt bei 3, 2, 5 falsch: Die Zahlen sind weder auf- noch absteigend.</li><li>Das Ergebnis <code class="i">0</code> ist der „Rest“: Wenn weder auf- noch absteigend gilt, bleibt nur 0. Deshalb steht es ohne eigene Bedingung am Ende.</li><li>Annahme: Gleiche Werte (z. B. 2, 2, 5) zählen nicht als geordnet, die Vergleiche sind strikt. Die Angabe nennt dafür kein Beispiel.</li></ul><p class="note"><b>Typische Fehler:</b> Ausgabeformat beachten: <code class="i">Number1:</code> ohne Leerzeichen nach dem Doppelpunkt und mit <code class="i">println</code>.</p></details></div>
+</div></section>
+
+<section id="zt-e" data-grp="Zwischentest 2021"><h2>Midterm E <small>Einmaleins mit wachsendem Array, Lichterkette mit char-Array</small></h2><div class="grid">
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>E1 · Multiplikationstabelle (5 Punkte)</h3><p class="ex">Methode <code class="i">printMultiplicationTable(int number, int rows)</code>: gibt das Einmaleins von <code class="i">number</code> für <code class="i">rows</code> Reihen aus (<code class="i">2*0=0</code>, <code class="i">2*1=2</code>, …) und liefert alle geraden Produkte als Array ohne leere Stellen. Ist eine Zahl kleiner als 1: „Invalid input“ ausgeben und <code class="i">null</code> zurückgeben.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Arrays;
+
+public class MidE1 {
+    public static int[] printMultiplicationTable(int number, int rows) {
+        if (number &lt; 1 || rows &lt; 1) {
+            System.out.println("Invalid input");
+            return null;
+        }
+
+        int[] evenProducts = new int[0];
+        for (int i = 0; i &lt; rows; i++) {
+            int product = number * i;
+            System.out.println(number + "*" + i + "=" + product);
+
+            if (product % 2 == 0) {
+                int[] bigger = new int[evenProducts.length + 1];
+                for (int j = 0; j &lt; evenProducts.length; j++) {
+                    bigger[j] = evenProducts[j];
+                }
+                bigger[evenProducts.length] = product;
+                evenProducts = bigger;
+            }
+        }
+        return evenProducts;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Arrays.toString(printMultiplicationTable(3, 5)));
+        System.out.println(Arrays.toString(printMultiplicationTable(6, 5)));
+        System.out.println(Arrays.toString(printMultiplicationTable(0, 5)));
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li>Ungültige Eingaben werden gleich am Anfang abgefangen (<code class="i">number &lt; 1 || rows &lt; 1</code>). Danach muss der Rest nicht mehr darauf achten. Ein Array kann man nicht „leer“ zurückgeben, das wäre etwas anderes als <code class="i">null</code>.</li><li>Die Reihen beginnen bei 0: <code class="i">2*0=0</code>, <code class="i">2*1=2</code>, … Deshalb läuft die Schleife von 0 bis <code class="i">rows - 1</code>. Bei <code class="i">(6, 5)</code> ist die letzte Zeile <code class="i">6*4=24</code>, wie in der Angabe.</li><li>„Gerade“ prüft man mit <code class="i">product % 2 == 0</code>. Die 0 zählt als gerade und gehört ins Ergebnis, die Beispiele beginnen auch bei 0.</li><li>Ein Array kann nicht wachsen. Darum die Idee aus dem Hinweis: Start mit Länge 0, bei jedem geraden Produkt ein um 1 größeres Array anlegen, alte Werte kopieren, neuen Wert hinten anfügen, dann das neue Array als <code class="i">evenProducts</code> verwenden.</li><li>Am Ende hat das Array genau so viele Stellen wie gerade Produkte, ohne leere (0er-)Plätze.</li><li>Beispiel <code class="i">(3, 5)</code>: Produkte 0, 3, 6, 9, 12. Gerade sind 0, 6, 12, also <code class="i">[0, 6, 12]</code>.</li></ul><p class="note"><b>Typische Fehler:</b> Wer das Array vorab mit Länge <code class="i">rows</code> anlegt, hat am Ende leere Stellen (Nullen), und die Angabe verbietet das ausdrücklich. Das Ausgabeformat der Zeilen ist in der Angabe nicht ganz einheitlich (<code class="i">2*0=0</code> und <code class="i">6 * 4 = 24</code>). Getestet wird der Rückgabewert.</p></details></div>
+<div class="blk wide"><span class="tag">Code schreiben</span><h3>E2 · Lichterkette (5 Punkte)</h3><p class="ex">Methode <code class="i">createFairyLights(int length)</code>: liest Farben <code class="i">r</code>, <code class="i">g</code> oder <code class="i">b</code> ein und füllt damit ein <code class="i">char</code>-Array der Länge <code class="i">length</code>. Bei ungültiger Eingabe „Invalid value“ ausgeben und erneut fragen. Ausgabe vor jeder Eingabe: <code class="i">Choose a light color (r,g,b):</code>.</p><details class="sol"><summary>Lösung mit Erklärung</summary><pre><code>import java.util.Arrays;
+import java.util.Scanner;
+
+public class MidE2 {
+    public static char[] createFairyLights(int length) {
+        Scanner scanner = new Scanner(System.in);
+        char[] lights = new char[length];
+        int count = 0;
+
+        while (count &lt; length) {
+            System.out.println("Choose a light color (r,g,b):");
+            String input = scanner.nextLine();
+
+            if (input.equals("r") || input.equals("g") || input.equals("b")) {
+                lights[count] = input.charAt(0);
+                count++;
+            } else {
+                System.out.println("Invalid value");
+            }
+        }
+        return lights;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Arrays.toString(createFairyLights(3)));
+    }
+}</code></pre><p class="why"><b>Warum so?</b></p><ul><li><code class="i">while (count &lt; length)</code> statt <code class="i">for</code>: Ein ungültiger Wert darf **nicht** als Durchlauf zählen. <code class="i">count</code> wird nur bei gültiger Eingabe erhöht, so wird die Kette erst bei <code class="i">length</code> gültigen Farben fertig.</li><li>Die Eingabe kommt als String, geprüft wird mit <code class="i">equals</code>. Alles andere (<code class="i">R</code>, <code class="i">rr</code>, <code class="i">x</code>) ist damit ungültig. Das große <code class="i">R</code> im Konsolenbeispiel wird deshalb abgelehnt.</li><li><code class="i">input.charAt(0)</code> wandelt den einstelligen String in das <code class="i">char</code> um, das im Array gespeichert wird.</li><li>Ein <code class="i">char</code> schreibt man mit einfachen Anführungszeichen (<code class="i">'r'</code>), ein String mit doppelten (<code class="i">"r"</code>).</li><li>Die Angabe nennt „Invalid value“, das Konsolenbeispiel zeigt „Invalid input“. Der Text steht nur auf der Konsole, getestet wird das zurückgegebene Array. Hier ist der Wortlaut aus dem Aufgabentext verwendet.</li></ul><p class="note"><b>Typische Fehler:</b> Mit einer <code class="i">for</code>-Schleife und <code class="i">continue</code> bei ungültiger Eingabe würde der Zähler trotzdem weiterlaufen, und die Kette bliebe unvollständig.</p></details></div>
 </div></section>
 
 <div class="empty hide" id="empty">Keine Treffer. Anderen Suchbegriff versuchen.</div>
