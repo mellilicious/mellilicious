@@ -4,6 +4,9 @@ Lernseite zu Konzepte der IT (475.007): Zahlendarstellung und Rechnen, Schaltwer
 
 `index.html` im Browser öffnen, kein Build nötig.
 
-- `data.js` enthält alle Themen (Text als HTML)
-- `app.js` baut Seitenleiste, Suche und Themenansicht
+Reiter: Übersicht, Lernplan, Checkliste, Theorie, Quiz, Aufgaben, Probeklausur, Karteikarten, Quellen.
+Fortschritt (Checkliste, Quiz, Aufgaben, Klausurversuche) wird im Browser gespeichert.
+
+- `data.js` enthält alle Inhalte (Texte als HTML)
+- `app.js` baut die Reiter
 - `style.css` ist das Aussehen
