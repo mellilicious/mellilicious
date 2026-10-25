@@ -133,3 +133,13 @@ input[type=text] { font-family: var(--mono); }
 .sol { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 8px; }
 mark { background: var(--note-bg); color: inherit; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+.bitgrid { display: flex; flex-wrap: wrap; gap: 12px 18px; margin-top: 10px; }
+.bitgroup { display: flex; gap: 4px; }
+.bitcell { display: flex; flex-direction: column; align-items: center; min-width: 52px; padding: 6px 4px; line-height: 1.25; border-radius: 6px; }
+.bitcell .bw { font-size: .78rem; color: var(--muted); }
+.bitcell .bv { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; }
+.bitcell .bn { font-size: .7rem; color: var(--accent); min-height: 1em; }
+.bitcell[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.bitcell[aria-pressed="true"] .bw, .bitcell[aria-pressed="true"] .bn { color: #fff; }
+@media (max-width: 520px) { .bitcell { min-width: 42px; } }

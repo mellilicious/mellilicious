@@ -115,7 +115,7 @@
   const VIEWS = [
     ['dashboard', 'Übersicht', renderDashboard], ['plan', 'Lernplan', renderPlan], ['checkliste', 'Checkliste', renderChecklist],
     ['theorie', 'Theorie', renderTheory], ['quiz', 'Quiz', renderQuiz], ['aufgaben', 'Aufgaben', renderTasks],
-    ['klausur', 'Probeklausur', renderExam], ['karten', 'Karteikarten', renderCards], ['quellen', 'Quellen', renderSources]
+    ['klausur', 'Probeklausur', renderExam], ['karten', 'Karteikarten', renderCards], ['umrechner', 'Umrechner', renderConverter], ['quellen', 'Quellen', renderSources]
   ];
   let current = 'dashboard';
   function renderTabs() {
@@ -482,6 +482,99 @@
     view.append(h('h2', {}, 'Karteikarten'), h('div', { class: 'row' }, sel, h('button', { onclick: load }, 'Mischen')), card,
       h('div', { class: 'row', style: 'margin-top:10px' }, h('button', { onclick: () => step(-1) }, '← Zurück'), h('button', { onclick: () => step(1) }, 'Weiter →'), pos));
     load();
+  }
+
+  /* ================= Umrechner ================= */
+  function renderConverter(view) {
+    let n = 8, pat = 0n, mode = 'dez';
+    const mask = () => (1n << BigInt(n)) - 1n;
+    const signed = p => (p >> BigInt(n - 1)) & 1n ? p - (1n << BigInt(n)) : p;
+    const group = (s, k) => s.replace(new RegExp('(.{' + k + '})(?=.)', 'g'), '$1 ');
+    const bin = p => group(p.toString(2).padStart(n, '0'), 4);
+    const hex = p => p.toString(16).toUpperCase().padStart(Math.ceil(n / 4), '0');
+    const widthSel = h('select', { id: 'conv-width', 'aria-label': 'Bitbreite' }, [4, 8, 16, 32].map(b => h('option', { value: b }, b + ' Bit')));
+    widthSel.value = String(n);
+    const modeSel = h('select', { id: 'conv-mode', 'aria-label': 'Eingabe als' }, [['dez', 'Dezimal'], ['bin', 'Binär'], ['hex', 'Hexadezimal']].map(([v, l]) => h('option', { value: v }, l)));
+    const input = h('input', { type: 'text', id: 'conv-in', autocomplete: 'off', 'aria-label': 'Zahl eingeben', value: '0', style: 'min-width:220px' });
+    const msg = h('p', { class: 'sub', id: 'conv-msg' });
+    const out = h('div', { class: 'panel' });
+    const bitsBox = h('div', { class: 'panel' });
+
+    function parse(raw) {
+      const s = raw.replace(/[\s_]/g, '').replace(/−/g, '-');
+      if (!s) return { err: 'Gib eine Zahl ein.' };
+      let v;
+      if (mode === 'dez') {
+        if (!/^-?\d+$/.test(s)) return { err: 'Dezimal: nur Ziffern, vorne optional ein Minus.' };
+        v = BigInt(s);
+        const min = -(1n << BigInt(n - 1)), max = mask();
+        if (v < min || v > max) return { err: v + ' passt nicht in ' + n + ' Bit. Zweierkomplement: ' + min + ' bis ' + ((1n << BigInt(n - 1)) - 1n) + ', vorzeichenlos: 0 bis ' + max + '.' };
+        return { pat: v & mask() };
+      }
+      if (mode === 'bin') {
+        if (!/^[01]+$/.test(s)) return { err: 'Binär: nur 0 und 1.' };
+        v = BigInt('0b' + s);
+      } else {
+        const t = s.replace(/^0x/i, '').replace(/h$/i, '');
+        if (!/^[0-9a-f]+$/i.test(t)) return { err: 'Hex: Ziffern 0–9 und A–F.' };
+        v = BigInt('0x' + t);
+      }
+      if (v > mask()) return { err: 'Das sind mehr als ' + n + ' Bit.' };
+      return { pat: v };
+    }
+    function sumText() {
+      const parts = [];
+      for (let i = n - 1; i >= 0; i--) if ((pat >> BigInt(i)) & 1n) parts.push(i === n - 1 ? '−' + (1n << BigInt(i)) : String(1n << BigInt(i)));
+      if (!parts.length) return '0';
+      const unsignedParts = parts.map((p, k) => k === 0 && p.startsWith('−') ? p.slice(1) : p);
+      return { twos: parts.join(' + ').replace(/\+ −/g, '− '), uns: unsignedParts.join(' + ') };
+    }
+    function draw() {
+      out.innerHTML = '';
+      const sv = signed(pat), msb = (pat >> BigInt(n - 1)) & 1n;
+      const rows = [['Binär', bin(pat), true], ['Hex', hex(pat) + 'h', true], ['Vorzeichenlos', String(pat)], ['Zweierkomplement', String(sv)]];
+      const t = h('table', { class: 't' });
+      rows.forEach(([k, v, mono]) => t.append(h('tr', {}, h('th', { class: 'l' }, k), h('td', { class: 'l' + (mono ? ' mono' : '') }, v))));
+      out.append(h('div', { class: 'scroll' }, t));
+      const s = sumText();
+      if (typeof s !== 'string') out.append(h('p', { class: 'sub' }, 'Vorzeichenlos: ' + s.uns + ' = ' + pat), h('p', { class: 'sub' }, 'Zweierkomplement: ' + s.twos + ' = ' + sv + (msb ? ' (MSB = 1, daher negativ)' : '')));
+      else out.append(h('p', { class: 'sub' }, 'Alle Bits sind 0.'));
+
+      bitsBox.innerHTML = '';
+      bitsBox.append(h('div', { class: 'row' }, h('b', {}, 'Bits (anklicken zum Umschalten)')));
+      const grid = h('div', { class: 'bitgrid' });
+      for (let g = n - 1; g >= 0; g -= 4) {
+        const grp = h('div', { class: 'bitgroup' });
+        for (let i = g; i > g - 4 && i >= 0; i--) {
+          const on = ((pat >> BigInt(i)) & 1n) === 1n;
+          const w = i === n - 1 ? '−2' + sup(i) : '2' + sup(i);
+          grp.append(h('button', { class: 'bitcell', 'aria-pressed': String(on), 'aria-label': 'Bit ' + i + ' = ' + (on ? 1 : 0), onclick: () => { pat ^= 1n << BigInt(i); syncInput(); draw(); } },
+            h('span', { class: 'bw' }, w), h('span', { class: 'bv' }, on ? '1' : '0'), h('span', { class: 'bn' }, i === n - 1 ? 'MSB' : i === 0 ? 'LSB' : ' ')));
+        }
+        grid.append(grp);
+      }
+      bitsBox.append(grid, h('div', { class: 'row', style: 'margin-top:12px' },
+        h('button', { onclick: () => { pat = ~pat & mask(); syncInput(); draw(); } }, 'Alle Bits invertieren'),
+        h('button', { onclick: () => { pat = (pat + 1n) & mask(); syncInput(); draw(); } }, '+ 1'),
+        h('button', { onclick: () => { pat = (~pat + 1n) & mask(); syncInput(); draw(); } }, 'Zweierkomplement bilden (invertieren + 1)'),
+        h('button', { onclick: () => { pat = 0n; syncInput(); draw(); } }, 'Alles 0')));
+    }
+    function sup(i) { return String(i).split('').map(c => '⁰¹²³⁴⁵⁶⁷⁸⁹'[c]).join(''); }
+    function syncInput() {
+      input.value = mode === 'dez' ? String(pat) : mode === 'bin' ? bin(pat) : hex(pat);
+      msg.textContent = '';
+    }
+    input.addEventListener('input', () => {
+      const r = parse(input.value);
+      if (r.err) { msg.textContent = r.err; msg.className = 'sub c-r'; return; }
+      msg.textContent = ''; msg.className = 'sub'; pat = r.pat; draw();
+    });
+    modeSel.addEventListener('change', () => { mode = modeSel.value; syncInput(); });
+    widthSel.addEventListener('change', () => { n = Number(widthSel.value); pat &= mask(); syncInput(); draw(); });
+    view.append(h('h2', {}, 'Umrechner'),
+      h('p', { class: 'sub' }, 'Gib eine Zahl ein oder klicke Bits an. Negative Dezimalzahlen werden im Zweierkomplement dargestellt. Zum Üben: erst von Hand rechnen, dann hier kontrollieren.'),
+      h('div', { class: 'row' }, h('label', { for: 'conv-mode' }, 'Eingabe '), modeSel, input, h('label', { for: 'conv-width' }, 'Breite '), widthSel), msg, out, bitsBox);
+    draw();
   }
 
   /* ================= Quellen ================= */
