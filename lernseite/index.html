@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Betriebssysteme Lernseite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: schmale Seitenleiste mit Fortschritt + eine Lesespalte; je Frage Selbsttest, dann volle Erklärung */
+:root{
+  --bg:#f4f6f8; --surface:#ffffff; --ink:#1b2430; --muted:#5b6776;
+  --accent:#0b6e8a; --accent-soft:#dcedf2; --ok:#1f7a4d; --ok-soft:#dff1e6; --line:#d5dbe2; --code:#eaeef2;
+  --display:'Fraunces',Georgia,serif; --body:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10161d; --surface:#18212b; --ink:#e4e9ef; --muted:#97a3b2;
+    --accent:#58b8d4; --accent-soft:#16323c; --ok:#5fc58c; --ok-soft:#173326; --line:#2a3644; --code:#0e141b; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10161d; --surface:#18212b; --ink:#e4e9ef; --muted:#97a3b2;
+  --accent:#58b8d4; --accent-soft:#16323c; --ok:#5fc58c; --ok-soft:#173326; --line:#2a3644; --code:#0e141b; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--body)}
+.wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:32px;max-width:1080px;margin:0 auto;padding:24px 16px 64px}
+nav{position:sticky;top:16px;align-self:start;display:flex;flex-direction:column;gap:4px;font-size:14px}
+nav h2{font:600 13px var(--body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 8px}
+nav a{display:flex;gap:8px;align-items:baseline;padding:5px 8px;border-radius:6px;color:var(--ink);text-decoration:none}
+nav a:hover{background:var(--accent-soft)}
+nav a .n{font-family:var(--mono);color:var(--muted);min-width:22px}
+nav a.done{color:var(--ok)}
+nav a.done .n::after{content:"\2713"}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin:4px 0 6px}
+.bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+.stat{color:var(--muted);font-size:13px;margin-bottom:12px}
+.tools{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+button{font:500 14px var(--body);padding:7px 12px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,summary:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] button.primary{color:#07202a}
+header h1{font:600 clamp(28px,5vw,40px)/1.15 var(--display);margin:0 0 8px;text-wrap:balance}
+header p{color:var(--muted);margin:0 0 24px;max-width:62ch}
+article{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;margin-bottom:20px}
+article.done{border-color:var(--ok)}
+.qhead{display:flex;gap:12px;align-items:baseline;justify-content:space-between}
+.qhead h2{font:600 21px/1.3 var(--display);margin:0;text-wrap:balance}
+.pts{font:500 13px var(--mono);color:var(--muted);white-space:nowrap}
+.task{margin:10px 0 14px;padding:10px 12px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0;font-size:15px}
+details{border:1px solid var(--line);border-radius:8px;margin:10px 0}
+details>summary{cursor:pointer;padding:10px 14px;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:8px}
+details>summary::after{content:"+";font-family:var(--mono);color:var(--accent)}
+details[open]>summary::after{content:"\2212"}
+details>summary::-webkit-details-marker{display:none}
+.body{padding:2px 14px 14px;max-width:70ch}
+.body h3{font:600 16px var(--body);margin:18px 0 4px;color:var(--accent)}
+.body p,.body ul,.body ol{margin:6px 0}
+.body li{margin:2px 0}
+pre{background:var(--code);border:1px solid var(--line);border-radius:6px;padding:12px;overflow-x:auto;font:13px/1.45 var(--mono);margin:10px 0;max-width:100%}
+code{font-family:var(--mono);font-size:.9em;background:var(--code);padding:1px 5px;border-radius:4px}
+pre code{background:none;padding:0}
+.tw{overflow-x:auto;margin:10px 0}
+table{border-collapse:collapse;font-size:14px;min-width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--accent-soft)}
+td,th{font-variant-numeric:tabular-nums}
+.key{background:var(--ok-soft);border-radius:8px;padding:10px 14px;margin:14px 0 0}
+.key b{color:var(--ok)}
+.note{background:var(--code);border-radius:8px;padding:8px 12px;font-size:14px;color:var(--muted);margin:10px 0}
+.check{display:flex;align-items:center;gap:8px;margin-top:12px;font-weight:500}
+.check input{width:18px;height:18px;accent-color:var(--ok)}
+.hint{color:var(--muted);font-size:14px;margin:0}
+.sheet{margin-top:8px}
+@media (max-width:760px){
+  .wrap{grid-template-columns:1fr;gap:16px}
+  nav{position:static}
+  nav .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr))}
+  nav a .t{display:none}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.bar i{transition:none}}
+@media print{nav,.tools,.check{display:none}.wrap{display:block}details{display:block}details>.body{display:block}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav aria-label="Fragen">
+  <h2>Fortschritt</h2>
+  <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="11" aria-valuenow="0" id="pbar"><i id="pfill"></i></div>
+  <div class="stat" id="pstat">0 von 11 gelernt</div>
+  <div class="list" id="navlist"></div>
+  <div class="tools">
+    <button type="button" id="openall">Alle Antworten aufklappen</button>
+    <button type="button" id="closeall">Alle zuklappen</button>
+    <button type="button" id="reset">Fortschritt zurücksetzen</button>
+  </div>
+</nav>
+
+<main>
+<header>
+  <h1>Betriebssysteme, Prüfung Gruppe A</h1>
+  <p>Elf Prüfungsfragen mit Erklärung. Lies zuerst die Frage, sag dir die Kernpunkte laut vor, decke sie dann auf und vergleiche. Hake eine Frage ab, wenn du sie ohne Hinweis erklären kannst.</p>
+</header>
+
+<!-- ============ 1 ============ -->
+<article id="q1" data-q="1">
+<div class="qhead"><h2>1. Unix-Systemarchitektur</h2><span class="pts">4 P.</span></div>
+<div class="task">Beschreibe die Unix-Systemarchitektur auf Systemebene. Erkläre die Rollen von Geräten, Treibern und Kernel und wie sie zusammenspielen.</div>
+<details><summary>Selbsttest: Kernpunkte</summary><div class="body"><ul>
+<li>Schichten: Hardware, Treiber, Kernel, Systemaufrufe, User Space</li>
+<li>Geräte erscheinen als Dateien in <code>/dev</code></li>
+<li>Treiber übersetzen einheitliche Kernel-Aufrufe in Hardware-Befehle</li>
+<li>Kernel verwaltet Prozesse, Speicher, Dateisystem, Geräte, Schutz</li>
+<li>Kontakt über Systemaufrufe (Trap) und Interrupts</li></ul></div></details>
+<details><summary>Volle Erklärung</summary><div class="body">
+<h3>Schichtenmodell</h3>
+<p>Das Betriebssystem vermittelt zwischen Hardware und Anwendungen. Unix ist in Schichten aufgebaut:</p>
+<pre>+--------------------------------------------------+
+| Benutzerprogramme (Shell, Editor, Browser, ...)  |  User Space
++--------------------------------------------------+
+| Bibliotheken (libc), Systemaufruf-Wrapper        |
++================ Systemaufrufe ===================+  Grenze
+| KERNEL                                           |  Kernel Space
+|  Prozesse | Speicher | Dateisystem (VFS) | Netz  |
+|  ----------------------------------------------  |
+|  Gerätetreiber                                   |
++==================================================+
+| HARDWARE: CPU, RAM, Platten, Netzwerkkarte ...   |
++--------------------------------------------------+</pre>
+<h3>Die drei Rollen</h3>
+<p><b>Geräte:</b> die physische Hardware. Unix macht sie als Dateien in <code>/dev</code> sichtbar (&bdquo;Everything is a file&ldquo;), etwa <code>/dev/sda</code> oder <code>/dev/tty</code>. Blockgeräte (Platte, SSD) arbeiten in Blöcken mit wahlfreiem Zugriff. Zeichengeräte (Tastatur, serielle Schnittstelle) liefern einen Datenstrom.</p>
+<p><b>Treiber:</b> Kernel-Module, die ein Gerät oder eine Geräteklasse kennen. Sie übersetzen <code>read</code>, <code>write</code>, <code>open</code>, <code>ioctl</code> in gerätespezifische Befehle (Register schreiben, Interrupts behandeln, DMA starten). Der Rest des Systems sieht die Hardware-Details nicht.</p>
+<p><b>Kernel:</b> der privilegierte Kern im Kernel-Modus mit vollem Hardwarezugriff. Er bietet Scheduling, Speicherverwaltung mit virtuellem Speicher, Dateisysteme, Netzwerk, Interprozesskommunikation und Zugriffsschutz.</p>
+<h3>Zusammenspiel am Beispiel <code>read()</code></h3>
+<ol>
+<li>Ein Programm im User Space ruft <code>read(fd, buf, n)</code> auf.</li>
+<li>Der Systemaufruf wechselt in den Kernel-Modus.</li>
+<li>Der Kernel prüft Rechte und findet über das Dateisystem das Gerät.</li>
+<li>Er ruft die passende Treiberfunktion auf.</li>
+<li>Der Treiber programmiert die Hardware, zum Beispiel den Plattencontroller.</li>
+<li>Das Gerät meldet per Interrupt, dass es fertig ist. Die Daten werden in den Puffer des Prozesses kopiert.</li>
+<li>Rückkehr in den User Mode, <code>read</code> liefert das Ergebnis.</li></ol>
+<div class="key"><b>Merken:</b> Schichten, Geräte als Dateien, Treiber als Übersetzer, Kernel als Verwalter und Schützer, Kommunikation über Systemaufrufe und Interrupts.</div>
+</div></details>
+<label class="check"><input type="checkbox" data-done="1"> Gelernt</label>
+</article>
+
+<!-- ============ 2 ============ -->
+<article id="q2" data-q="2">
+<div class="qhead"><h2>2. Linux-Dateirechte</h2><span class="pts">4 P.</span></div>
+<div class="task">Die Benutzer alice und bob sind angelegt. alice ist nur in der Gruppe alice, bob nur in der Gruppe bob. Für zwei Dateien, <code>exam1.dir</code> und <code>exam2.txt</code>, sind Rechte angegeben. Beantworte die zugehörigen Fragen.</div>
+<div class="note">Die Rechte-Tabelle der Prüfung fehlt in der Vorlage. Hier lernst du das Verfahren an einem Beispiel. Ergänze die echte Tabelle, sobald du sie hast.</div>
+<details><summary>Selbsttest: Kernpunkte</summary><div class="body"><ul>
+<li>Format: Typ, Besitzer, Gruppe, Andere (<code>drwxr-x---</code>)</li>
+<li>r=4, w=2, x=1</li>
+<li>Prüfreihenfolge: Besitzer, dann Gruppe, dann Andere, erster Treffer zählt</li>
+<li>Verzeichnis: <code>x</code> = betreten, <code>r</code> = auflisten, <code>w</code> = Einträge ändern (zusammen mit <code>x</code>)</li></ul></div></details>
+<details><summary>Volle Erklärung</summary><div class="body">
+<pre>drwxr-x---  2 alice bob   4096  exam1.dir
+-rw-rw-r--  1 bob   bob    120  exam2.txt</pre>
+<div class="tw"><table><tr><th>Zeichen</th><th>Datei</th><th>Verzeichnis</th></tr>
+<tr><td><code>r</code> (4)</td><td>Inhalt lesen</td><td>Inhalt auflisten (<code>ls</code>)</td></tr>
+<tr><td><code>w</code> (2)</td><td>Inhalt ändern</td><td>Einträge anlegen, löschen, umbenennen (braucht <code>x</code>)</td></tr>
+<tr><td><code>x</code> (1)</td><td>als Programm ausführen</td><td>hineinwechseln (<code>cd</code>), auf Einträge zugreifen</td></tr></table></div>
+<h3>Prüfreihenfolge</h3>
+<ol><li>Ist der Benutzer der Besitzer? Dann gelten die Besitzerrechte, auch wenn die Gruppenrechte großzügiger wären.</li>
+<li>Sonst: ist er in der Gruppe der Datei? Dann gelten die Gruppenrechte.</li>
+<li>Sonst gelten die Rechte für Andere. <code>root</code> umgeht die Prüfung.</li></ol>
+<h3>Beispiel</h3>
+<p><code>exam2.txt</code> mit <code>-rw-r-----</code>, Besitzer alice, Gruppe bob:</p>
+<ul><li>alice (Besitzer): <code>rw-</code>, lesen und schreiben.</li>
+<li>bob (Gruppe): <code>r--</code>, nur lesen.</li>
+<li>Dritte: <code>---</code>, nichts.</li></ul>
+<p><code>rw-r-----</code> ist Oktal 640. Mit <code>chmod 640 exam2.txt</code> setzt du es. Besitzer und Gruppe ändert <code>chown alice:bob exam2.txt</code>.</p>
+<p>Kann bob in <code>exam1.dir</code> eine Datei anlegen? Nur mit <code>w</code> und <code>x</code> auf dem Verzeichnis in der Rolle, die für bob gilt.</p>
+<div class="key"><b>Merken:</b> alice und bob teilen keine Gruppe. Rechte über die Gruppe gibt es nur, wenn die Datei der eigenen Gruppe gehört. Sonst zählen &bdquo;Andere&ldquo;.</div>
+</div></details>
+<label class="check"><input type="checkbox" data-done="2"> Gelernt</label>
+</article>
+
+<!-- ============ 3 ============ -->
+<article id="q3" data-q="3">
+<div class="qhead"><h2>3. Paging und Adressübersetzung</h2><span class="pts">5 P.</span></div>
+<div class="task">Beschreibe den Paging-Mechanismus und die Übersetzung von virtuellen in physische Adressen. Erkläre die Rolle von MMU, Seitentabellen und Seitenrahmen. Welche Probleme entstehen bei großen virtuellen Adressräumen?</div>
+<details><summary>Selbsttest: Kernpunkte</summary><div class="body"><ul>
+<li>Adresse = Seitennummer + Offset</li>
+<li>Seitentabelle ordnet Seite zu Rahmen zu, die MMU übersetzt in Hardware</li>
+<li>TLB als Cache der Übersetzungen</li>
+<li>Page Fault: Present-Bit 0, Seite wird nachgeladen</li>
+<li>Große Räume: Tabellen zu groß, Lösung mehrstufig, invertiert, Huge Pages</li></ul></div></details>
+<details><summary>Volle Erklärung</summary><div class="body">
+<p>Jeder Prozess soll einen eigenen, großen, zusammenhängenden Adressraum sehen, obwohl der echte Speicher begrenzt und zerstückelt ist. Das leistet virtueller Speicher mit Paging.</p>
+<h3>Begriffe</h3>
+<ul><li><b>Seite (Page):</b> Block fester Größe im virtuellen Raum, meist 4 KiB.</li>
+<li><b>Seitenrahmen (Frame):</b> gleich großer Block im physischen RAM.</li>
+<li><b>Seitentabelle:</b> pro Prozess, ordnet jede Seite einem Rahmen zu oder markiert sie als nicht im RAM.</li>
+<li><b>MMU:</b> Hardware in der CPU, die jede Adresse zur Laufzeit übersetzt.</li>
+<li><b>TLB:</b> kleiner, schneller Cache der letzten Übersetzungen.</li></ul>
+<h3>Übersetzung</h3>
+<pre>virtuelle Adresse = [ Seitennummer p | Offset d ]
+1. MMU schlägt p in der Seitentabelle nach: p -> Rahmen f
+2. physische Adresse = [ f | d ]   (Offset bleibt gleich)</pre>
+<p><b>Zahlenbeispiel:</b> Seitengröße 4 KiB, also 12 Bit Offset. Virtuelle Adresse <code>0x00003A7C</code> hat Seitennummer <code>0x3</code> und Offset <code>0xA7C</code>. Die Tabelle sagt Seite 3 gehört zu Rahmen 7. Ergebnis: <code>0x7A7C</code>.</p>
+<p>Mit TLB: Zuerst im TLB nachsehen. Ein Treffer ist schnell. Bei einem Miss liest die MMU die Seitentabelle aus dem RAM und trägt den Eintrag in den TLB ein.</p>
+<h3>Seitenfehler (Page Fault)</h3>
+<p>Ist das Present-Bit 0, löst die MMU eine Ausnahme aus. Das Betriebssystem prüft, ob der Zugriff erlaubt ist (sonst Segmentation Fault), sucht einen freien Rahmen (sonst wird per LRU oder Clock ein Opfer ausgelagert), lädt die Seite von der Platte, aktualisiert die Tabelle und setzt den Befehl fort. Weitere Bits im Eintrag: Dirty, Referenced, Schutzbits (r/w/x), User/Supervisor.</p>
+<h3>Probleme bei großen Adressräumen</h3>
+<p>Bei 64 Bit und 4-KiB-Seiten gibt es bis zu 2<sup>52</sup> Seiten. Eine flache Tabelle wäre pro Prozess riesig.</p>
+<ul><li><b>Mehrstufige Tabellen</b> (x86-64: 4 Ebenen) legen nur benutzte Teilbäume an, weil der Raum dünn besiedelt ist.</li>
+<li><b>Invertierte Tabelle:</b> ein Eintrag pro Rahmen, Suche per Hash.</li>
+<li><b>TLB</b> ist nötig, weil mehrere Ebenen mehrere Speicherzugriffe pro Übersetzung kosten.</li>
+<li><b>Huge Pages</b> (2 MiB, 1 GiB) verkleinern Tabellen und entlasten den TLB.</li>
+<li>Weitere Nachteile: interne Fragmentierung, Thrashing bei zu wenig RAM.</li></ul>
+<div class="key"><b>Merken:</b> p+d, Tabelle p&rarr;f, MMU in Hardware, TLB, Page Fault, mehrstufige Tabellen.</div>
+</div></details>
+<label class="check"><input type="checkbox" data-done="3"> Gelernt</label>
+</article>
+
+<!-- ============ 4 ============ -->
+<article id="q4" data-q="4">
+<div class="qhead"><h2>4. RAID</h2><span class="pts">2 P.</span></div>
+<div class="task">Erkläre das Grundkonzept von RAID, die Unterschiede zwischen RAID 0 und RAID 1 und passende Einsatzfälle.</div>
+<details><summary>Selbsttest: Kernpunkte</summary><div class="body"><ul>
+<li>Mehrere Platten als ein logisches Laufwerk, für Tempo und/oder Sicherheit</li>
+<li>RAID 0: Striping, schnell, keine Redundanz</li>
+<li>RAID 1: Spiegelung, 1 Plattenausfall verkraftbar, halbe Kapazität</li>
+<li>RAID ist kein Backup</li></ul></div></details>
+<details><summary>Volle Erklärung</summary><div class="body">
+<p>RAID (Redundant Array of Independent Disks) fasst mehrere physische Platten zu einem logischen Laufwerk zusammen. Die zwei Grundtechniken sind Striping (Daten verteilen) und Spiegelung oder Parität (Redundanz).</p>
+<div class="tw"><table><tr><th></th><th>RAID 0</th><th>RAID 1</th></tr>
+<tr><td>Prinzip</td><td>Striping</td><td>Spiegelung</td></tr>
+<tr><td>Mindestplatten</td><td>2</td><td>2</td></tr>
+<tr><td>Nutzbare Kapazität</td><td>100 %</td><td>50 % bei 2 Platten</td></tr>
+<tr><td>Ausfalltoleranz</td><td>keine, ein Ausfall zerstört alles</td><td>eine Platte darf ausfallen</td></tr>
+<tr><td>Leistung</td><td>sehr gut beim Lesen und Schreiben</td><td>Lesen schneller, Schreiben wie eine Platte</td></tr>
+<tr><td>Einsatz</td><td>Videoschnitt-Scratchdisk, Caches, temporäre Daten</td><td>Boot-Platte, Datenbank-Logs, kleine Server, Buchhaltung</td></tr></table></div>
+<p>RAID 0 verteilt Blöcke abwechselnd auf alle Platten, das Ausfallrisiko steigt mit der Plattenzahl. RAID 1 schreibt jeden Block identisch auf beide Platten.</p>
+<div class="key"><b>Merken:</b> RAID schützt vor Plattenausfall, nicht vor Löschen, Viren oder Brand. Dafür braucht es ein Backup.</div>
+</div></details>
+<label class="check"><input type="checkbox" data-done="4"> Gelernt</label>
+</article>
+
+<!-- ============ 5 ============ -->
+<article id="q5" data-q="5">
+<div class="qhead"><h2>5. Dateisystem-Allokation</h2><span class="pts">3 P.</span></div>
+<div class="task">Zusammenhängende Belegung, verkettete Liste oder i-Node: Was wählst du für eine große Festplatte mit vielen Dateien? Begründe und erkläre die gewählte Methode.</div>
+<details><summary>Selbsttest: Kernpunkte</summary><div class="body"><ul>
+<li>Contiguous: schnell, aber externe Fragmentierung, Größe vorab nötig</li>
+<li>Linked List: kein Fragmentieren, aber wahlfreier Zugriff langsam</li>
+<li>i-Node: Metadaten plus direkte und indirekte Zeiger, gut für alles</li>
+<li>Meine Wahl: i-Node</li></ul></div></details>
+<details><summary>Volle Erklärung</summary><div class="body">
+<div class="tw"><table><tr><th>Methode</th><th>Vorteile</th><th>Nachteile</th></tr>
+<tr><td>Zusammenhängend</td><td>sehr schneller sequenzieller und direkter Zugriff</td><td>externe Fragmentierung, Größe muss vorab bekannt sein, Wachsen erfordert Umkopieren</td></tr>
+<tr><td>Verkettete Liste</td><td>keine externe Fragmentierung, Dateien wachsen leicht</td><td>wahlfreier Zugriff muss alle Zeiger ablaufen, Zeiger kosten Platz, ein defekter Zeiger kappt die Datei (FAT mildert das, braucht aber die ganze Tabelle im RAM)</td></tr>
+<tr><td>i-Node</td><td>direkter Zugriff auf jeden Block, flexibles Wachsen, kleine Dateien brauchen nur direkte Zeiger</td><td>Zusatzaufwand durch indirekte Blöcke bei sehr großen Dateien, feste Zahl an i-Nodes</td></tr></table></div>
+<h3>Wahl: i-Node</h3>
+<p>Der i-Node speichert Rechte, Besitzer, Größe, Zeiten und die Blockzeiger: 12 direkte, 1 einfach indirekter, 1 zweifach indirekter, 1 dreifach indirekter.</p>
+<ul><li>Viele Dateien in wechselnder Größe mit ständigem Anlegen und Löschen würden bei contiguous stark fragmentieren.</li>
+<li>Wahlfreier Zugriff auf große Dateien macht die verkettete Liste zu langsam.</li>
+<li>Der i-Node einer Datei muss nur im RAM sein, solange die Datei offen ist. Der Bedarf wächst also mit den offenen, nicht mit allen Dateien.</li>
+<li>Bewährt in ext2/3/4 und UFS.</li></ul>
+<h3>Rechenbeispiel</h3>
+<p>Blockgröße 4 KiB, Zeiger 4 B, also 1024 Zeiger pro Block.</p>
+<div class="tw"><table><tr><th>Stufe</th><th>Zusätzliche Größe</th></tr>
+<tr><td>12 direkte Zeiger</td><td>48 KiB</td></tr>
+<tr><td>einfach indirekt</td><td>4 MiB</td></tr>
+<tr><td>zweifach indirekt</td><td>4 GiB</td></tr>
+<tr><td>dreifach indirekt</td><td>4 TiB</td></tr></table></div>
+</div></details>
+<label class="check"><input type="checkbox" data-done="5"> Gelernt</label>
+</article>
+
+<!-- ============ 6 ============ -->
+<article id="q6" data-q="6">
+<div class="qhead"><h2>6. Pfadnamen</h2><span class="pts">2 P.</span></div>
+<div class="task">Aktuelles Verzeichnis: <code>/home/student/assignments/os</code>. Wie lautet der absolute Pfad zu <code>../../resources/slides.pdf</code>? Wie lautet der relative Pfad zu <code>/home/student/projects/kernel/main.c</code>?</div>
+<details><summary>Selbsttest: Lösung erst selbst rechnen</summary><div class="body">
+<p class="hint">Tipp: Zähle, wie viele Ebenen <code>..</code> nach oben geht.</p></div></details>
+<details><summary>Lösung mit Weg</summary><div class="body">
+<h3>a) Absoluter Pfad</h3>
+<pre>/home/student/assignments/os   (hier)
+..    -> /home/student/assignments
+../.. -> /home/student
++ resources/slides.pdf</pre>
+<p><b>/home/student/resources/slides.pdf</b></p>
+<h3>b) Relativer Pfad</h3>
+<p>Zwei Ebenen hoch bis <code>/home/student</code>, dann <code>projects/kernel/main.c</code>.</p>
+<p><b>../../projects/kernel/main.c</b></p>
+<div class="key"><b>Merken:</b> absolut beginnt mit <code>/</code>. <code>.</code> ist hier, <code>..</code> ist eine Ebene höher.</div>
+<div class="note">Das Baumdiagramm der Aufgabe lag nicht vor. Die Lösung nutzt nur die genannten Pfade.</div>
+</div></details>
+<label class="check"><input type="checkbox" data-done="6"> Gelernt</label>
+</article>
+
+<!-- ============ 7 ============ -->
+<article id="q7" data-q="7">
+<div class="qhead"><h2>7. Prozess, Thread, Speicherlayout</h2><span class="pts">4 P.</span></div>
+<div class="task">Was ist ein Prozess? Was bedeutet Thread? Zeichne das Speicherlayout eines Prozesses, markiere die logischen Bereiche und beschreibe Zweck und Inhalt.</div>
+<details><summary>Selbsttest: Kernpunkte</summary><div class="body"><ul>
+<li>Prozess = Programm in Ausführung mit eigenem Adressraum, verwaltet im PCB</li>
+<li>Thread = Ablauf im Prozess, teilt Adressraum, eigener Stack und Register</li>
+<li>Layout von unten: Text, Data, BSS, Heap (wächst hoch), Stack (wächst runter)</li></ul></div></details>
+<details><summary>Volle Erklärung</summary><div class="body">
+<p><b>Prozess:</b> ein Programm in Ausführung. Er besteht aus dem Code und dem dynamischen Zustand: eigener Adressraum, Register (Programmzähler, Stackpointer), offene Dateien, PID, Rechte, Zustand. Das Betriebssystem führt dafür den Process Control Block (PCB).</p>
+<p><b>Thread:</b> eine Ausführungseinheit innerhalb eines Prozesses. Threads teilen Code, Daten, Heap und offene Dateien. Jeder hat eigenen Programmzähler, Registersatz und Stack. Vorteile: billiges Erzeugen und Umschalten, einfacher Datenaustausch, Parallelität auf mehreren Kernen. Nachteil: Synchronisation nötig, ein Fehler trifft den ganzen Prozess.</p>
+<h3>Speicherlayout</h3>
+<pre>hohe Adressen
++------------------------+
+| Kernel-Bereich         |
++------------------------+
+| Stack          (runter)|
+|        |               |
+|        v   ... ^       |
+|        |               |
+| Heap            (hoch) |
++------------------------+
+| BSS   (nicht init.)    |
++------------------------+
+| Data  (initialisiert)  |
++------------------------+
+| Text  (Code)           |
++------------------------+
+niedrige Adressen</pre>
+<div class="tw"><table><tr><th>Bereich</th><th>Zweck</th><th>Beispiel</th></tr>
+<tr><td>Text</td><td>Programmbefehle, schreibgeschützt, teilbar</td><td>Maschinencode, Konstanten</td></tr>
+<tr><td>Data</td><td>initialisierte globale und statische Variablen</td><td><code>int x = 5;</code> global</td></tr>
+<tr><td>BSS</td><td>nicht initialisierte globale und statische Variablen, beim Start 0</td><td><code>int arr[1000];</code> global</td></tr>
+<tr><td>Heap</td><td>Speicher, der zur Laufzeit angefordert wird</td><td><code>malloc</code>, <code>new</code></td></tr>
+<tr><td>Stack</td><td>Funktionsaufrufe: Rücksprungadresse, Parameter, lokale Variablen</td><td>Stack Frames</td></tr></table></div>
+<div class="key"><b>Merken:</b> Prozess hat einen Adressraum, Threads teilen ihn. Reihenfolge von unten: Text, Data, BSS, Heap, Stack.</div>
+</div></details>
+<label class="check"><input type="checkbox" data-done="7"> Gelernt</label>
+</article>
+
+<!-- ============ 8 ============ -->
+<article id="q8" data-q="8">
+<div class="qhead"><h2>8. Prozesszustände</h2><span class="pts">4 P.</span></div>
+<div class="task">Skizziere die Prozesszustände, zeichne die Übergänge und erkläre sie. Wie viele Prozesse können in einem Einkernsystem höchstens gleichzeitig in jedem Zustand sein (0, 1, 2, ..., n)?</div>
+<details><summary>Selbsttest: Kernpunkte</summary><div class="body"><ul>
+<li>New, Ready, Running, Blocked, Terminated</li>
+<li>Ready&rarr;Running: Dispatch. Running&rarr;Ready: Zeitscheibe vorbei</li>
+<li>Running&rarr;Blocked: wartet. Blocked&rarr;Ready: Ereignis da</li>
+<li>Kein Blocked&rarr;Running, kein Ready&rarr;Blocked</li>
+<li>Running höchstens 1, Ready und Blocked bis n</li></ul></div></details>
+<details><summary>Volle Erklärung</summary><div class="body">
+<pre>            admit              dispatch
+ New ─────────────► Ready ─────────────► Running ── exit ──► Terminated
+                      ▲  ◄──────────────    │
+                      │   Zeitscheibe        │
+                      │   abgelaufen /       │ wartet auf
+                      │   verdrängt          │ I/O, Ereignis
+                      │                      ▼
+                      └───────────────── Blocked
+                          Ereignis eingetreten</pre>
+<div class="tw"><table><tr><th>Übergang</th><th>Auslöser</th></tr>
+<tr><td>New &rarr; Ready</td><td>Prozess ist zugelassen</td></tr>
+<tr><td>Ready &rarr; Running</td><td>Dispatch: der Scheduler wählt ihn</td></tr>
+<tr><td>Running &rarr; Ready</td><td>Preemption: Zeitscheibe abgelaufen oder höhere Priorität</td></tr>
+<tr><td>Running &rarr; Blocked</td><td>wartet auf I/O oder ein Ereignis</td></tr>
+<tr><td>Blocked &rarr; Ready</td><td>Ereignis eingetreten, zum Beispiel I/O fertig</td></tr>
+<tr><td>Running &rarr; Terminated</td><td><code>exit</code>, Fehler oder Abbruch</td></tr></table></div>
+<h3>Anzahl pro Zustand (ein Kern, n Prozesse)</h3>
+<div class="tw"><table><tr><th>Zustand</th><th>Höchstens gleichzeitig</th></tr>
+<tr><td>Running</td><td>1 (also 0 oder 1)</td></tr>
+<tr><td>Ready</td><td>n, oder n&minus;1 wenn einer läuft</td></tr>
+<tr><td>Blocked</td><td>n</td></tr></table></div>
+<p>Warten alle auf I/O, gilt Running = 0 und Blocked = n. Im anderen Extrem: 1 Running und n&minus;1 Ready.</p>
+</div></details>
+<label class="check"><input type="checkbox" data-done="8"> Gelernt</label>
+</article>
+
+<!-- ============ 9 ============ -->
+<article id="q9" data-q="9">
+<div class="qhead"><h2>9. Multiprogramming</h2><span class="pts">4 P.</span></div>
+<div class="task">Was bedeutet Multiprogramming? Was wollen wir damit erreichen? Wer steuert, welches Programm als Nächstes läuft?</div>
+<details><summary>Selbsttest: Kernpunkte</summary><div class="body"><ul>
+<li>Mehrere Programme gleichzeitig im Hauptspeicher</li>
+<li>Bei Wartezeit (I/O) wird die CPU einem anderen Programm gegeben</li>
+<li>Ziel: CPU-Auslastung und Durchsatz</li>
+<li>Entscheider: Scheduler des Betriebssystems, Dispatcher wechselt</li></ul></div></details>
+<details><summary>Volle Erklärung</summary><div class="body">
+<p>Beim Multiprogramming liegen mehrere Programme gleichzeitig im Hauptspeicher und teilen sich die CPU. Wartet eines, etwa auf die Platte, schaltet das Betriebssystem auf ein anderes bereites Programm um.</p>
+<h3>Ziel</h3>
+<ul><li>Die CPU soll nicht untätig auf langsame I/O warten.</li>
+<li>Mehr Durchsatz und bessere Ressourcennutzung.</li></ul>
+<p>Faustformel: Bei Wartezeitanteil p und n Programmen ist die Auslastung etwa 1 &minus; p<sup>n</sup>. Bei p = 80 % ergibt n = 4 rund 59 %, n = 10 rund 89 %.</p>
+<p>Voraussetzungen sind Speicherschutz, Prozessverwaltung und ein Scheduler. Time-Sharing (Zeitscheiben) erweitert das Prinzip um gute Antwortzeiten.</p>
+<h3>Wer entscheidet?</h3>
+<p>Der CPU-Scheduler im Kernel (Short-Term-Scheduler). Der Dispatcher führt den Kontextwechsel aus. Die Wahl folgt einer Strategie wie Round Robin, Priorität, FCFS oder SJF. Weder die Programme noch der Benutzer entscheiden.</p>
+</div></details>
+<label class="check"><input type="checkbox" data-done="9"> Gelernt</label>
+</article>
+
+<!-- ============ 10 ============ -->
+<article id="q10" data-q="10">
+<div class="qhead"><h2>10. Kommunikation und Synchronisation</h2><span class="pts">4 P.</span></div>
+<div class="task">Wie erreichen wir Interaktion oder Kommunikation zwischen Programmen? Welche Mittel bietet das Betriebssystem für Verwaltung und Synchronisation des Zugriffs auf gemeinsame Ressourcen?</div>
+<details><summary>Selbsttest: Kernpunkte</summary><div class="body"><ul>
+<li>IPC: Pipes, FIFOs, Message Queues, Shared Memory, Sockets, Signale</li>
+<li>Problem: Race Condition im kritischen Abschnitt</li>
+<li>Lösung: Mutex, Semaphor, Monitor, atomare Operationen</li>
+<li>Gefahren: Deadlock, Starvation</li></ul></div></details>
+<details><summary>Volle Erklärung</summary><div class="body">
+<h3>Interprozesskommunikation</h3>
+<p>Prozesse haben getrennte Adressräume und brauchen Hilfsmittel vom Betriebssystem.</p>
+<div class="tw"><table><tr><th>Mittel</th><th>Beschreibung</th></tr>
+<tr><td>Pipe, FIFO</td><td>Bytestrom zwischen Prozessen, zum Beispiel <code>ls | grep txt</code></td></tr>
+<tr><td>Message Queue</td><td>Nachrichten mit Typ oder Priorität, vom Kernel verwaltet</td></tr>
+<tr><td>Shared Memory</td><td>gemeinsamer Speicherbereich, am schnellsten, braucht eigene Synchronisation</td></tr>
+<tr><td>Socket</td><td>lokal oder über das Netzwerk</td></tr>
+<tr><td>Signal</td><td>kurze asynchrone Benachrichtigung, etwa <code>SIGTERM</code></td></tr>
+<tr><td>Datei</td><td>Austausch über das Dateisystem</td></tr></table></div>
+<p>Zwei Modelle: Message Passing (Kernel kopiert, einfach, langsamer) und Shared Memory (direkter Zugriff, schnell, Synchronisation Sache des Programmierers).</p>
+<h3>Synchronisation</h3>
+<p>Eine <b>Race Condition</b> entsteht, wenn das Ergebnis von der Reihenfolge abhängt. Beispiel: Zwei Threads erhöhen denselben Zähler, ein Update geht verloren. Der gefährdete Codeabschnitt heißt <b>kritischer Abschnitt</b>. Es muss gegenseitiger Ausschluss gelten.</p>
+<ul><li><b>Mutex / Lock:</b> nur einer darf hinein (<code>lock</code>, <code>unlock</code>).</li>
+<li><b>Semaphor:</b> Zähler mit atomarem <code>wait</code> (P) und <code>signal</code> (V). Binär ist er ein Mutex. Zählend schützt er begrenzte Ressourcen, etwa 5 Plätze.</li>
+<li><b>Monitor:</b> kapselt Daten und Zugriffsfunktionen, nur ein Thread ist aktiv, mit Bedingungsvariablen (<code>wait</code>, <code>notify</code>).</li>
+<li><b>Atomare Operationen:</b> Test-and-Set, Compare-and-Swap als Hardwarebasis.</li></ul>
+<p>Typische Gefahren: Deadlock, Starvation, Prioritätsinversion. Klassische Beispiele: Producer-Consumer, Readers-Writers, Philosophenproblem.</p>
+</div></details>
+<label class="check"><input type="checkbox" data-done="10"> Gelernt</label>
+</article>
+
+<!-- ============ 11 ============ -->
+<article id="q11" data-q="11">
+<div class="qhead"><h2>11. Preemptive und Non-Preemptive Resources</h2><span class="pts">4 P.</span></div>
+<div class="task">Was bedeuten &bdquo;Preemptive&ldquo; und &bdquo;Non-Preemptive Resources&ldquo;? Gib je ein Beispielszenario an und begründe.</div>
+<details><summary>Selbsttest: Kernpunkte</summary><div class="body"><ul>
+<li>Preemptive: entziehbar ohne Schaden (Zustand sicherbar)</li>
+<li>Non-preemptive: Entzug zerstört Arbeit oder Konsistenz</li>
+<li>Beispiele: RAM oder CPU gegen Drucker, Brenner oder Lock</li>
+<li>Bezug: Deadlock braucht die Bedingung &bdquo;No Preemption&ldquo;</li></ul></div></details>
+<details><summary>Volle Erklärung</summary><div class="body">
+<p><b>Preemptive Resource:</b> Das System kann sie einem Prozess wegnehmen und später ohne Schaden zurückgeben, weil sich der Zustand sichern und wiederherstellen lässt.</p>
+<p><b>Non-Preemptive Resource:</b> Ein gewaltsamer Entzug verliert Arbeit oder macht den Zustand inkonsistent. Sie wird nur freiwillig freigegeben.</p>
+<h3>Beispiel preemptive: Hauptspeicher oder CPU</h3>
+<p>Wird der RAM knapp, lagert das Betriebssystem Seiten auf die Platte aus und gibt den Rahmen einem anderen Prozess. Beim nächsten Zugriff holt ein Page Fault die Seite zurück. Der Prozess merkt nichts. Bei der CPU entzieht der Scheduler sie per Timer-Interrupt, sichert die Register und stellt sie später wieder her.</p>
+<h3>Beispiel non-preemptive: Drucker, CD-Brenner, Lock</h3>
+<p>Druckt Prozess A und das System entzieht ihm den Drucker, mischen sich beide Ausdrucke und sind unbrauchbar. Beim CD-Brenner entsteht ein defekter Rohling. Ein Mutex im kritischen Abschnitt darf ebenfalls nicht einfach entzogen werden, sonst sind die Daten inkonsistent.</p>
+<div class="key"><b>Merken:</b> Nur bei non-preemptive Ressourcen kann ein Deadlock entstehen. Die vier Bedingungen sind Mutual Exclusion, Hold and Wait, No Preemption und Circular Wait.</div>
+</div></details>
+<label class="check"><input type="checkbox" data-done="11"> Gelernt</label>
+</article>
+</main>
+</div>
+
+<script>
+(function(){
+  var KEY='os-lern-gruppe-a', total=11, state={};
+  try{ state=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ state={}; }
+  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(state)); }catch(e){} }
+
+  var titles={};
+  document.querySelectorAll('article').forEach(function(a){ titles[a.dataset.q]=a.querySelector('h2').textContent.replace(/^\d+\.\s*/,''); });
+
+  var list=document.getElementById('navlist');
+  for(var i=1;i<=total;i++){
+    var a=document.createElement('a'); a.href='#q'+i; a.id='nav'+i;
+    a.innerHTML='<span class="n">'+i+'</span><span class="t">'+titles[i]+'</span>';
+    list.appendChild(a);
+  }
+
+  function render(){
+    var done=0;
+    for(var i=1;i<=total;i++){
+      var d=!!state[i];
+      if(d) done++;
+      document.getElementById('nav'+i).classList.toggle('done',d);
+      document.getElementById('q'+i).classList.toggle('done',d);
+      document.querySelector('input[data-done="'+i+'"]').checked=d;
+    }
+    document.getElementById('pfill').style.width=(done/total*100)+'%';
+    document.getElementById('pstat').textContent=done+' von '+total+' gelernt';
+    document.getElementById('pbar').setAttribute('aria-valuenow',done);
+  }
+
+  document.querySelectorAll('input[data-done]').forEach(function(c){
+    c.addEventListener('change',function(){ state[c.dataset.done]=c.checked; save(); render(); });
+  });
+  document.getElementById('openall').addEventListener('click',function(){ document.querySelectorAll('details').forEach(function(d){d.open=true;}); });
+  document.getElementById('closeall').addEventListener('click',function(){ document.querySelectorAll('details').forEach(function(d){d.open=false;}); });
+  document.getElementById('reset').addEventListener('click',function(){ state={}; save(); render(); });
+  render();
+})();
+</script>
+</body>
+</html>
