@@ -34,22 +34,50 @@ Rechtsklick auf `overlay.html` → **Öffnen mit** → **Google Chrome** (oder M
 Du siehst jetzt das Overlay auf einem **pinken Hintergrund**. Das ist Absicht: Den pinken
 Hintergrund schneidet OBS später weg.
 
-### Schritt 3: Minecraft-Ordner freigeben
+### Schritt 3: Minecraft-Ordner umziehen und freigeben
 
-1. Klicke unter dem Overlay auf den grünen Knopf **📁 Minecraft-Ordner wählen**.
-2. Im Fenster, das sich öffnet, klickst du oben in die **Adresszeile**, tippst Folgendes ein und drückst Enter:
-   ```
-   %appdata%\.minecraft
-   ```
-3. Doppelklicke auf den Ordner **`saves`** und klicke dann auf **„Ordner auswählen“**.
-4. Chrome fragt, ob die Seite Dateien ansehen darf. Klicke auf **„Dateien ansehen“** bzw. **„Zulassen“**.
+**Warum?** Minecraft speichert deine Welten normalerweise in `%appdata%\.minecraft`.
+Chrome und Edge sperren aus Sicherheitsgründen **alles im Ordner `AppData`**.
+Deshalb kannst du den Ordner dort nicht freigeben. Die Lösung: Du sagst dem Minecraft Launcher
+einmal, dass er einen anderen Ordner benutzen soll.
+
+**3a) Neuen Ordner anlegen**
+
+Erstelle im Explorer den Ordner **`C:\Minecraft`**.
+(Nimm besser nicht „Dokumente“ oder „Desktop“, wenn die mit OneDrive synchronisiert werden.)
+
+**3b) Launcher umstellen**
+
+1. Öffne den **Minecraft Launcher** und klicke oben auf **Installationen**.
+2. Fahre mit der Maus über die Installation, mit der du spielst (meist **„Neueste Version“**),
+   und klicke rechts auf **„⋯“** → **Bearbeiten**.
+3. Bei **Spielverzeichnis** klickst du auf **Durchsuchen** und wählst `C:\Minecraft`.
+4. Klicke unten auf **Speichern**.
+
+**3c) Deine Welt mitnehmen**
+
+Der neue Ordner ist noch leer. So kopierst du deine bisherige Welt und deine Einstellungen hinein:
+
+1. Drücke **Windows-Taste + R**, tippe `%appdata%\.minecraft` ein und drücke Enter.
+2. Kopiere den Ordner **`saves`** und die Datei **`options.txt`** (deine Einstellungen und Tastenbelegung).
+   Wenn du Ressourcenpakete benutzt, nimm auch **`resourcepacks`** mit.
+3. Füge alles in `C:\Minecraft` ein.
+
+Starte Minecraft einmal über den Launcher und prüfe, ob deine Welt in der Liste ist.
+Die alte Kopie in `AppData` bleibt als Sicherung liegen. Spiel ab jetzt aber nur noch über diese Installation,
+sonst landet der Fortschritt im alten Ordner.
+
+**3d) Ordner im Overlay freigeben**
+
+1. Klicke im Overlay auf den grünen Knopf **📁 Minecraft-Ordner wählen**.
+2. Wähle **`C:\Minecraft\saves`** und klicke auf **„Ordner auswählen“**.
+3. Chrome fragt, ob die Seite Dateien ansehen darf. Klicke auf **„Dateien ansehen“** bzw. **„Zulassen“**.
    Wenn dir die Option **„Bei jedem Besuch zulassen“** angezeigt wird, wähle diese.
 
 Oben im Menü steht jetzt grün **„Auto-Tracker: verbunden · Welt …“** mit dem Namen deiner zuletzt gespielten Welt. 🎉
 
-> Benutzt du einen anderen Launcher (Prism, CurseForge, Modrinth …)? Dann wähle dessen `saves`-Ordner.
-> Du findest ihn in Minecraft unter **Einzelspieler → Welt auswählen → Bearbeiten → Weltordner öffnen**.
-> Geh von dort einen Ordner zurück, dann bist du in `saves`.
+> **Anderer Launcher** (Prism, CurseForge, Modrinth …)? Diese Launcher speichern meist auch in `AppData`.
+> In ihren Einstellungen kannst du den Speicherort für Instanzen ändern, zum Beispiel auf `C:\Minecraft`.
 
 ### Schritt 4: Menü ausblenden
 
@@ -164,8 +192,9 @@ Alles wird automatisch gespeichert und bleibt auch nach einem Neustart von OBS e
 | Problem | Lösung |
 |---|---|
 | **Browser:** kein grüner Knopf „Minecraft-Ordner wählen“ | Du benutzt nicht Chrome oder Edge. Öffne die Datei mit Chrome oder Edge. |
-| **Browser:** „Diese Seite kann diesen Ordner nicht öffnen, da er Systemdateien enthält“ | Wähle nicht `AppData` oder `Roaming`, sondern den Ordner **`saves`** darin |
-| **Browser:** „in diesem Ordner ist keine Welt“ | Du hast einen falschen Ordner gewählt. Klicke auf „📁 Anderen Ordner wählen“ und nimm `saves`. |
+| **Browser:** „Diese Seite kann diesen Ordner nicht öffnen, da er Systemdateien enthält“ | Der Ordner liegt in `AppData`. Das sperrt Chrome. Zieh den Minecraft-Ordner um (Schritt 3). |
+| **Browser:** „in diesem Ordner ist keine Welt“ | Du hast einen falschen Ordner gewählt, oder die Welt wurde noch nicht kopiert (Schritt 3c). Klicke auf „📁 Anderen Ordner wählen“ und nimm `C:\Minecraft\saves`. |
+| **Browser:** Ziele haken sich nicht mehr ab | Spielst du über die umgestellte Installation (Schritt 3b)? Sonst speichert Minecraft wieder im alten Ordner. |
 | **Browser:** Overlay friert im Stream ein | Das Chrome-Fenster ist minimiert oder ganz verdeckt. Lass es sichtbar (siehe Schritt 5). |
 | **Browser:** pinke Ränder um die Schrift | Im Chroma-Key-Filter den Wert **Ähnlichkeit** etwas erhöhen |
 | **Python:** Schwarzes Fenster geht sofort wieder zu oder zeigt „python wurde nicht gefunden“ | Python neu installieren und den Haken bei **„Add python.exe to PATH“** setzen (Schritt 2) |

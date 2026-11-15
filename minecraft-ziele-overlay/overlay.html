@@ -192,7 +192,8 @@ html.keyed, html.keyed body{background:#ff00ff;overflow:auto}
 html.keyed .panel{background:#141418;box-shadow:inset 3px 3px 0 var(--border-light), inset -3px -3px 0 #2c2c2c}
 html.keyed .editor{background:#0c0c0e}
 .folder{display:none;margin-bottom:8px}
-.folder.show{display:flex}
+.folder.show{display:flex;flex-direction:column;gap:4px}
+.folder small{font-size:18px;color:var(--muted);line-height:1.2}
 .folder button{flex:1;background:#3d6b2f;box-shadow:inset 2px 2px 0 #5d9b47, inset -2px -2px 0 #24401b}
 .editor .hint{color:var(--muted);font-size:18px;margin-top:8px;line-height:1.2}
 </style>
@@ -218,7 +219,11 @@ html.keyed .editor{background:#0c0c0e}
 <div class="editor" id="editor">
   <h2>Ziele bearbeiten</h2>
   <div class="sync" id="sync">Auto-Tracker: nicht verbunden</div>
-  <div class="folder row" id="folderRow"><button id="btnFolder">📁 Minecraft-Ordner wählen</button></div>
+  <div class="folder" id="folderRow">
+    <button id="btnFolder">📁 Minecraft-Ordner wählen</button>
+    <small>Chrome sperrt den Standardordner in „AppData“. Lege den Minecraft-Ordner deshalb einmal
+      an einen anderen Ort, z. B. C:\Minecraft (siehe Anleitung, Schritt 3).</small>
+  </div>
   <div class="row">
     <div><label>Überschrift</label><input id="inTitle"></div>
     <div style="flex:.4"><label>Icon</label><input id="inTitleIcon"></div>
