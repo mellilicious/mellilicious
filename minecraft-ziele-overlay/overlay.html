@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Minecraft Ziele Overlay</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   MINECRAFT ZIELE – Twitch/OBS Overlay
+   Empfohlene Browserquelle: 420 x 700 px
+   ========================================================= */
+:root{
+  --panel: rgba(20, 20, 24, 0.78);
+  --border-dark: #1b1b1b;
+  --border-light: #6f6f6f;
+  --title: #ffd84a;
+  --text: #f2f2f2;
+  --muted: #a8a8a8;
+  --done: #6fe36f;
+  --xp-a: #80ff20;
+  --xp-b: #3fae0e;
+  --accent: #5fd3ff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:transparent;overflow:hidden}
+body{
+  font-family:'VT323', monospace;
+  color:var(--text);
+  padding:16px;
+  font-size:26px;
+  line-height:1;
+  -webkit-font-smoothing:none;
+  text-shadow:2px 2px 0 #000;
+  user-select:none;
+}
+
+/* ---------- Panel ---------- */
+.panel{
+  width:100%;
+  max-width:400px;
+  background:var(--panel);
+  border:3px solid var(--border-dark);
+  box-shadow:
+    inset 3px 3px 0 var(--border-light),
+    inset -3px -3px 0 #2c2c2c,
+    0 6px 0 rgba(0,0,0,.35);
+  padding:14px 16px 16px;
+  image-rendering:pixelated;
+}
+.head{
+  display:flex;align-items:center;gap:10px;
+  padding-bottom:10px;margin-bottom:10px;
+  border-bottom:3px solid rgba(255,255,255,.12);
+}
+.head .ico{font-size:28px;filter:drop-shadow(2px 2px 0 #000)}
+.head h1{
+  font-size:36px;font-weight:normal;letter-spacing:1px;
+  color:var(--title);
+}
+.head .count{margin-left:auto;font-size:28px;color:var(--muted)}
+.subtitle{font-size:22px;color:var(--muted);margin:-4px 0 10px}
+
+/* ---------- Ziel-Liste ---------- */
+ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+li{
+  display:grid;
+  grid-template-columns:30px 1fr auto;
+  align-items:center;gap:8px;
+  padding:5px 6px;
+  background:rgba(255,255,255,.04);
+  border-left:4px solid transparent;
+  transition:background .3s, border-color .3s;
+  cursor:pointer;
+}
+li .box{
+  width:24px;height:24px;
+  border:3px solid #000;
+  background:#3a3a3a;
+  box-shadow:inset 2px 2px 0 #555;
+  display:grid;place-items:center;
+  font-size:22px;color:var(--done);
+}
+li .label{display:flex;align-items:center;gap:6px;min-width:0}
+li .label .emo{font-size:20px;flex:none}
+li .label .txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+li .prog{font-size:22px;color:var(--accent);white-space:nowrap}
+li .bar{
+  grid-column:2 / 4;height:6px;margin-top:2px;
+  background:#000;border:1px solid #000;
+}
+li .bar i{display:block;height:100%;background:var(--accent);transition:width .5s}
+
+li.done{border-left-color:var(--done);background:rgba(111,227,111,.08)}
+li.done .txt{color:#9fb59f;text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:rgba(111,227,111,.8);text-shadow:1px 1px 0 #000}
+li.done .box{background:#1f4d1f}
+li.done .prog{color:var(--done)}
+li.done .bar i{background:var(--done)}
+li.current{border-left-color:var(--title);background:rgba(255,216,74,.10)}
+li.current .txt{color:var(--title)}
+
+/* ---------- XP-Leiste ---------- */
+.xp{margin-top:14px}
+.xp .lvl{
+  text-align:center;font-size:30px;color:var(--xp-a);margin-bottom:4px;
+  text-shadow:2px 2px 0 #000, 0 0 6px rgba(128,255,32,.4);
+}
+.xp .track{
+  height:16px;background:#111;
+  border:3px solid #000;
+  box-shadow:inset 0 2px 0 #333;
+  position:relative;overflow:hidden;
+}
+.xp .fill{
+  height:100%;width:0;
+  background:linear-gradient(var(--xp-a), var(--xp-b));
+  transition:width .8s cubic-bezier(.2,.8,.2,1);
+}
+.xp .track::after{ /* Segmente wie bei der XP-Leiste */
+  content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg, transparent 0 calc(10% - 3px), #000 calc(10% - 3px) 10%);
+  opacity:.55;
+}
+.xp .pct{text-align:center;font-size:22px;color:var(--muted);margin-top:4px}
+
+/* ---------- Erfolgs-Popup ---------- */
+.toast{
+  position:fixed;top:16px;right:16px;
+  width:330px;
+  display:flex;align-items:center;gap:12px;
+  padding:10px 14px;
+  background:#212121;
+  border:3px solid #000;
+  box-shadow:inset 3px 3px 0 #555, inset -3px -3px 0 #111;
+  transform:translateX(130%);
+  transition:transform .45s cubic-bezier(.2,.9,.3,1.2);
+  z-index:10;
+}
+.toast.show{transform:translateX(0)}
+.toast .t-ico{
+  width:44px;height:44px;display:grid;place-items:center;font-size:28px;
+  background:#3a3a3a;border:3px solid #000;flex:none;
+}
+.toast .t-head{color:var(--title);font-size:24px}
+.toast .t-body{font-size:24px;margin-top:2px}
+
+/* ---------- Konfetti-Pixel ---------- */
+.px{position:fixed;width:8px;height:8px;pointer-events:none;z-index:9;
+  animation:fall 1.4s ease-in forwards}
+@keyframes fall{
+  to{transform:translate(var(--dx), 260px) rotate(360deg);opacity:0}
+}
+.pop{animation:pop .5s}
+@keyframes pop{40%{transform:scale(1.04)}}
+
+/* ---------- Bearbeiten-Modus ---------- */
+.editor{
+  display:none;margin-top:14px;max-width:400px;
+  background:rgba(10,10,12,.92);border:3px solid #000;padding:12px;
+  font-size:22px;text-shadow:none;
+}
+body.edit .editor{display:block}
+.editor h2{font-size:26px;font-weight:normal;color:var(--title);margin-bottom:8px}
+.editor label{display:block;color:var(--muted);margin:6px 0 2px}
+.editor input{
+  width:100%;font:inherit;font-size:22px;padding:4px 6px;
+  background:#2a2a2a;color:#fff;border:2px solid #000;outline:none;
+}
+.editor input:focus{border-color:var(--title)}
+.editor .row{display:flex;gap:6px}
+.editor .row > *{flex:1}
+.editor button{
+  font:inherit;font-size:22px;padding:4px 10px;cursor:pointer;
+  background:#6b6b6b;color:#fff;border:2px solid #000;
+  box-shadow:inset 2px 2px 0 #9a9a9a, inset -2px -2px 0 #3d3d3d;
+  text-shadow:2px 2px 0 #333;
+}
+.editor button:hover{background:#7d86c4}
+.editor .list{margin-top:10px;display:flex;flex-direction:column;gap:4px;max-height:260px;overflow:auto}
+.editor .item{display:flex;gap:4px;align-items:center}
+.editor .item span{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.editor .item button{padding:0 8px;flex:none}
+.editor .hint{color:var(--muted);font-size:18px;margin-top:8px;line-height:1.2}
+</style>
+</head>
+<body>
+
+<div class="panel" id="panel">
+  <div class="head">
+    <span class="ico" id="titleIcon">⛏️</span>
+    <h1 id="title">Ziele</h1>
+    <span class="count" id="count">0/0</span>
+  </div>
+  <div class="subtitle" id="subtitle"></div>
+  <ul id="list"></ul>
+  <div class="xp">
+    <div class="lvl" id="lvl">0</div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <div class="pct" id="pct">0% erreicht</div>
+  </div>
+</div>
+
+<!-- Bearbeiten-Modus: Taste "E" im OBS-Interagieren-Fenster oder ?edit=1 an die URL -->
+<div class="editor" id="editor">
+  <h2>Ziele bearbeiten</h2>
+  <div class="row">
+    <div><label>Überschrift</label><input id="inTitle"></div>
+    <div style="flex:.4"><label>Icon</label><input id="inTitleIcon"></div>
+  </div>
+  <label>Untertitel (optional)</label><input id="inSub" placeholder="z.B. Tag 12 · Hardcore">
+  <label>Neues Ziel</label>
+  <div class="row">
+    <input id="inEmo" style="flex:.25" placeholder="💎">
+    <input id="inText" placeholder="Diamanten sammeln">
+    <input id="inMax" style="flex:.35" placeholder="Anz." type="number" min="0">
+  </div>
+  <div class="row" style="margin-top:6px">
+    <button id="btnAdd">+ Hinzufügen</button>
+    <button id="btnReset">Alles zurücksetzen</button>
+  </div>
+  <div class="list" id="editList"></div>
+  <div class="hint">
+    Klick auf ein Ziel = abhaken (bei Mengen-Zielen +1).<br>
+    Rechtsklick = Fortschritt −1 · Mausrad = Fortschritt ±1.<br>
+    Taste <b>E</b> blendet dieses Menü ein/aus.
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <div class="t-ico" id="tIco">🏆</div>
+  <div>
+    <div class="t-head">Ziel erreicht!</div>
+    <div class="t-body" id="tBody"></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   STANDARD-ZIELE – hier kannst du die Startliste anpassen.
+   emoji: Symbol · text: Ziel · max: Zielmenge (0 = einfaches Abhaken)
+   ========================================================= */
+const DEFAULT = {
+  title: "Ziele",
+  titleIcon: "⛏️",
+  subtitle: "Survival-Run",
+  goals: [
+    { emoji:"🪓", text:"Erste Holzwerkzeuge",      max:0,  value:0, done:false },
+    { emoji:"🏠", text:"Basis bauen",              max:0,  value:0, done:false },
+    { emoji:"⚒️", text:"Eisenrüstung craften",     max:24, value:0, done:false },
+    { emoji:"💎", text:"Diamanten finden",         max:10, value:0, done:false },
+    { emoji:"🔥", text:"Nether betreten",          max:0,  value:0, done:false },
+    { emoji:"🧪", text:"Lohenruten sammeln",       max:7,  value:0, done:false },
+    { emoji:"👁️", text:"Festung finden",           max:0,  value:0, done:false },
+    { emoji:"🐉", text:"Enderdrache besiegen",     max:0,  value:0, done:false },
+  ]
+};
+
+const KEY = "mc-ziele-overlay-v1";
+const $ = id => document.getElementById(id);
+let state = load();
+const chan = ("BroadcastChannel" in window) ? new BroadcastChannel(KEY) : null;
+
+function load(){
+  try{ const s = JSON.parse(localStorage.getItem(KEY)); if(s && Array.isArray(s.goals)) return s; }catch(e){}
+  return structuredClone(DEFAULT);
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+  if(chan) chan.postMessage(state);
+}
+if(chan) chan.onmessage = e => { state = e.data; render(); };
+window.addEventListener("storage", e => { if(e.key===KEY){ state = load(); render(); }});
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function render(){
+  $("title").textContent = state.title;
+  $("titleIcon").textContent = state.titleIcon || "";
+  $("subtitle").textContent = state.subtitle || "";
+  $("subtitle").style.display = state.subtitle ? "" : "none";
+
+  const goals = state.goals;
+  const doneCount = goals.filter(g => g.done).length;
+  const firstOpen = goals.findIndex(g => !g.done);
+
+  $("list").innerHTML = goals.map((g,i) => {
+    const cls = [g.done ? "done" : "", i===firstOpen ? "current" : ""].join(" ");
+    const prog = g.max > 0 ? `<span class="prog">${g.value}/${g.max}</span>` : `<span></span>`;
+    const bar = g.max > 0 ? `<div class="bar"><i style="width:${Math.min(100, g.value/g.max*100)}%"></i></div>` : "";
+    return `<li class="${cls}" data-i="${i}">
+      <span class="box">${g.done ? "✔" : ""}</span>
+      <span class="label"><span class="emo">${esc(g.emoji||"")}</span><span class="txt">${esc(g.text)}</span></span>
+      ${prog}${bar}
+    </li>`;
+  }).join("");
+
+  const pct = goals.length ? Math.round(doneCount/goals.length*100) : 0;
+  $("count").textContent = `${doneCount}/${goals.length}`;
+  $("lvl").textContent = doneCount;
+  $("fill").style.width = pct + "%";
+  $("pct").textContent = pct === 100 ? "Alle Ziele erreicht! 🎉" : `${pct}% erreicht`;
+
+  renderEditor();
+}
+
+function renderEditor(){
+  if(!document.body.classList.contains("edit")) return;
+  if(document.activeElement?.id !== "inTitle") $("inTitle").value = state.title;
+  if(document.activeElement?.id !== "inTitleIcon") $("inTitleIcon").value = state.titleIcon || "";
+  if(document.activeElement?.id !== "inSub") $("inSub").value = state.subtitle || "";
+  $("editList").innerHTML = state.goals.map((g,i) => `
+    <div class="item">
+      <span>${esc(g.emoji||"")} ${esc(g.text)}${g.max ? ` (${g.value}/${g.max})` : ""}</span>
+      <button data-a="up" data-i="${i}" title="Nach oben">▲</button>
+      <button data-a="down" data-i="${i}" title="Nach unten">▼</button>
+      <button data-a="del" data-i="${i}" title="Löschen">✖</button>
+    </div>`).join("");
+}
+
+/* ---------- Erfolg feiern ---------- */
+let toastTimer;
+function celebrate(g){
+  $("tIco").textContent = g.emoji || "🏆";
+  $("tBody").textContent = g.text;
+  $("toast").classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $("toast").classList.remove("show"), 4500);
+
+  const colors = ["#80ff20","#ffd84a","#5fd3ff","#ff6b6b","#ffffff"];
+  const r = $("panel").getBoundingClientRect();
+  for(let k=0;k<26;k++){
+    const p = document.createElement("div");
+    p.className = "px";
+    p.style.left = (r.left + Math.random()*r.width) + "px";
+    p.style.top = (r.top + Math.random()*60) + "px";
+    p.style.background = colors[k % colors.length];
+    p.style.setProperty("--dx", (Math.random()*120-60) + "px");
+    p.style.animationDelay = (Math.random()*.3) + "s";
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1900);
+  }
+  $("panel").classList.remove("pop"); void $("panel").offsetWidth; $("panel").classList.add("pop");
+}
+
+function setDone(g, done){
+  if(g.done === done) return;
+  g.done = done;
+  if(done){ if(g.max) g.value = g.max; celebrate(g); }
+}
+function step(g, d){
+  if(!g.max) return;
+  g.value = Math.max(0, Math.min(g.max, g.value + d));
+  setDone(g, g.value >= g.max);
+}
+
+/* ---------- Bedienung im Overlay ---------- */
+const itemOf = e => { const li = e.target.closest("li"); return li ? state.goals[+li.dataset.i] : null; };
+$("list").addEventListener("click", e => {
+  const g = itemOf(e); if(!g) return;
+  if(g.max && !g.done) step(g, 1); else setDone(g, !g.done);
+  if(!g.done && g.max && g.value >= g.max) g.value = g.max - 1;
+  save(); render();
+});
+$("list").addEventListener("contextmenu", e => {
+  e.preventDefault();
+  const g = itemOf(e); if(!g) return;
+  if(g.max) step(g, -1); else setDone(g, false);
+  save(); render();
+});
+$("list").addEventListener("wheel", e => {
+  const g = itemOf(e); if(!g || !g.max) return;
+  e.preventDefault();
+  step(g, e.deltaY < 0 ? 1 : -1);
+  save(); render();
+}, {passive:false});
+
+/* ---------- Editor ---------- */
+function toggleEdit(on){
+  document.body.classList.toggle("edit", on);
+  renderEditor();
+}
+document.addEventListener("keydown", e => {
+  if(e.target.tagName === "INPUT") { if(e.key === "Enter" && e.target.closest(".row")) $("btnAdd").click(); return; }
+  if(e.key.toLowerCase() === "e") toggleEdit(!document.body.classList.contains("edit"));
+});
+["inTitle","inTitleIcon","inSub"].forEach(id => $(id).addEventListener("input", () => {
+  state.title = $("inTitle").value; state.titleIcon = $("inTitleIcon").value; state.subtitle = $("inSub").value;
+  save(); render();
+}));
+$("btnAdd").addEventListener("click", () => {
+  const text = $("inText").value.trim(); if(!text) return;
+  state.goals.push({ emoji:$("inEmo").value.trim(), text, max:Math.max(0, parseInt($("inMax").value)||0), value:0, done:false });
+  $("inText").value = ""; $("inEmo").value = ""; $("inMax").value = "";
+  save(); render(); $("inText").focus();
+});
+$("btnReset").addEventListener("click", () => {
+  if(!confirm("Alle Ziele auf die Standardliste zurücksetzen?")) return;
+  state = structuredClone(DEFAULT); save(); render();
+});
+$("editList").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  const i = +b.dataset.i, G = state.goals;
+  if(b.dataset.a === "del") G.splice(i,1);
+  if(b.dataset.a === "up" && i>0) [G[i-1],G[i]] = [G[i],G[i-1]];
+  if(b.dataset.a === "down" && i<G.length-1) [G[i+1],G[i]] = [G[i],G[i+1]];
+  save(); render();
+});
+
+if(new URLSearchParams(location.search).has("edit")) document.body.classList.add("edit");
+render();
+</script>
+</body>
+</html>
