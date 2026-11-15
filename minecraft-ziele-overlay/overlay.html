@@ -181,6 +181,12 @@ body.edit .editor{display:block}
 .editor .item{display:flex;gap:4px;align-items:center}
 .editor .item span{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .editor .item button{padding:0 8px;flex:none}
+.editor select{
+  width:100%;font:inherit;font-size:22px;padding:4px 6px;
+  background:#2a2a2a;color:#fff;border:2px solid #000;outline:none;
+}
+.sync{margin-bottom:8px;padding:4px 8px;border:2px solid #000;background:#2a1a1a;color:#ff9b9b}
+.sync.ok{background:#1a2a1a;color:var(--done)}
 .editor .hint{color:var(--muted);font-size:18px;margin-top:8px;line-height:1.2}
 </style>
 </head>
@@ -204,11 +210,14 @@ body.edit .editor{display:block}
 <!-- Bearbeiten-Modus: Taste "E" im OBS-Interagieren-Fenster oder ?edit=1 an die URL -->
 <div class="editor" id="editor">
   <h2>Ziele bearbeiten</h2>
+  <div class="sync" id="sync">Auto-Tracker: nicht verbunden</div>
   <div class="row">
     <div><label>Überschrift</label><input id="inTitle"></div>
     <div style="flex:.4"><label>Icon</label><input id="inTitleIcon"></div>
   </div>
   <label>Untertitel (optional)</label><input id="inSub" placeholder="z.B. Tag 12 · Hardcore">
+  <label>Vorlage (⚡ = hakt sich automatisch ab)</label>
+  <select id="inPreset"></select>
   <label>Neues Ziel</label>
   <div class="row">
     <input id="inEmo" style="flex:.25" placeholder="💎">
@@ -223,6 +232,7 @@ body.edit .editor{display:block}
   <div class="hint">
     Klick auf ein Ziel = abhaken (bei Mengen-Zielen +1).<br>
     Rechtsklick = Fortschritt −1 · Mausrad = Fortschritt ±1.<br>
+    ⚡-Ziele aktualisieren sich selbst, sobald Minecraft speichert.<br>
     Taste <b>E</b> blendet dieses Menü ein/aus.
   </div>
 </div>
@@ -245,18 +255,65 @@ const DEFAULT = {
   titleIcon: "⛏️",
   subtitle: "Survival-Run",
   goals: [
-    { emoji:"🪓", text:"Erste Holzwerkzeuge",      max:0,  value:0, done:false },
-    { emoji:"🏠", text:"Basis bauen",              max:0,  value:0, done:false },
-    { emoji:"⚒️", text:"Eisenrüstung craften",     max:24, value:0, done:false },
-    { emoji:"💎", text:"Diamanten finden",         max:10, value:0, done:false },
-    { emoji:"🔥", text:"Nether betreten",          max:0,  value:0, done:false },
-    { emoji:"🧪", text:"Lohenruten sammeln",       max:7,  value:0, done:false },
-    { emoji:"👁️", text:"Festung finden",           max:0,  value:0, done:false },
-    { emoji:"🐉", text:"Enderdrache besiegen",     max:0,  value:0, done:false },
+    { emoji:"🪓", text:"Holzspitzhacke craften",  max:0,  auto:{stat:"minecraft:crafted",   items:["minecraft:wooden_pickaxe"]} },
+    { emoji:"🏠", text:"Basis bauen",             max:0 },
+    { emoji:"🛡️", text:"Eisenrüstung herstellen", max:0,  auto:{adv:"minecraft:story/obtain_armor"} },
+    { emoji:"💎", text:"Diamanten sammeln",       max:10, auto:{stat:"minecraft:picked_up", items:["minecraft:diamond"]} },
+    { emoji:"🔥", text:"Nether betreten",         max:0,  auto:{adv:"minecraft:story/enter_the_nether"} },
+    { emoji:"🧪", text:"Lohenruten sammeln",      max:7,  auto:{stat:"minecraft:picked_up", items:["minecraft:blaze_rod"]} },
+    { emoji:"👁️", text:"Endfestung finden",       max:0,  auto:{adv:"minecraft:story/follow_ender_eye"} },
+    { emoji:"🐉", text:"Enderdrache besiegen",    max:0,  auto:{adv:"minecraft:end/kill_dragon"} },
   ]
 };
+DEFAULT.goals.forEach(g => { g.value = 0; g.done = false; });
 
-const KEY = "mc-ziele-overlay-v1";
+/* =========================================================
+   VORLAGEN für das Bearbeiten-Menü.
+   adv  = Minecraft-Fortschritt (advancement)
+   stat = Statistik + Items/Mobs, die zusammengezählt werden
+   ========================================================= */
+const ADV = id => ({adv:"minecraft:"+id});
+const ST  = (cat, ...items) => ({stat:"minecraft:"+cat, items:items.map(i => "minecraft:"+i)});
+const LOGS = ["oak_log","spruce_log","birch_log","jungle_log","acacia_log","dark_oak_log","mangrove_log","cherry_log","pale_oak_log"];
+const PRESETS = [
+  ["Fortschritte", [
+    ["🪨","Steinzeit erreichen",          0, ADV("story/mine_stone")],
+    ["⛏️","Steinspitzhacke herstellen",   0, ADV("story/upgrade_tools")],
+    ["🔩","Eisen schmelzen",              0, ADV("story/smelt_iron")],
+    ["⛏️","Eisenspitzhacke herstellen",   0, ADV("story/iron_tools")],
+    ["🛡️","Eisenrüstung herstellen",      0, ADV("story/obtain_armor")],
+    ["💎","Ersten Diamanten finden",      0, ADV("story/mine_diamond")],
+    ["💠","Diamantrüstung anziehen",      0, ADV("story/shiny_gear")],
+    ["🪣","Lavaeimer füllen",             0, ADV("story/lava_bucket")],
+    ["⬛","Obsidian herstellen",          0, ADV("story/form_obsidian")],
+    ["🔥","Nether betreten",              0, ADV("story/enter_the_nether")],
+    ["🏯","Netherfestung finden",         0, ADV("nether/find_fortress")],
+    ["🧪","Erste Lohenrute",              0, ADV("nether/obtain_blaze_rod")],
+    ["🟫","Antiken Schrott finden",       0, ADV("nether/obtain_ancient_debris")],
+    ["👁️","Endfestung finden",            0, ADV("story/follow_ender_eye")],
+    ["🌌","Das Ende betreten",            0, ADV("story/enter_the_end")],
+    ["🐉","Enderdrache besiegen",         0, ADV("end/kill_dragon")],
+    ["🏙️","Endsiedlung finden",           0, ADV("end/find_end_city")],
+    ["🪽","Elytren finden",               0, ADV("end/elytra")],
+    ["💀","Wither beschwören",            0, ADV("nether/summon_wither")],
+    ["🐺","Ein Tier zähmen",              0, ADV("husbandry/tame_an_animal")],
+    ["🛏️","In einem Bett schlafen",       0, ADV("adventure/sleep_in_bed")],
+    ["💰","Mit Dorfbewohner handeln",     0, ADV("adventure/trade")],
+  ]],
+  ["Mengen", [
+    ["🪵","Holz hacken",                 64, ST("mined", ...LOGS)],
+    ["🪨","Roheisen sammeln",            32, ST("picked_up","raw_iron")],
+    ["💎","Diamanten sammeln",           10, ST("picked_up","diamond")],
+    ["🧪","Lohenruten sammeln",           7, ST("picked_up","blaze_rod")],
+    ["🟢","Enderperlen sammeln",         12, ST("picked_up","ender_pearl")],
+    ["🟫","Antiken Schrott abbauen",      4, ST("mined","ancient_debris")],
+    ["🧟","Zombies besiegen",            20, ST("killed","zombie")],
+    ["💥","Creeper besiegen",            10, ST("killed","creeper")],
+    ["⚪","Endermen besiegen",           10, ST("killed","enderman")],
+  ]],
+];
+
+const KEY = "mc-ziele-overlay-v2";
 const $ = id => document.getElementById(id);
 let state = load();
 const chan = ("BroadcastChannel" in window) ? new BroadcastChannel(KEY) : null;
@@ -311,7 +368,7 @@ function renderEditor(){
   if(document.activeElement?.id !== "inSub") $("inSub").value = state.subtitle || "";
   $("editList").innerHTML = state.goals.map((g,i) => `
     <div class="item">
-      <span>${esc(g.emoji||"")} ${esc(g.text)}${g.max ? ` (${g.value}/${g.max})` : ""}</span>
+      <span>${g.auto ? "⚡" : ""}${esc(g.emoji||"")} ${esc(g.text)}${g.max ? ` (${g.value}/${g.max})` : ""}</span>
       <button data-a="up" data-i="${i}" title="Nach oben">▲</button>
       <button data-a="down" data-i="${i}" title="Nach unten">▼</button>
       <button data-a="del" data-i="${i}" title="Löschen">✖</button>
@@ -319,13 +376,20 @@ function renderEditor(){
 }
 
 /* ---------- Erfolg feiern ---------- */
-let toastTimer;
+let toastTimer, toastQueue = [], toastBusy = false;
 function celebrate(g){
+  toastQueue.push({emoji:g.emoji, text:g.text});
+  if(!toastBusy) nextToast();
+}
+function nextToast(){
+  const g = toastQueue.shift();
+  if(!g){ toastBusy = false; return; }
+  toastBusy = true;
   $("tIco").textContent = g.emoji || "🏆";
   $("tBody").textContent = g.text;
   $("toast").classList.add("show");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => $("toast").classList.remove("show"), 4500);
+  toastTimer = setTimeout(() => { $("toast").classList.remove("show"); setTimeout(nextToast, 600); }, 4500);
 
   const colors = ["#80ff20","#ffd84a","#5fd3ff","#ff6b6b","#ffffff"];
   const r = $("panel").getBoundingClientRect();
@@ -390,13 +454,17 @@ document.addEventListener("keydown", e => {
 }));
 $("btnAdd").addEventListener("click", () => {
   const text = $("inText").value.trim(); if(!text) return;
-  state.goals.push({ emoji:$("inEmo").value.trim(), text, max:Math.max(0, parseInt($("inMax").value)||0), value:0, done:false });
+  const goal = { emoji:$("inEmo").value.trim(), text, max:Math.max(0, parseInt($("inMax").value)||0), value:0, done:false };
+  if(pendingAuto) goal.auto = pendingAuto;
+  state.goals.push(goal);
   $("inText").value = ""; $("inEmo").value = ""; $("inMax").value = "";
+  pendingAuto = null; $("inPreset").value = "";
+  lastSync && applySync(lastSync, true);
   save(); render(); $("inText").focus();
 });
 $("btnReset").addEventListener("click", () => {
   if(!confirm("Alle Ziele auf die Standardliste zurücksetzen?")) return;
-  state = structuredClone(DEFAULT); save(); render();
+  state = structuredClone(DEFAULT); firstSync = true; save(); render(); sync();
 });
 $("editList").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b) return;
@@ -406,6 +474,77 @@ $("editList").addEventListener("click", e => {
   if(b.dataset.a === "down" && i<G.length-1) [G[i+1],G[i]] = [G[i],G[i+1]];
   save(); render();
 });
+
+/* ---------- Vorlagen-Auswahl ---------- */
+let pendingAuto = null;
+const flatPresets = [];
+$("inPreset").innerHTML = `<option value="">— eigenes Ziel (manuell abhaken) —</option>` +
+  PRESETS.map(([group, items]) => `<optgroup label="${group}">` + items.map(p => {
+    flatPresets.push(p);
+    return `<option value="${flatPresets.length-1}">⚡ ${p[0]} ${esc(p[1])}${p[2] ? " ("+p[2]+")" : ""}</option>`;
+  }).join("") + `</optgroup>`).join("");
+$("inPreset").addEventListener("change", () => {
+  const p = flatPresets[$("inPreset").value];
+  pendingAuto = p ? p[3] : null;
+  if(p){ $("inEmo").value = p[0]; $("inText").value = p[1]; $("inMax").value = p[2] || ""; }
+});
+
+/* ---------- Auto-Tracker (ziele_server.py) ---------- */
+const SYNC_URL = location.protocol.startsWith("http") ? "state.json" : "http://localhost:8765/state.json";
+let lastSync = null, firstSync = true;
+
+function renderStatus(ok, msg){
+  $("sync").className = "sync" + (ok ? " ok" : "");
+  $("sync").textContent = "Auto-Tracker: " + msg;
+}
+
+function applySync(d, silent){
+  // Neue Welt? Dann automatische Ziele zurücksetzen (manuelle bleiben).
+  if(state.world && state.world !== d.welt){
+    state.goals.forEach(g => { if(g.auto){ g.done = false; g.value = 0; } });
+    silent = true;
+  }
+  state.world = d.welt;
+  const adv = new Set(d.advancements || []);
+  let changed = false;
+  for(const g of state.goals){
+    if(!g.auto) continue;
+    let reached;
+    if(g.auto.adv){
+      reached = adv.has(g.auto.adv);
+    }else{
+      const cat = (d.stats || {})[g.auto.stat] || {};
+      const count = g.auto.items.reduce((sum, id) => sum + (cat[id] || 0), 0);
+      reached = count >= (g.max || 1);
+      if(g.max && !g.done){
+        const v = Math.min(g.max, count);
+        if(v !== g.value){ g.value = v; changed = true; }
+      }
+    }
+    if(reached && !g.done){
+      g.done = true; if(g.max) g.value = g.max;
+      if(!silent) celebrate(g);
+      changed = true;
+    }
+  }
+  if(changed){ save(); render(); }
+}
+
+async function sync(){
+  try{
+    const r = await fetch(SYNC_URL, {cache:"no-store"});
+    const d = await r.json();
+    if(!d.ok){ renderStatus(false, d.fehler); return; }
+    renderStatus(true, "verbunden · Welt „" + d.welt + "“");
+    lastSync = d;
+    applySync(d, firstSync);   // beim ersten Laden nicht alles auf einmal feiern
+    firstSync = false;
+  }catch(e){
+    renderStatus(false, "nicht verbunden (läuft ziele_server.py?)");
+  }
+}
+sync();
+setInterval(sync, 3000);
 
 if(new URLSearchParams(location.search).has("edit")) document.body.classList.add("edit");
 render();
