@@ -6,7 +6,90 @@ Ein Overlay für OBS, das deine Minecraft-Ziele im Stream zeigt. Die Ziele mit �
 
 Funktioniert mit **Minecraft Java Edition** in **Einzelspieler-Welten**.
 
-## Was ist in diesem Ordner?
+Es gibt zwei Wege. Du brauchst nur **einen** davon:
+
+| | **A) Browser-Version** | **B) Python-Version** |
+|---|---|---|
+| Was du brauchst | nur `overlay.html` + Chrome oder Edge | alle Dateien + Python |
+| In OBS als | Fensteraufnahme + Chroma Key | Browserquelle (echt transparent) |
+| Nachteil | Chrome-Fenster muss sichtbar bleiben | Python muss installiert sein |
+
+---
+
+# A) Browser-Version (ohne Python)
+
+Du brauchst **nur die Datei `overlay.html`** und **Google Chrome** oder **Microsoft Edge**.
+Firefox und Opera GX funktionieren nicht, weil sie keine Ordner auslesen können.
+
+## Einmalige Einrichtung
+
+### Schritt 1: Datei speichern
+
+Speichere `overlay.html` an einem festen Ort, zum Beispiel `Dokumente\Stream\overlay.html`.
+
+### Schritt 2: In Chrome öffnen
+
+Rechtsklick auf `overlay.html` → **Öffnen mit** → **Google Chrome** (oder Microsoft Edge).
+
+Du siehst jetzt das Overlay auf einem **pinken Hintergrund**. Das ist Absicht: Den pinken
+Hintergrund schneidet OBS später weg.
+
+### Schritt 3: Minecraft-Ordner freigeben
+
+1. Klicke unter dem Overlay auf den grünen Knopf **📁 Minecraft-Ordner wählen**.
+2. Im Fenster, das sich öffnet, klickst du oben in die **Adresszeile**, tippst Folgendes ein und drückst Enter:
+   ```
+   %appdata%\.minecraft
+   ```
+3. Doppelklicke auf den Ordner **`saves`** und klicke dann auf **„Ordner auswählen“**.
+4. Chrome fragt, ob die Seite Dateien ansehen darf. Klicke auf **„Dateien ansehen“** bzw. **„Zulassen“**.
+   Wenn dir die Option **„Bei jedem Besuch zulassen“** angezeigt wird, wähle diese.
+
+Oben im Menü steht jetzt grün **„Auto-Tracker: verbunden · Welt …“** mit dem Namen deiner zuletzt gespielten Welt. 🎉
+
+> Benutzt du einen anderen Launcher (Prism, CurseForge, Modrinth …)? Dann wähle dessen `saves`-Ordner.
+> Du findest ihn in Minecraft unter **Einzelspieler → Welt auswählen → Bearbeiten → Weltordner öffnen**.
+> Geh von dort einen Ordner zurück, dann bist du in `saves`.
+
+### Schritt 4: Menü ausblenden
+
+Drücke die Taste **E**. Jetzt ist nur noch das Overlay auf Pink zu sehen.
+
+### Schritt 5: Fenster vorbereiten
+
+- Zieh den Tab aus Chrome heraus, sodass er **ein eigenes Fenster** ist.
+- Mach das Fenster etwa so groß, dass das Overlay gut hineinpasst.
+- **Wichtig:** Das Fenster darf **nicht minimiert** und **nicht komplett von anderen Fenstern verdeckt** werden.
+  Sonst „schläft“ Chrome ein und das Overlay friert im Stream ein.
+  Am besten legst du es auf einen **zweiten Bildschirm**. Mit nur einem Bildschirm schiebst du es
+  in eine Ecke, wo ein kleines Stück davon sichtbar bleibt.
+
+### Schritt 6: In OBS einbinden
+
+1. In OBS unter **Quellen** auf **+** klicken und **Fensteraufnahme** wählen. Gib ihr einen Namen, z. B. „Ziele“.
+2. Bei **Fenster** wählst du **`[chrome.exe]: Minecraft Ziele Overlay`** (bzw. `[msedge.exe]`).
+3. Bei **Aufnahmemethode** wählst du **„Windows 10 (1903 und neuer)“**.
+4. **Mauszeiger aufnehmen** ausschalten und auf **OK** klicken.
+5. **Pinken Hintergrund entfernen:** Rechtsklick auf die Quelle → **Filter** → unten bei „Effektfilter“ auf **+** →
+   **Chroma Key**. Bei **Key-Farbtyp** wählst du **Magenta**. Fertig, der Hintergrund ist weg.
+6. **Chrome-Leisten abschneiden:** Halte im Vorschaubild **Alt** gedrückt und zieh am roten Rahmen der Quelle
+   von oben nach unten, bis die Tab- und Adressleiste weg sind. Genauso rechts und unten.
+
+## Bei jedem Stream
+
+1. `overlay.html` in Chrome öffnen (am einfachsten speicherst du sie dir als **Lesezeichen**).
+2. Falls Chrome fragt: auf **▶ Zugriff auf „saves“ erlauben** klicken. Du musst den Ordner **nicht** neu suchen.
+3. Taste **E** drücken (Menü weg) und das Fenster an seinen Platz schieben.
+4. OBS starten und Minecraft spielen.
+
+**Kurz testen:** Verdecke das Chrome-Fenster und schau, ob sich das Overlay in OBS noch bewegt,
+zum Beispiel wenn ein Ziel abgehakt wird. Wenn es einfriert, lass mehr vom Fenster sichtbar.
+
+---
+
+# B) Python-Version
+
+Hier brauchst du alle Dateien aus diesem Ordner:
 
 | Datei | Wofür |
 |---|---|
@@ -14,64 +97,27 @@ Funktioniert mit **Minecraft Java Edition** in **Einzelspieler-Welten**.
 | `ziele_server.py` | Kleines Programm, das deine Minecraft-Welt ausliest |
 | `start.bat` | Startet das Programm per Doppelklick (Windows) |
 
----
-
-## Einmalige Einrichtung
-
-### Schritt 1: Dateien herunterladen
-
-Lade den Ordner `minecraft-ziele-overlay` herunter und speichere ihn an einem festen Ort,
-zum Beispiel unter `Dokumente\Stream\minecraft-ziele-overlay`.
-Die drei Dateien müssen **zusammen in einem Ordner** bleiben.
-
-### Schritt 2: Python installieren (nur einmal nötig)
+### Schritt 1: Python installieren (nur einmal nötig)
 
 1. Gehe auf **https://www.python.org/downloads/** und klicke auf den großen gelben „Download Python“-Knopf.
 2. Starte die heruntergeladene Datei.
 3. **Wichtig:** Setze unten im ersten Fenster den Haken bei **„Add python.exe to PATH“**.
-4. Klicke auf **„Install Now“** und warte, bis es fertig ist.
+4. Klicke auf **„Install Now“**.
 
-### Schritt 3: Testen
+### Schritt 2: Programm starten
 
-1. Starte Minecraft und lade deine Einzelspieler-Welt einmal (danach kannst du sie offen lassen).
-2. Doppelklicke im Ordner auf **`start.bat`**.
-3. Ein schwarzes Fenster öffnet sich. Dort sollte etwa das hier stehen:
+Lade deine Welt einmal in Minecraft und doppelklicke auf **`start.bat`**
+(oder direkt auf `ziele_server.py`). Im schwarzen Fenster steht der Name deiner Welt.
+Das Fenster bleibt während des Streams offen.
 
-   ```
-   Welt:            Meine Welt
-   Fortschritte:    12 erreicht
-   Overlay-URL für OBS:   http://localhost:8765/
-   ```
+### Schritt 3: In OBS einbinden
 
-4. Öffne **http://localhost:8765/** in deinem Browser. Jetzt solltest du das Overlay sehen.
-
-> **Windows-Warnung „Der Computer wurde durch Windows geschützt“?**
-> Klicke auf „Weitere Informationen“ und dann auf „Trotzdem ausführen“. Die Warnung kommt bei
-> jeder unbekannten .bat-Datei.
->
-> **Firewall-Frage?** Das Programm ist nur auf deinem eigenen PC erreichbar. „Abbrechen“ ist in Ordnung.
-
-### Schritt 4: In OBS einbinden
-
-1. In OBS unter **Quellen** auf **+** klicken und **Browser** wählen. Gib der Quelle einen Namen, z. B. „Ziele“.
-2. **„Lokale Datei“ NICHT anhaken.** Trage stattdessen bei **URL** ein:
-   ```
-   http://localhost:8765/
-   ```
-3. Breite **420**, Höhe **700** (die Höhe je nach Anzahl der Ziele anpassen)
-4. **OK** klicken und das Overlay an die gewünschte Stelle ziehen.
+Füge in OBS eine **Browser**-Quelle hinzu. **„Lokale Datei“ NICHT anhaken**, sondern als URL
+`http://localhost:8765/` eintragen. Breite 420, Höhe 700.
 
 ---
 
-## Bei jedem Stream
-
-1. **`start.bat`** doppelklicken und das schwarze Fenster offen lassen (minimieren ist okay).
-2. OBS starten.
-3. Minecraft spielen. Die Ziele haken sich von selbst ab. 🎉
-
-Startest du `start.bat` erst nach OBS, findet das Overlay das Programm trotzdem nach ein paar Sekunden von selbst.
-
-### Wann wird abgehakt?
+## Wann wird abgehakt? (beide Versionen)
 
 Minecraft speichert deine Fortschritte nicht sofort, sondern:
 - automatisch etwa **alle 5 Minuten**
@@ -80,11 +126,17 @@ Minecraft speichert deine Fortschritte nicht sofort, sondern:
 **Tipp:** Hast du gerade etwas geschafft? Drück kurz ESC und dann wieder zurück ins Spiel.
 Spätestens nach 3 Sekunden erscheint das „Ziel erreicht!“-Popup.
 
+Es wird immer die **zuletzt gespielte Welt** ausgelesen. Wechselst du die Welt, werden
+die ⚡-Ziele automatisch zurückgesetzt. Deine selbst abgehakten Ziele bleiben, wie sie sind.
+
 ---
 
 ## Ziele bearbeiten
 
-Rechtsklick auf die Browserquelle in OBS → **Interagieren**. In dem Fenster:
+**Browser-Version:** direkt im Chrome-Fenster.
+**Python-Version:** Rechtsklick auf die Browserquelle in OBS → **Interagieren**.
+
+Dort gilt:
 
 | Aktion | Wirkung |
 |---|---|
@@ -101,15 +153,9 @@ Im Menü:
 - **„— eigenes Ziel —“** legt ein Ziel ohne ⚡ an, das du von Hand abhakst, z. B. „Basis bauen“.
 - Mit ▲ ▼ ✖ sortierst und löschst du Ziele.
 
-⚠️ Blende das Menü mit **E** wieder aus, bevor du das Interagieren-Fenster schließt.
-Sonst sehen es deine Zuschauer im Stream.
+⚠️ Blende das Menü danach mit **E** wieder aus. Sonst sehen es deine Zuschauer im Stream.
 
 Alles wird automatisch gespeichert und bleibt auch nach einem Neustart von OBS erhalten.
-
-### Neue Welt?
-
-Das Programm nimmt immer die **zuletzt gespielte Welt**. Wechselst du die Welt, werden
-die ⚡-Ziele automatisch zurückgesetzt und neu ausgelesen. Deine selbst abgehakten Ziele bleiben, wie sie sind.
 
 ---
 
@@ -117,14 +163,19 @@ die ⚡-Ziele automatisch zurückgesetzt und neu ausgelesen. Deine selbst abgeha
 
 | Problem | Lösung |
 |---|---|
-| Schwarzes Fenster geht sofort wieder zu oder zeigt „python wurde nicht gefunden“ | Python neu installieren und den Haken bei **„Add python.exe to PATH“** setzen (Schritt 2) |
-| „Keine Welt gefunden“ | Lade die Welt einmal in Minecraft. Mit einem anderen Launcher (Prism, MultiMC, CurseForge, Modrinth) siehe unten. |
+| **Browser:** kein grüner Knopf „Minecraft-Ordner wählen“ | Du benutzt nicht Chrome oder Edge. Öffne die Datei mit Chrome oder Edge. |
+| **Browser:** „Diese Seite kann diesen Ordner nicht öffnen, da er Systemdateien enthält“ | Wähle nicht `AppData` oder `Roaming`, sondern den Ordner **`saves`** darin |
+| **Browser:** „in diesem Ordner ist keine Welt“ | Du hast einen falschen Ordner gewählt. Klicke auf „📁 Anderen Ordner wählen“ und nimm `saves`. |
+| **Browser:** Overlay friert im Stream ein | Das Chrome-Fenster ist minimiert oder ganz verdeckt. Lass es sichtbar (siehe Schritt 5). |
+| **Browser:** pinke Ränder um die Schrift | Im Chroma-Key-Filter den Wert **Ähnlichkeit** etwas erhöhen |
+| **Python:** Schwarzes Fenster geht sofort wieder zu oder zeigt „python wurde nicht gefunden“ | Python neu installieren und den Haken bei **„Add python.exe to PATH“** setzen (Schritt 2) |
+| **Python:** „Keine Welt gefunden“ | Lade die Welt einmal in Minecraft. Mit einem anderen Launcher (Prism, MultiMC, CurseForge, Modrinth) siehe unten. |
 | Falsche Welt wird gelesen | Lade die richtige Welt einmal kurz oder trag sie fest ein (siehe unten) |
-| Im Menü steht „nicht verbunden“ | Läuft `start.bat`? Ist bei OBS die URL `http://localhost:8765/` eingetragen? |
-| „Port 8765 ist belegt“ | Das Programm läuft schon in einem anderen Fenster. Schließe eins davon. |
+| **Python:** Im Menü steht „nicht verbunden“ | Läuft `start.bat`? Ist bei OBS die URL `http://localhost:8765/` eingetragen? |
+| **Python:** „Port 8765 ist belegt“ | Das Programm läuft schon in einem anderen Fenster. Schließe eins davon. |
 | Ziel wird nicht abgehakt | Drück in Minecraft kurz ESC (dann speichert das Spiel) und warte 3 Sekunden |
 
-### Welt oder Launcher-Ordner fest einstellen
+### Python: Welt oder Launcher-Ordner fest einstellen
 
 Öffne `ziele_server.py` mit einem Texteditor (Rechtsklick → „Bearbeiten“ oder „Öffnen mit → Editor“).
 Oben stehen zwei Einstellungen:

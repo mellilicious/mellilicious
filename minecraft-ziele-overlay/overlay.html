@@ -187,6 +187,13 @@ body.edit .editor{display:block}
 }
 .sync{margin-bottom:8px;padding:4px 8px;border:2px solid #000;background:#2a1a1a;color:#ff9b9b}
 .sync.ok{background:#1a2a1a;color:var(--done)}
+/* Browser-Modus (Fensteraufnahme + Chroma Key Magenta) */
+html.keyed, html.keyed body{background:#ff00ff;overflow:auto}
+html.keyed .panel{background:#141418;box-shadow:inset 3px 3px 0 var(--border-light), inset -3px -3px 0 #2c2c2c}
+html.keyed .editor{background:#0c0c0e}
+.folder{display:none;margin-bottom:8px}
+.folder.show{display:flex}
+.folder button{flex:1;background:#3d6b2f;box-shadow:inset 2px 2px 0 #5d9b47, inset -2px -2px 0 #24401b}
 .editor .hint{color:var(--muted);font-size:18px;margin-top:8px;line-height:1.2}
 </style>
 </head>
@@ -211,6 +218,7 @@ body.edit .editor{display:block}
 <div class="editor" id="editor">
   <h2>Ziele bearbeiten</h2>
   <div class="sync" id="sync">Auto-Tracker: nicht verbunden</div>
+  <div class="folder row" id="folderRow"><button id="btnFolder">📁 Minecraft-Ordner wählen</button></div>
   <div class="row">
     <div><label>Überschrift</label><input id="inTitle"></div>
     <div style="flex:.4"><label>Icon</label><input id="inTitleIcon"></div>
@@ -489,14 +497,103 @@ $("inPreset").addEventListener("change", () => {
   if(p){ $("inEmo").value = p[0]; $("inText").value = p[1]; $("inMax").value = p[2] || ""; }
 });
 
-/* ---------- Auto-Tracker (ziele_server.py) ---------- */
+/* ---------- Auto-Tracker ----------
+   Weg 1: ziele_server.py läuft (Python)           -> Daten über http://localhost:8765
+   Weg 2: Browser-Version (Chrome/Edge, ohne Python) -> Minecraft-Ordner direkt lesen
+   ------------------------------------------------------------------------------- */
+const IN_OBS = !!window.obsstudio;
+const CAN_PICK = "showDirectoryPicker" in window;
+if(!IN_OBS && location.protocol === "file:") document.documentElement.classList.add("keyed");
+
 const SYNC_URL = location.protocol.startsWith("http") ? "state.json" : "http://localhost:8765/state.json";
-let lastSync = null, firstSync = true;
+let lastSync = null, firstSync = true, autoOpened = false, dirHandle = null, storedHandle = null, connected = false;
 
 function renderStatus(ok, msg){
+  connected = ok;
   $("sync").className = "sync" + (ok ? " ok" : "");
   $("sync").textContent = "Auto-Tracker: " + msg;
+  renderFolderButton();
 }
+
+/* --- Ordner-Zugriff merken (IndexedDB), damit man ihn nicht jedes Mal neu suchen muss --- */
+function idb(mode, fn){
+  return new Promise((res, rej) => {
+    const r = indexedDB.open("mc-ziele", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("h");
+    r.onerror = () => rej(r.error);
+    r.onsuccess = () => {
+      const tx = r.result.transaction("h", mode), q = fn(tx.objectStore("h"));
+      tx.oncomplete = () => res(q && q.result);
+      tx.onerror = () => rej(tx.error);
+    };
+  });
+}
+const saveHandle = h => idb("readwrite", st => st.put(h, "dir")).catch(() => {});
+const loadHandle = () => idb("readonly", st => st.get("dir")).catch(() => null);
+
+async function sub(dir, name){ try{ return await dir.getDirectoryHandle(name); }catch(e){ return null; } }
+async function fileIn(dir, name){ try{ return await (await dir.getFileHandle(name)).getFile(); }catch(e){ return null; } }
+
+// Akzeptiert: .minecraft-Ordner, saves-Ordner oder direkt einen Weltordner
+async function findWorld(root){
+  if(await fileIn(root, "level.dat")) return root;
+  const saves = (await sub(root, "saves")) || root;
+  let best = null, bestT = -1;
+  for await (const [, h] of saves.entries()){
+    if(h.kind !== "directory") continue;
+    const f = await fileIn(h, "level.dat");
+    if(f && f.lastModified > bestT){ best = h; bestT = f.lastModified; }
+  }
+  return best;
+}
+async function newestJson(dir){
+  if(!dir) return {};
+  let best = null;
+  for await (const [name, h] of dir.entries()){
+    if(h.kind !== "file" || !name.endsWith(".json")) continue;
+    const f = await h.getFile();
+    if(!best || f.lastModified > best.lastModified) best = f;
+  }
+  if(!best) return {};
+  try{ return JSON.parse(await best.text()); }catch(e){ return {}; }
+}
+async function readFolder(){
+  const w = await findWorld(dirHandle);
+  if(!w) return {ok:false, fehler:"in diesem Ordner ist keine Welt – wähle den Ordner „saves“"};
+  const adv = await newestJson(await sub(w, "advancements"));
+  const st = await newestJson(await sub(w, "stats"));
+  return {
+    ok:true, welt:w.name,
+    advancements:Object.keys(adv).filter(k => adv[k] && adv[k].done),
+    stats:st.stats || {}
+  };
+}
+
+function renderFolderButton(){
+  const row = $("folderRow");
+  const show = CAN_PICK && !IN_OBS && !(connected && !dirHandle);  // nicht nötig, wenn Python läuft
+  row.classList.toggle("show", show);
+  if(!show) return;
+  $("btnFolder").textContent =
+    dirHandle ? "📁 Anderen Ordner wählen" :
+    storedHandle ? "▶ Zugriff auf „" + storedHandle.name + "“ erlauben" :
+    "📁 Minecraft-Ordner wählen";
+}
+
+$("btnFolder").addEventListener("click", async () => {
+  try{
+    if(storedHandle && !dirHandle){
+      if(await storedHandle.requestPermission({mode:"read"}) === "granted"){ dirHandle = storedHandle; sync(); return; }
+    }
+    const h = await window.showDirectoryPicker({id:"minecraft", mode:"read"});
+    dirHandle = storedHandle = h;
+    await saveHandle(h);
+    firstSync = true;
+    sync();
+  }catch(e){
+    if(e.name !== "AbortError") renderStatus(false, "Ordner konnte nicht geöffnet werden: " + e.message);
+  }
+});
 
 function applySync(d, silent){
   // Neue Welt? Dann automatische Ziele zurücksetzen (manuelle bleiben).
@@ -531,20 +628,38 @@ function applySync(d, silent){
 }
 
 async function sync(){
+  let d = null;
   try{
     const r = await fetch(SYNC_URL, {cache:"no-store"});
-    const d = await r.json();
-    if(!d.ok){ renderStatus(false, d.fehler); return; }
-    renderStatus(true, "verbunden · Welt „" + d.welt + "“");
-    lastSync = d;
-    applySync(d, firstSync);   // beim ersten Laden nicht alles auf einmal feiern
-    firstSync = false;
-  }catch(e){
-    renderStatus(false, "nicht verbunden (läuft ziele_server.py?)");
+    d = await r.json();
+  }catch(e){}
+  if(!d && dirHandle){
+    try{ d = await readFolder(); }
+    catch(e){ d = {ok:false, fehler:"Ordner nicht lesbar – bitte neu wählen"}; dirHandle = null; }
   }
+  if(!d){
+    renderStatus(false, CAN_PICK && !IN_OBS
+      ? (storedHandle ? "bitte unten Zugriff erlauben" : "bitte unten den Minecraft-Ordner wählen")
+      : "nicht verbunden (läuft ziele_server.py?)");
+    if(!IN_OBS && CAN_PICK && !autoOpened){ autoOpened = true; toggleEdit(true); }
+    return;
+  }
+  if(!d.ok){ renderStatus(false, d.fehler); return; }
+  renderStatus(true, "verbunden · Welt „" + d.welt + "“");
+  lastSync = d;
+  applySync(d, firstSync);   // beim ersten Laden nicht alles auf einmal feiern
+  firstSync = false;
 }
-sync();
-setInterval(sync, 3000);
+
+(async () => {
+  if(CAN_PICK && !IN_OBS){
+    storedHandle = await loadHandle();
+    if(storedHandle && await storedHandle.queryPermission({mode:"read"}) === "granted") dirHandle = storedHandle;
+  }
+  sync();
+  setInterval(sync, 3000);
+})();
+
 
 if(new URLSearchParams(location.search).has("edit")) document.body.classList.add("edit");
 render();
