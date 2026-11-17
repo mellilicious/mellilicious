@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Java-Foto-Löser</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --text: #1d2330; --muted: #667085; --border: #dde1e7;
+    --accent: #e76f00; --accent-text: #fff; --code-bg: #f0f2f5; --ok: #1a7f37; --err: #c62828;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161b; --card: #1d2027; --text: #e6e8ec; --muted: #9aa3b2; --border: #2e333d;
+      --accent: #ff8a1f; --accent-text: #111; --code-bg: #262a33; --ok: #4ac26b; --err: #ff6b6b;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .card h2 { font-size: 15px; margin: 0 0 10px; display: flex; align-items: center; gap: 8px; }
+  #drop { border: 2px dashed var(--border); border-radius: 10px; padding: 28px 16px; text-align: center;
+          cursor: pointer; color: var(--muted); transition: border-color .15s; }
+  #drop.over { border-color: var(--accent); }
+  #drop img { max-width: 100%; max-height: 360px; border-radius: 6px; display: block; margin: 0 auto; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; margin-top: 12px; }
+  label { font-size: 13px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; flex: 1 1 200px; }
+  input, select, textarea { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border);
+          border-radius: 8px; padding: 8px 10px; width: 100%; }
+  textarea { min-height: 140px; font-family: ui-monospace, Consolas, monospace; font-size: 13px; resize: vertical; }
+  button { font: inherit; font-weight: 600; border: 0; border-radius: 8px; padding: 10px 16px; cursor: pointer;
+           background: var(--accent); color: var(--accent-text); }
+  button.secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  button:disabled { opacity: .5; cursor: default; }
+  .status { font-size: 13px; color: var(--muted); }
+  .status .bad { color: var(--err); font-weight: 600; }
+  .stage { font-size: 13px; color: var(--accent); font-weight: 600; min-height: 20px; }
+  #answer { overflow-wrap: anywhere; }
+  #answer p { margin: 0 0 10px; white-space: pre-wrap; }
+  .codewrap { position: relative; margin: 0 0 12px; }
+  .codewrap pre { background: var(--code-bg); border-radius: 8px; padding: 12px; overflow-x: auto; margin: 0;
+                  font: 13px/1.45 ui-monospace, Consolas, monospace; }
+  .codewrap button { position: absolute; top: 6px; right: 6px; padding: 4px 10px; font-size: 12px; }
+  .badge { font-size: 12px; padding: 2px 8px; border-radius: 99px; border: 1px solid currentColor; }
+  .ok { color: var(--ok); } .err { color: var(--err); }
+  pre.out { background: var(--code-bg); border-radius: 8px; padding: 10px; white-space: pre-wrap;
+            font: 13px/1.45 ui-monospace, Consolas, monospace; margin: 8px 0 0; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>☕ Java-Foto-Löser</h1>
+  <p class="sub">Foto einer Java-Aufgabe einfügen (Strg+V), hineinziehen oder auswählen. Alles läuft lokal.</p>
+  <p class="status" id="status">Prüfe Ollama …</p>
+
+  <section class="card">
+    <div id="drop" tabindex="0">
+      <div id="dropText">📷 Foto hier ablegen, mit <b>Strg+V</b> einfügen oder <u>klicken</u> zum Auswählen</div>
+      <img id="preview" class="hidden" alt="Vorschau">
+    </div>
+    <input type="file" id="file" accept="image/*" class="hidden">
+    <div class="row">
+      <label>Zusätzlicher Hinweis (optional)
+        <input id="note" placeholder="z. B. „nur Teilaufgabe b“ oder „ohne ArrayList, nur Arrays“">
+      </label>
+    </div>
+    <div class="row">
+      <label>Modell zum Lesen (Vision)<select id="vision"></select></label>
+      <label>Modell zum Lösen (Code)<select id="coder"></select></label>
+      <button id="go" disabled>Aufgabe lösen</button>
+    </div>
+  </section>
+
+  <section class="card hidden" id="taskCard">
+    <h2>📄 Erkannte Aufgabe <span class="status">– kannst du korrigieren und neu lösen lassen</span></h2>
+    <textarea id="task"></textarea>
+    <div class="row"><button class="secondary" id="resolve">Mit diesem Text neu lösen</button></div>
+  </section>
+
+  <section class="card hidden" id="answerCard">
+    <h2>✅ Lösung <span id="compileBadge"></span></h2>
+    <div class="stage" id="stage"></div>
+    <div id="answer"></div>
+    <div id="compileOut" class="hidden"><b>Compiler:</b><pre class="out" id="compileText"></pre></div>
+    <div id="runOut" class="hidden"><b>Ausgabe beim Ausführen von main():</b><pre class="out" id="runText"></pre></div>
+  </section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+let imageData = null;
+
+// ---------- Status / Modelle
+async function loadStatus() {
+  try {
+    const s = await (await fetch('/api/status')).json();
+    const parts = [];
+    parts.push(s.ollama ? 'Ollama ✔' : '<span class="bad">Ollama nicht erreichbar – bitte starten</span>');
+    parts.push(s.jdk ? 'JDK ✔ (Lösung wird kompiliert & getestet)' : 'kein JDK (Lösung wird nicht kompiliert)');
+    if (s.ollama && !s.models.length) parts.push('<span class="bad">keine Modelle installiert – siehe README</span>');
+    $('status').innerHTML = parts.join(' · ');
+    fillSelect($('vision'), s.models, s.vision_model);
+    fillSelect($('coder'), s.models, s.code_model);
+  } catch { $('status').innerHTML = '<span class="bad">Server nicht erreichbar</span>'; }
+}
+function fillSelect(sel, models, preferred) {
+  const list = models.includes(preferred) ? models : [preferred, ...models];
+  sel.innerHTML = list.map(m => `<option${m === preferred ? ' selected' : ''}>${m}${models.includes(m) ? '' : ' (nicht installiert)'}</option>`).join('');
+  [...sel.options].forEach(o => o.value = o.textContent.replace(' (nicht installiert)', ''));
+}
+
+// ---------- Bild einlesen (verkleinert auf max. 1600px)
+function loadImage(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const img = new Image();
+  img.onload = () => {
+    const scale = Math.min(1, 1600 / Math.max(img.width, img.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    imageData = c.toDataURL('image/jpeg', 0.9);
+    $('preview').src = imageData; $('preview').classList.remove('hidden');
+    $('dropText').classList.add('hidden');
+    $('go').disabled = false;
+    URL.revokeObjectURL(img.src);
+  };
+  img.src = URL.createObjectURL(file);
+}
+$('drop').onclick = () => $('file').click();
+$('file').onchange = e => loadImage(e.target.files[0]);
+$('drop').ondragover = e => { e.preventDefault(); $('drop').classList.add('over'); };
+$('drop').ondragleave = () => $('drop').classList.remove('over');
+$('drop').ondrop = e => { e.preventDefault(); $('drop').classList.remove('over'); loadImage(e.dataTransfer.files[0]); };
+document.addEventListener('paste', e => {
+  const item = [...e.clipboardData.items].find(i => i.type.startsWith('image/'));
+  if (item) { e.preventDefault(); loadImage(item.getAsFile()); }
+});
+
+// ---------- Mini-Markdown: Codeblöcke + Text
+function esc(s) { return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function render(md) {
+  let html = '', re = /```[^\n]*\n?([\s\S]*?)(```|$)/g, last = 0, m;
+  while ((m = re.exec(md))) {
+    if (m.index > last) html += textBlock(md.slice(last, m.index));
+    html += `<div class="codewrap"><button class="secondary" onclick="copyCode(this)">Kopieren</button><pre><code>${esc(m[1])}</code></pre></div>`;
+    last = re.lastIndex;
+    if (!m[2]) break;
+  }
+  if (last < md.length) html += textBlock(md.slice(last));
+  return html;
+}
+function textBlock(t) {
+  t = esc(t.trim()); if (!t) return '';
+  t = t.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`([^`\n]+)`/g, '<code>$1</code>').replace(/^#{1,6}\s*(.*)$/gm, '<b>$1</b>');
+  return `<p>${t}</p>`;
+}
+function copyCode(btn) {
+  navigator.clipboard.writeText(btn.nextElementSibling.innerText);
+  btn.textContent = 'Kopiert ✔'; setTimeout(() => btn.textContent = 'Kopieren', 1500);
+}
+
+// ---------- Lösen (gestreamt)
+async function run(body) {
+  $('go').disabled = $('resolve').disabled = true;
+  $('answerCard').classList.remove('hidden');
+  ['compileOut', 'runOut'].forEach(id => $(id).classList.add('hidden'));
+  $('answer').innerHTML = ''; $('compileBadge').innerHTML = '';
+  let answer = '', task = '';
+  if (!body.task) { $('taskCard').classList.remove('hidden'); $('task').value = ''; }
+
+  body.note = $('note').value; body.vision_model = $('vision').value; body.code_model = $('coder').value;
+  try {
+    const res = await fetch('/api/solve', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+    const reader = res.body.getReader(), dec = new TextDecoder();
+    let buf = '';
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let nl;
+      while ((nl = buf.indexOf('\n')) >= 0) {
+        const line = buf.slice(0, nl); buf = buf.slice(nl + 1);
+        if (!line.trim()) continue;
+        const ev = JSON.parse(line);
+        if (ev.type === 'stage') { $('stage').textContent = ev.label; if (ev.reset) answer = ''; }
+        else if (ev.type === 'token' && ev.stage === 'extract') { task += ev.text; $('task').value = task; }
+        else if (ev.type === 'token') { answer += ev.text; $('answer').innerHTML = render(answer); }
+        else if (ev.type === 'compile') {
+          $('compileBadge').innerHTML = ev.ok === true ? '<span class="badge ok">kompiliert ✔</span>'
+            : ev.ok === false ? '<span class="badge err">Compilerfehler</span>' : '';
+          $('compileText').textContent = ev.output; $('compileOut').classList.remove('hidden');
+        }
+        else if (ev.type === 'run') { $('runText').textContent = ev.output; $('runOut').classList.remove('hidden'); }
+        else if (ev.type === 'error') { $('stage').innerHTML = `<span class="err">Fehler: ${esc(ev.message)}</span>`; }
+        else if (ev.type === 'done') { $('stage').textContent = ''; }
+      }
+    }
+  } catch (e) {
+    $('stage').innerHTML = `<span class="err">Verbindung abgebrochen: ${esc(String(e))}</span>`;
+  }
+  $('go').disabled = !imageData; $('resolve').disabled = false;
+}
+$('go').onclick = () => run({ image: imageData });
+$('resolve').onclick = () => { if ($('task').value.trim()) run({ task: $('task').value }); };
+
+loadStatus();
+</script>
+</body>
+</html>
