@@ -503,14 +503,12 @@ $("inPreset").addEventListener("change", () => {
 });
 
 /* ---------- Auto-Tracker ----------
-   Weg 1: ziele_server.py läuft (Python)           -> Daten über http://localhost:8765
-   Weg 2: Browser-Version (Chrome/Edge, ohne Python) -> Minecraft-Ordner direkt lesen
+   Liest den Minecraft-Ordner direkt im Browser (nur Chrome/Edge).
    ------------------------------------------------------------------------------- */
 const IN_OBS = !!window.obsstudio;
 const CAN_PICK = "showDirectoryPicker" in window;
 if(!IN_OBS && location.protocol === "file:") document.documentElement.classList.add("keyed");
 
-const SYNC_URL = location.protocol.startsWith("http") ? "state.json" : "http://localhost:8765/state.json";
 let lastSync = null, firstSync = true, autoOpened = false, dirHandle = null, storedHandle = null, connected = false;
 
 function renderStatus(ok, msg){
@@ -576,7 +574,7 @@ async function readFolder(){
 
 function renderFolderButton(){
   const row = $("folderRow");
-  const show = CAN_PICK && !IN_OBS && !(connected && !dirHandle);  // nicht nötig, wenn Python läuft
+  const show = CAN_PICK && !IN_OBS;
   row.classList.toggle("show", show);
   if(!show) return;
   $("btnFolder").textContent =
@@ -634,18 +632,14 @@ function applySync(d, silent){
 
 async function sync(){
   let d = null;
-  try{
-    const r = await fetch(SYNC_URL, {cache:"no-store"});
-    d = await r.json();
-  }catch(e){}
-  if(!d && dirHandle){
+  if(dirHandle){
     try{ d = await readFolder(); }
     catch(e){ d = {ok:false, fehler:"Ordner nicht lesbar – bitte neu wählen"}; dirHandle = null; }
   }
   if(!d){
     renderStatus(false, CAN_PICK && !IN_OBS
       ? (storedHandle ? "bitte unten Zugriff erlauben" : "bitte unten den Minecraft-Ordner wählen")
-      : "nicht verbunden (läuft ziele_server.py?)");
+      : "nicht verbunden – öffne overlay.html in Chrome oder Edge");
     if(!IN_OBS && CAN_PICK && !autoOpened){ autoOpened = true; toggleEdit(true); }
     return;
   }

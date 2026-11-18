@@ -6,17 +6,7 @@ Ein Overlay für OBS, das deine Minecraft-Ziele im Stream zeigt. Die Ziele mit �
 
 Funktioniert mit **Minecraft Java Edition** in **Einzelspieler-Welten**.
 
-Es gibt zwei Wege. Du brauchst nur **einen** davon:
-
-| | **A) Browser-Version** | **B) Python-Version** |
-|---|---|---|
-| Was du brauchst | nur `overlay.html` + Chrome oder Edge | alle Dateien + Python |
-| In OBS als | Fensteraufnahme + Chroma Key | Browserquelle (echt transparent) |
-| Nachteil | Chrome-Fenster muss sichtbar bleiben | Python muss installiert sein |
-
----
-
-# A) Browser-Version (ohne Python)
+## Was du brauchst
 
 Du brauchst **nur die Datei `overlay.html`** und **Google Chrome** oder **Microsoft Edge**.
 Firefox und Opera GX funktionieren nicht, weil sie keine Ordner auslesen können.
@@ -115,37 +105,7 @@ zum Beispiel wenn ein Ziel abgehakt wird. Wenn es einfriert, lass mehr vom Fenst
 
 ---
 
-# B) Python-Version
-
-Hier brauchst du alle Dateien aus diesem Ordner:
-
-| Datei | Wofür |
-|---|---|
-| `overlay.html` | Das Overlay selbst |
-| `ziele_server.py` | Kleines Programm, das deine Minecraft-Welt ausliest |
-| `start.bat` | Startet das Programm per Doppelklick (Windows) |
-
-### Schritt 1: Python installieren (nur einmal nötig)
-
-1. Gehe auf **https://www.python.org/downloads/** und klicke auf den großen gelben „Download Python“-Knopf.
-2. Starte die heruntergeladene Datei.
-3. **Wichtig:** Setze unten im ersten Fenster den Haken bei **„Add python.exe to PATH“**.
-4. Klicke auf **„Install Now“**.
-
-### Schritt 2: Programm starten
-
-Lade deine Welt einmal in Minecraft und doppelklicke auf **`start.bat`**
-(oder direkt auf `ziele_server.py`). Im schwarzen Fenster steht der Name deiner Welt.
-Das Fenster bleibt während des Streams offen.
-
-### Schritt 3: In OBS einbinden
-
-Füge in OBS eine **Browser**-Quelle hinzu. **„Lokale Datei“ NICHT anhaken**, sondern als URL
-`http://localhost:8765/` eintragen. Breite 420, Höhe 700.
-
----
-
-## Wann wird abgehakt? (beide Versionen)
+## Wann wird abgehakt?
 
 Minecraft speichert deine Fortschritte nicht sofort, sondern:
 - automatisch etwa **alle 5 Minuten**
@@ -161,10 +121,7 @@ die ⚡-Ziele automatisch zurückgesetzt. Deine selbst abgehakten Ziele bleiben,
 
 ## Ziele bearbeiten
 
-**Browser-Version:** direkt im Chrome-Fenster.
-**Python-Version:** Rechtsklick auf die Browserquelle in OBS → **Interagieren**.
-
-Dort gilt:
+Direkt im Chrome-Fenster:
 
 | Aktion | Wirkung |
 |---|---|
@@ -183,7 +140,7 @@ Im Menü:
 
 ⚠️ Blende das Menü danach mit **E** wieder aus. Sonst sehen es deine Zuschauer im Stream.
 
-Alles wird automatisch gespeichert und bleibt auch nach einem Neustart von OBS erhalten.
+Alles wird automatisch im Browser gespeichert und bleibt auch nach einem Neustart erhalten.
 
 ---
 
@@ -191,35 +148,14 @@ Alles wird automatisch gespeichert und bleibt auch nach einem Neustart von OBS e
 
 | Problem | Lösung |
 |---|---|
-| **Browser:** kein grüner Knopf „Minecraft-Ordner wählen“ | Du benutzt nicht Chrome oder Edge. Öffne die Datei mit Chrome oder Edge. |
-| **Browser:** „Diese Seite kann diesen Ordner nicht öffnen, da er Systemdateien enthält“ | Der Ordner liegt in `AppData`. Das sperrt Chrome. Zieh den Minecraft-Ordner um (Schritt 3). |
-| **Browser:** „in diesem Ordner ist keine Welt“ | Du hast einen falschen Ordner gewählt, oder die Welt wurde noch nicht kopiert (Schritt 3c). Klicke auf „📁 Anderen Ordner wählen“ und nimm `C:\Minecraft\saves`. |
-| **Browser:** Ziele haken sich nicht mehr ab | Spielst du über die umgestellte Installation (Schritt 3b)? Sonst speichert Minecraft wieder im alten Ordner. |
-| **Browser:** Overlay friert im Stream ein | Das Chrome-Fenster ist minimiert oder ganz verdeckt. Lass es sichtbar (siehe Schritt 5). |
-| **Browser:** pinke Ränder um die Schrift | Im Chroma-Key-Filter den Wert **Ähnlichkeit** etwas erhöhen |
-| **Python:** Schwarzes Fenster geht sofort wieder zu oder zeigt „python wurde nicht gefunden“ | Python neu installieren und den Haken bei **„Add python.exe to PATH“** setzen (Schritt 2) |
-| **Python:** „Keine Welt gefunden“ | Lade die Welt einmal in Minecraft. Mit einem anderen Launcher (Prism, MultiMC, CurseForge, Modrinth) siehe unten. |
-| Falsche Welt wird gelesen | Lade die richtige Welt einmal kurz oder trag sie fest ein (siehe unten) |
-| **Python:** Im Menü steht „nicht verbunden“ | Läuft `start.bat`? Ist bei OBS die URL `http://localhost:8765/` eingetragen? |
-| **Python:** „Port 8765 ist belegt“ | Das Programm läuft schon in einem anderen Fenster. Schließe eins davon. |
+| kein grüner Knopf „Minecraft-Ordner wählen“ | Du benutzt nicht Chrome oder Edge. Öffne die Datei mit Chrome oder Edge. |
+| „Diese Seite kann diesen Ordner nicht öffnen, da er Systemdateien enthält“ | Der Ordner liegt in `AppData`. Das sperrt Chrome. Zieh den Minecraft-Ordner um (Schritt 3). |
+| „in diesem Ordner ist keine Welt“ | Du hast einen falschen Ordner gewählt, oder die Welt wurde noch nicht kopiert (Schritt 3c). Klicke auf „📁 Anderen Ordner wählen“ und nimm `C:\Minecraft\saves`. |
+| Ziele haken sich nicht mehr ab | Spielst du über die umgestellte Installation (Schritt 3b)? Sonst speichert Minecraft wieder im alten Ordner. |
+| Overlay friert im Stream ein | Das Chrome-Fenster ist minimiert oder ganz verdeckt. Lass es sichtbar (siehe Schritt 5). |
+| pinke Ränder um die Schrift | Im Chroma-Key-Filter den Wert **Ähnlichkeit** etwas erhöhen |
+| Falsche Welt wird gelesen | Es wird immer die zuletzt gespielte Welt gelesen. Lade die richtige Welt einmal kurz. |
 | Ziel wird nicht abgehakt | Drück in Minecraft kurz ESC (dann speichert das Spiel) und warte 3 Sekunden |
-
-### Python: Welt oder Launcher-Ordner fest einstellen
-
-Öffne `ziele_server.py` mit einem Texteditor (Rechtsklick → „Bearbeiten“ oder „Öffnen mit → Editor“).
-Oben stehen zwei Einstellungen:
-
-```python
-WELT = r"C:\Users\DeinName\AppData\Roaming\.minecraft\saves\Meine Welt"
-
-MINECRAFT_ORDNER = r"C:\Users\DeinName\AppData\Roaming\PrismLauncher\instances\1.21\.minecraft"
-```
-
-- **WELT:** genau diese eine Welt verwenden
-- **MINECRAFT_ORDNER:** bei anderen Launchern. Das ist der Ordner, in dem `saves` liegt.
-
-Den Ordner findest du in Minecraft unter **Einzelspieler → Welt auswählen → Bearbeiten → Weltordner öffnen**.
-Speichern und `start.bat` neu starten.
 
 ---
 
